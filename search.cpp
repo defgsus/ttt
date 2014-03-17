@@ -27,5 +27,9 @@ Search::Search()
 
 Move Search::bestMove(const Board& b)
 {
+    Moves m;
+    b.getMoves(m);
+    if (m.empty()) return InvalidMove;
 
+    return m[rand() % m.size()];
 }

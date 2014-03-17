@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "board.h"
+#include "search.h"
 
 int main(int , char **)
 {
@@ -28,6 +29,7 @@ int main(int , char **)
               << std::endl;
 
     Board b;
+    Search ai;
 
     b.init();
 
@@ -37,7 +39,24 @@ int main(int , char **)
 
         b.printBoard();
 
-        std::cout << "              score X=" << b.eval(X) << " O=" << b.eval(O) << std::endl;
+        int evalx = b.eval(X),
+            evalo = b.eval(O);
+
+        std::cout << "              score X=" << evalx << " O=" << evalo << std::endl;
+
+        if (evalx >= 1000)
+        {
+            std::cout << "You win!\n" << std::endl;
+            b.init();
+            goto reprint_;
+        }
+
+        if (evalo >= 1000)
+        {
+            std::cout << "I win, i'm a machine!\n" << std::endl;
+            b.init();
+            goto reprint_;
+        }
 
     again_:
         std::cout << ">";
@@ -61,6 +80,21 @@ int main(int , char **)
         }
 
         b.makeMove(m);
+
+        b.flipStm();
+
+        m = ai.bestMove(b);
+
+        if (m == InvalidMove)
+        {
+            std::cout << "I'm lost, you win!\n" << std::endl;
+            b.init();
+        }
+        else
+        {
+            b.makeMove(m);
+            b.flipStm();
+        }
     }
 
     haveit_:
