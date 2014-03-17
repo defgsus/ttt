@@ -25,35 +25,37 @@ int main(int , char **)
 {
     std::cout << "Hello, you play X\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
-              << "I also understand 'quit' and 'start'\n"
+              << "I also understand 'quit', 'start', 'print', guess', 'tree' and 'btree'\n"
               << std::endl;
 
-    Board b;
+    Board b(4,4);
     Search ai;
 
     b.init();
+    //std::cout << b.eval(X) << "\n"; return 0;
 
     while (true)
     {
     reprint_:
 
+        std::cout << std::endl;
         b.printBoard();
 
         int evalx = b.eval(X),
-            evalo = b.eval(O);
-
-        std::cout << "              score X=" << evalx << " O=" << evalo << std::endl;
-
-        if (evalx >= 1000)
+            evalo = b.eval(O),
+            eval = b.eval();
+        std::cout << "              eval " << eval << " (X=" << evalx << " Y=" << evalo << ")" << std::endl;
+        std::cout << "              pieces: " << b.pieces() << std::endl;
+        if (evalx >= MaxScore)
         {
-            std::cout << "You win!\n" << std::endl;
+            std::cout << "\nYou win!\n" << std::endl;
             b.init();
             goto reprint_;
         }
 
-        if (evalo >= 1000)
+        if (evalo >= MaxScore)
         {
-            std::cout << "I win, i'm a machine!\n" << std::endl;
+            std::cout << "\nI win, i'm a machine!\n" << std::endl;
             b.init();
             goto reprint_;
         }
@@ -62,8 +64,8 @@ int main(int , char **)
         std::cout << ">";
         std::string str;
         std::cin >> str;
-        std::cout << std::endl;
 
+        // check command
         if (str == "q" || str == "quit")
             goto haveit_;
         else if (str == "start")
@@ -71,7 +73,30 @@ int main(int , char **)
             b.init();
             goto reprint_;
         }
+        else if (str == "print")
+            goto reprint_;
+        else if (str.find("tree") == 0)
+        {
+            int level = -1;
+            if (str.size() >= 5)
+                level = str[4] - '0';
+            ai.printTree(false, level);
+            goto again_;
+        }
+        else if (str == "btree")
+        {
+            ai.printTree(true);
+            goto again_;
+        }
+        else if (str == "guess")
+        {
+            int score;
+            Move m = ai.bestMove(b, &score);
+            std::cout << "best move: " << b.toString(m) << " (" << score << ")" << std::endl;
+            goto again_;
+        }
 
+        // parse move
         Move m = b.parseMove(str);
         if (m == InvalidMove)
         {
@@ -79,22 +104,46 @@ int main(int , char **)
             goto again_;
         }
 
+        // apply user move
         b.makeMove(m);
-
         b.flipStm();
 
-        m = ai.bestMove(b);
+        // check for win
+        if (b.eval(X) >= MaxScore)
+        {
+            std::cout << "\nYou win!" << std::endl;
+            b.init();
+            goto reprint_;
+        }
 
+        // run ai
+        int score;
+        m = ai.bestMove(b, &score);
+
+        // ai is clueless ???
         if (m == InvalidMove)
         {
-            std::cout << "I'm lost, you win!\n" << std::endl;
+            std::cout << "I'm lost, you win!" << std::endl;
             b.init();
         }
         else
         {
+            std::cout << "\nai score: " << score << std::endl;
+            // apply ai move
             b.makeMove(m);
             b.flipStm();
         }
+
+        // check for draw
+        if (b.fin())
+        {
+            std::cout << std::endl;
+            b.printBoard();
+            std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
+            b.init();
+            goto reprint_;
+        }
+
     }
 
     haveit_:

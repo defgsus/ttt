@@ -29,8 +29,45 @@ public:
     Search();
 
     /** Returns best move for current board and stm */
-    Move bestMove(const Board& b);
+    Move bestMove(const Board& b, int * score = 0);
 
+    void printTree(bool bestOnly = false, int maxlevel = -1, std::ostream& out = std::cout);
+
+protected:
+
+    static const int max_depth_ = 4;
+
+    struct Node
+    {
+        int depth;
+        bool ismax;
+        // score/utility
+        int x;
+        // Node's board position
+        Board board;
+        // all possible moves
+        Moves moves;
+        // move that led to this node
+        Move move;
+        // child nodes
+        std::vector<Node> childs;
+        // best index into childs/moves
+        unsigned int best;
+        // terminal node?
+        bool term;
+
+        Node()
+            : depth(0),ismax(false),move(InvalidMove),best(-1),term(false)
+        { }
+    };
+
+    /** Evaluates a Node.
+        Only needs depth and board to be set. */
+    void minimax(Node& n);
+
+    void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
+
+    Node root_;
 };
 
 #endif // SEARCH_H

@@ -30,6 +30,7 @@ typedef unsigned int Move;
 typedef std::vector<Move> Moves;
 
 const Move InvalidMove = -1;
+const int MaxScore = 1000;
 
 enum PieceType
 {
@@ -39,7 +40,7 @@ enum PieceType
 class Board
 {
 public:
-    Board(unsigned int size = 3);
+    Board(unsigned int size = 3, unsigned int consecutives = 3);
 
     /** Clears board and sets stm to X */
     void init();
@@ -53,6 +54,12 @@ public:
     /** Changes side to move, returns new value. */
     Piece flipStm();
 
+    /** return if game finished in draw. */
+    bool fin() const { return pieces_ >= size_ * size_; }
+
+    /** Returns number of pieces on board. */
+    unsigned int pieces() const { return pieces_; }
+
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */
     Move parseMove(const std::string& str) const;
@@ -64,17 +71,24 @@ public:
         m will be cleared before. */
     void getMoves(Moves& m) const;
 
+    /** Returns board value */
+    int eval();
+
     /** Returns the utility for X or O */
     int eval(PieceType p) const;
+
+    /** Returns the alphanum rep */
+    std::string toString(Move m) const;
 
     /** print the board as ascii */
     void printBoard(std::ostream& out = std::cout) const;
 
 protected:
-    unsigned int size_;
+    unsigned int size_, cons_;
     std::vector<Piece> board_;
 
     Piece stm_;
+    unsigned int pieces_;
 };
 
 #endif // BOARD_H

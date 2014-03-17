@@ -20,10 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "board.h"
 
+#include <cassert>
 #include <iomanip>
 
-Board::Board(unsigned int size)
+Board::Board(unsigned int size, unsigned int cons)
     :   size_   (size),
+        cons_   (cons),
         board_  (size*size)
 {
     init();
@@ -33,7 +35,9 @@ void Board::init()
 {
     for (auto &i : board_)
         i = Empty;
+
     stm_ = X;
+    pieces_ = 0;
 }
 
 void Board::init(const std::string& str)
@@ -44,8 +48,8 @@ void Board::init(const std::string& str)
         Piece p = Empty;
         switch (str[i])
         {
-        case 'x': case 'X': p = X; break;
-        case 'o': case 'O': p = O; break;
+            case 'x': case 'X': p = X; pieces_++; break;
+            case 'o': case 'O': p = O; pieces_++; break;
         }
         board_[i] = p;
     }
@@ -94,7 +98,11 @@ Move Board::parseMove(const std::string& str) const
 
 void Board::makeMove(Move m)
 {
+    assert(m < size_*size_ && board_[m] == Empty &&
+           "invalid move in Board::makeMove");
+
     board_[m] = stm_;
+    pieces_++;
 }
 
 void Board::getMoves(Moves &m) const
@@ -103,6 +111,19 @@ void Board::getMoves(Moves &m) const
     for (size_t i = 0; i<board_.size(); ++i)
         if (board_[i] == Empty)
             m.push_back(i);
+}
+
+std::string Board::toString(Move m) const
+{
+    if (m == InvalidMove)
+        return "invalid";
+    else
+    {
+        std::string s;
+        s += (char)((m%size_) + 'a');
+        s += (char)((m/size_) + '1');
+        return s;
+    }
 }
 
 void Board::printBoard(std::ostream& out) const
@@ -130,9 +151,42 @@ void Board::printBoard(std::ostream& out) const
     }
 }
 
+int Board::eval()
+{
+    int x = eval(X), o = eval(O);
+    int v = eval(X) - eval(O);
+
+    if (x>=MaxScore)
+        v = x;
+    else if (o>=MaxScore)
+        v = o;
+
+    return (stm_ == X)? v : -v;
+    /*
+    if (stm_ == X)
+    {
+        if (x>=MaxScore)
+            return x;
+        else if (o>=MaxScore)
+            return -o;
+        else
+            return eval(X) - eval(O);
+    }
+    else
+    {
+        if (o>=MaxScore)
+            return o;
+        else if (x>=MaxScore)
+            return -x;
+        else
+            return eval(O) - eval(X);
+    }*/
+}
+
+#if (0)
 int Board::eval(PieceType p) const
 {
-    if (p == Empty) return 0.f;
+    if (p == Empty) return 0;
 
     int u = 0, c;
     unsigned int x,y;
@@ -140,8 +194,9 @@ int Board::eval(PieceType p) const
     // --- find consecutives ---
 
 #define TTT_ADD                  \
-    if (c>=(int)size_) return 1000;   \
+    if (c>=(int)cons_) return MaxScore;   \
     if (c>1) u += c-1;
+    //u += c;
 
 #define TTT_CHECK(expr_)         \
     if ((expr_))                 \
@@ -194,4 +249,61 @@ int Board::eval(PieceType p) const
 
     return u;
 }
+#endif
+
+int Board::eval(PieceType p) const
+{
+    if (p == Empty) return 0;
+
+    int u = 0;
+    unsigned int x,y;
+
+    // --- find consecutives ---
+
+#define TTT_CHECK(xi, yi)                   \
+    {                                       \
+        unsigned int cx = x, cy = y,        \
+                     cnt = 0;               \
+        for (unsigned int i=0; i<cons_; ++i)\
+        {                                   \
+            Piece b = board_[cy*size_+cx];  \
+            if (b == p)                     \
+                cnt += 2;                   \
+            else if (b == Empty)            \
+            {   if (cnt) cnt += 1; }        \
+            else                            \
+            {                               \
+                cnt = 0;                    \
+            }                               \
+            cx += xi; cy += yi;             \
+        }                                   \
+        if (cnt >= cons_*2) return 1000;    \
+        u += cnt;                           \
+    }
+
+    // horizontal
+    for (y=0; y<size_; ++y)
+    for (x=0; x<=size_-cons_; ++x)
+        TTT_CHECK(1,0);
+
+    // vertically
+    for (x=0; x<size_; ++x)
+    for (y=0; y<=size_-cons_; ++y)
+        TTT_CHECK(0,1);
+
+    // diagonally right
+    for (y=0; y<=size_-cons_; ++y)
+    for (x=0; x<=size_-cons_; ++x)
+        TTT_CHECK(1,1);
+
+    // diagonally left
+    for (y=0; y<=size_-cons_; ++y)
+    for (x=size_-1; x>=cons_-1; --x)
+        TTT_CHECK(-1,1);
+
+    #undef TTT_CHECK
+
+    return u;
+}
+
 
