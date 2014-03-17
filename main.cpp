@@ -25,10 +25,10 @@ int main(int , char **)
 {
     std::cout << "Hello, you play X\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
-              << "I also understand 'quit', 'start', 'print', guess', 'tree' and 'btree'\n"
+              << "I also understand 'quit', 'start', 'print', 'guess', 'tree' and 'btree'\n"
               << std::endl;
 
-    Board b(4,4);
+    Board b(3);
     Search ai;
 
     b.init();
@@ -45,7 +45,7 @@ int main(int , char **)
             evalo = b.eval(O),
             eval = b.eval();
         std::cout << "              eval " << eval << " (X=" << evalx << " Y=" << evalo << ")" << std::endl;
-        std::cout << "              pieces: " << b.pieces() << std::endl;
+
         if (evalx >= MaxScore)
         {
             std::cout << "\nYou win!\n" << std::endl;
@@ -116,6 +116,17 @@ int main(int , char **)
             goto reprint_;
         }
 
+        // check for draw
+        if (b.pieces() >= b.size() * b.size() - 1)
+        {
+            std::cout << std::endl;
+            b.printBoard();
+            std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
+            std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
+            b.init();
+            goto reprint_;
+        }
+
         // run ai
         int score;
         m = ai.bestMove(b, &score);
@@ -132,16 +143,6 @@ int main(int , char **)
             // apply ai move
             b.makeMove(m);
             b.flipStm();
-        }
-
-        // check for draw
-        if (b.fin())
-        {
-            std::cout << std::endl;
-            b.printBoard();
-            std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
-            b.init();
-            goto reprint_;
         }
 
     }

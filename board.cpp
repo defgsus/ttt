@@ -283,23 +283,37 @@ int Board::eval(PieceType p) const
 
     // horizontal
     for (y=0; y<size_; ++y)
-    for (x=0; x<=size_-cons_; ++x)
-        TTT_CHECK(1,0);
+    {
+        for (x=0; x<=size_-cons_; ++x)
+            TTT_CHECK(1,0);
+        for (x=size_-1; x>=cons_-1; --x)
+            TTT_CHECK(-1,0);
+    }
 
     // vertically
     for (x=0; x<size_; ++x)
-    for (y=0; y<=size_-cons_; ++y)
-        TTT_CHECK(0,1);
+    {
+        for (y=0; y<=size_-cons_; ++y)
+            TTT_CHECK(0,1);
+        for (y=size_-1; y>=cons_-1; --y)
+            TTT_CHECK(0,-1);
+    }
 
     // diagonally right
     for (y=0; y<=size_-cons_; ++y)
     for (x=0; x<=size_-cons_; ++x)
         TTT_CHECK(1,1);
+    for (y=size_-1; y>=cons_-1; --y)
+    for (x=size_-1; x>=cons_-1; --x)
+        TTT_CHECK(-1,-1);
 
     // diagonally left
     for (y=0; y<=size_-cons_; ++y)
     for (x=size_-1; x>=cons_-1; --x)
         TTT_CHECK(-1,1);
+    for (y=size_-1; y>=cons_-1; --y)
+    for (x=0; x<=size_-cons_; ++x)
+        TTT_CHECK(1,-1);
 
     #undef TTT_CHECK
 

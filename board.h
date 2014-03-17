@@ -54,8 +54,8 @@ public:
     /** Changes side to move, returns new value. */
     Piece flipStm();
 
-    /** return if game finished in draw. */
-    bool fin() const { return pieces_ >= size_ * size_; }
+    /** Returns sidelength. */
+    unsigned int size() const { return size_; }
 
     /** Returns number of pieces on board. */
     unsigned int pieces() const { return pieces_; }
