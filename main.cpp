@@ -22,10 +22,48 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 int main(int , char **)
 {
+    std::cout << "Hello, you play X\n"
+              << "Enter moves like: 'a1', 'c2' ...\n"
+              << "I also understand 'quit' and 'start'\n"
+              << std::endl;
+
     Board b;
 
-    b.init(".XX.X....");
+    b.init();
 
-    b.printBoard();
-    std::cout << b.eval(X) << std::endl;
+    while (true)
+    {
+    reprint_:
+
+        b.printBoard();
+
+        std::cout << "              score X=" << b.eval(X) << " O=" << b.eval(O) << std::endl;
+
+    again_:
+        std::cout << ">";
+        std::string str;
+        std::cin >> str;
+        std::cout << std::endl;
+
+        if (str == "q" || str == "quit")
+            goto haveit_;
+        else if (str == "start")
+        {
+            b.init();
+            goto reprint_;
+        }
+
+        Move m = b.parseMove(str);
+        if (m == InvalidMove)
+        {
+            std::cout << "invalid move, try again" << std::endl;
+            goto again_;
+        }
+
+        b.makeMove(m);
+    }
+
+    haveit_:
+
+    std::cout << "\nthank you\n" << std::endl;
 }

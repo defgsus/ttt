@@ -29,6 +29,8 @@ typedef unsigned char Piece;
 typedef unsigned int Move;
 typedef std::vector<Move> Moves;
 
+const Move InvalidMove = -1;
+
 enum PieceType
 {
     Empty, X, O
@@ -48,15 +50,25 @@ public:
     /** Returns side to move, either X or O */
     Piece stm() const { return stm_; }
 
+    /** Changes side to move, returns new value. */
+    Piece flipStm();
+
+    /** Parses a string like 'a1' and return the move.
+        InvalidMove on error. */
+    Move parseMove(const std::string& str) const;
+
+    /** execute move for stm */
+    void makeMove(Move m);
+
     /** pushes all moves onto @p m.
         m will be cleared before. */
-    void getMoves(Moves& m);
+    void getMoves(Moves& m) const;
 
     /** Returns the utility for X or O */
-    int eval(PieceType p);
+    int eval(PieceType p) const;
 
     /** print the board as ascii */
-    void printBoard(std::ostream& out = std::cout);
+    void printBoard(std::ostream& out = std::cout) const;
 
 protected:
     unsigned int size_;
