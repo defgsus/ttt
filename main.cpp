@@ -25,10 +25,10 @@ int main(int , char **)
 {
     std::cout << "Hello, you play X\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
-              << "I also understand 'quit', 'start', 'print', 'guess', 'tree' and 'btree'\n"
+              << "I also understand 'quit', 'start', 'back', 'print', 'guess', 'tree' and 'btree'\n"
               << std::endl;
 
-    Board b(3);
+    Board b(5,4);
     Search ai;
 
     b.init();
@@ -49,15 +49,11 @@ int main(int , char **)
         if (evalx >= MaxScore)
         {
             std::cout << "\nYou win!\n" << std::endl;
-            b.init();
-            goto reprint_;
         }
 
         if (evalo >= MaxScore)
         {
             std::cout << "\nI win, i'm a machine!\n" << std::endl;
-            b.init();
-            goto reprint_;
         }
 
     again_:
@@ -112,8 +108,7 @@ int main(int , char **)
         if (b.eval(X) >= MaxScore)
         {
             std::cout << "\nYou win!" << std::endl;
-            b.init();
-            goto reprint_;
+            goto again_;
         }
 
         // check for draw
@@ -124,7 +119,7 @@ int main(int , char **)
             std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
             std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
             b.init();
-            goto reprint_;
+            goto again_;
         }
 
         // run ai
@@ -135,7 +130,6 @@ int main(int , char **)
         if (m == InvalidMove)
         {
             std::cout << "I'm lost, you win!" << std::endl;
-            b.init();
         }
         else
         {

@@ -37,6 +37,8 @@ enum PieceType
     Empty, X, O
 };
 
+const char pieceChar[] = { '.', 'X', 'O' };
+
 class Board
 {
 public:
@@ -84,11 +86,16 @@ public:
     void printBoard(std::ostream& out = std::cout) const;
 
 protected:
+
+    void createRowValues();
+
     unsigned int size_, cons_;
     std::vector<Piece> board_;
 
     Piece stm_;
     unsigned int pieces_;
+
+    static std::vector<int> rowVal_;
 };
 
 #endif // BOARD_H

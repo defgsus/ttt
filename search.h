@@ -35,7 +35,7 @@ public:
 
 protected:
 
-    static const int max_depth_ = 10;
+    static const int max_depth_ = 2;
 
     struct Node
     {

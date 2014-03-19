@@ -21,13 +21,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "board.h"
 
 #include <cassert>
+#include <cmath>
 #include <iomanip>
+
+std::vector<int> Board::rowVal_;
 
 Board::Board(unsigned int size, unsigned int cons)
     :   size_   (size),
         cons_   (cons),
         board_  (size*size)
 {
+    createRowValues();
     init();
 }
 
@@ -38,6 +42,71 @@ void Board::init()
 
     stm_ = X;
     pieces_ = 0;
+}
+
+void Board::createRowValues()
+{
+    if (!rowVal_.empty()) return;
+
+    // creat all permutations of empty/X/O for a row of length cons_
+    // and precalculate the utility value
+    unsigned int i,j,kk,k = 0, num = pow(4, cons_);
+    for (j=0; j<num; ++j, ++k)
+    {
+        std::vector<int> row;
+        for (i=0; i<cons_; ++i)
+        {
+            kk = k>>(i*2);
+            if ((kk&3)==0) row.push_back(0); else
+            if ((kk&3)==1) row.push_back(1); else
+            if ((kk&3)>=2) row.push_back(2);
+        }
+
+        // get utility value
+        unsigned int u = 0;
+
+        // count empty=1, piece=2
+        for (i = 0; i<cons_; ++i)
+            u += std::min(1, row[i]) + 1;
+
+        // full row?
+        if (u>=cons_*2)
+        {
+            u = MaxScore; // win
+        }
+        else
+        {
+            // additional points for consecutiveness
+            for (i=0; i<cons_-1; ++i)
+                if (row[i] == 1 && row[i+1] == 1)
+                    u++;
+        }
+
+        // no points when opponent breaks row
+        for (i = 0; i<cons_; ++i)
+            if (row[i] == 2) { u = 0; break; }
+
+#if 0
+        // no points for emptyness
+        cnt = 0;
+        for (i = 0; i<cons_; ++i)
+            cnt += row[i] == 0;
+        if (cnt == cons_) u = 0;
+#endif
+        // store utility value
+        rowVal_.push_back(u);
+
+#if 0
+        // debug print
+        if (k%4 != 3)
+        {
+            std::cout << std::setw(4) << k << " ";
+            for (i=0; i<cons_; ++i) std::cout << pieceChar[row[i]];
+            if (u) std::cout << " " << u;
+            std::cout << std::endl;
+        }
+#endif
+    }
 }
 
 void Board::init(const std::string& str)
@@ -130,7 +199,7 @@ void Board::printBoard(std::ostream& out) const
 {
     out << "   ";
     for (unsigned int x=0; x<size_; ++x)
-        out << (char)(x + 'A');
+        out << (char)(x + 'a') << " ";
     out << std::endl;
 
     for (unsigned int y=0; y<size_; ++y)
@@ -139,12 +208,7 @@ void Board::printBoard(std::ostream& out) const
 
         for (unsigned int x=0; x<size_; ++x)
         {
-            switch (board_[y*size_+x])
-            {
-                default: out << "."; break;
-                case X: out << "X"; break;
-                case O: out << "O"; break;
-            }
+            out << pieceChar[board_[y*size_+x]] << " ";
         }
 
         out << std::endl;
@@ -154,33 +218,14 @@ void Board::printBoard(std::ostream& out) const
 int Board::eval()
 {
     int x = eval(X), o = eval(O);
-    int v = eval(X) - eval(O);
-
+    int v = x-o;
+    /*
     if (x>=MaxScore)
         v = x;
     else if (o>=MaxScore)
         v = o;
-
+    */
     return (stm_ == X)? v : -v;
-    /*
-    if (stm_ == X)
-    {
-        if (x>=MaxScore)
-            return x;
-        else if (o>=MaxScore)
-            return -o;
-        else
-            return eval(X) - eval(O);
-    }
-    else
-    {
-        if (o>=MaxScore)
-            return o;
-        else if (x>=MaxScore)
-            return -x;
-        else
-            return eval(O) - eval(X);
-    }*/
 }
 
 #if (0)
@@ -251,6 +296,7 @@ int Board::eval(PieceType p) const
 }
 #endif
 
+#if (0)
 int Board::eval(PieceType p) const
 {
     if (p == Empty) return 0;
@@ -319,5 +365,65 @@ int Board::eval(PieceType p) const
 
     return u;
 }
+#endif
+
+int Board::eval(PieceType p) const
+{
+    if (p == Empty) return 0;
+
+    int u = 0;
+    unsigned int x,y;
+
+    // --- find consecutives ---
+
+// start at x,y, go along direction xi,yi, count row value
+#define TTT_CHECK(xi, yi)                   \
+    {                                       \
+        unsigned int cx = x, cy = y, cnt=0; \
+        for (unsigned int i=0; i<cons_; ++i)\
+        {                                   \
+            cnt <<= 2;                      \
+            Piece b = board_[cy*size_+cx];  \
+            if (b == p)                     \
+                ++cnt;                      \
+            else if (b != Empty)            \
+                cnt += 2;                   \
+            cx += xi; cy += yi;             \
+        }                                   \
+    /*std::cout << ":" << cnt << "\n";*/ \
+        u += rowVal_[cnt];                  \
+        if (u >= MaxScore) return MaxScore; \
+    }
+
+    // horizontal
+    for (y=0; y<size_; ++y)
+    {
+        for (x=0; x<=size_-cons_; ++x)
+            TTT_CHECK(1,0);
+    }
+
+    // vertically
+    for (x=0; x<size_; ++x)
+    {
+        for (y=0; y<=size_-cons_; ++y)
+            TTT_CHECK(0,1);
+    }
+
+    // diagonally right
+    for (y=0; y<=size_-cons_; ++y)
+    for (x=0; x<=size_-cons_; ++x)
+        TTT_CHECK(1,1);
+
+    // diagonally left
+    for (y=0; y<=size_-cons_; ++y)
+    for (x=size_-1; x>=cons_-1; --x)
+        TTT_CHECK(-1,1);
+
+    #undef TTT_CHECK
+
+    return u;
+}
+
+
 
 
