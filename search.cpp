@@ -91,9 +91,19 @@ void Search::minimax(Node& n)
 
     for (size_t i=0; i<n.moves.size(); ++i)
     {
+    #ifdef TTT_KEEP_TREE
         // create child node
         n.childs.push_back(Node());
         Node * c = &n.childs.back();
+    #else
+        Node * c;
+        if (n.depth == 0)
+        {
+            n.childs.push_back(Node());
+            c = &n.childs.back();
+        }
+            else c = new Node;
+    #endif
         // setup node
         c->depth = n.depth + 1;
         c->ismax = !n.ismax;
@@ -116,6 +126,9 @@ void Search::minimax(Node& n)
         {
             if (c->x < n.x) { n.x = c->x; n.best = i; }
         }
+    #ifndef TTT_KEEP_TREE
+        if (n.depth>0) delete c;
+    #endif
     }
 }
 

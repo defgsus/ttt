@@ -29,12 +29,13 @@ int main(int , char **)
 {
     std::cout << "Hello, you play X\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
-              << "I also understand 'quit', 'start', 'back', 'print', 'guess', 'tree' and 'btree'\n"
+              << "I also understand 'quit', 'start', 'back', 'print',\n"
+              << "'guess', 'depth x', 'tree' and 'btree'\n"
               << std::endl;
 
     int mdepth = 2;
     bool print_eval = true;
-    Board b(5,4);
+    Board b(5,3);
     Search ai;
 
     b.init();
@@ -60,7 +61,7 @@ int main(int , char **)
         std::cin >> str;
 
         // check command
-        if (str == "q" || str == "quit")
+        if (str == "q" || str == "quit" || str == "exit")
             goto haveit_;
         else if (str == "start")
         {

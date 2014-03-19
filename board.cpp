@@ -247,12 +247,12 @@ int Board::eval()
 {
     int x = eval(X), o = eval(O);
     int v = x-o;
-    /*
+
     if (x>=MaxScore)
         v = x;
     else if (o>=MaxScore)
         v = o;
-    */
+
     return (stm_ == X)? v : -v;
 }
 
