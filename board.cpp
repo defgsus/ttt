@@ -29,7 +29,8 @@ std::vector<int> Board::rowVal_;
 Board::Board(unsigned int size, unsigned int cons)
     :   size_   (size),
         cons_   (cons),
-        board_  (size*size)
+        board_  (size*size),
+        score_  (size*size)
 {
     createRowValues();
     init();
@@ -50,7 +51,7 @@ void Board::createRowValues()
 
     // creat all permutations of empty/X/O for a row of length cons_
     // and precalculate the utility value
-    unsigned int i,j,kk,k = 0, num = pow(4, cons_);
+    unsigned int i,j,kk,cnt,k = 0, num = pow(4, cons_);
     for (j=0; j<num; ++j, ++k)
     {
         std::vector<int> row;
@@ -86,7 +87,7 @@ void Board::createRowValues()
         for (i = 0; i<cons_; ++i)
             if (row[i] == 2) { u = 0; break; }
 
-#if 0
+#if 1
         // no points for emptyness
         cnt = 0;
         for (i = 0; i<cons_; ++i)
@@ -195,12 +196,18 @@ std::string Board::toString(Move m) const
     }
 }
 
-void Board::printBoard(std::ostream& out) const
+void Board::printBoard(bool eval, std::ostream& out) const
 {
     out << "   ";
     for (unsigned int x=0; x<size_; ++x)
         out << (char)(x + 'a') << " ";
-    out << std::endl;
+    if (eval)
+    {
+        out << "    | ";
+        for (unsigned int x=0; x<size_; ++x)
+            out << std::setw(5) << (char)(x + 'a');
+        out << std::endl;
+    }
 
     for (unsigned int y=0; y<size_; ++y)
     {
@@ -211,9 +218,30 @@ void Board::printBoard(std::ostream& out) const
             out << pieceChar[board_[y*size_+x]] << " ";
         }
 
+        if (eval)
+        {
+            out << "    | ";
+            for (unsigned int x=0; x<size_; ++x)
+            {
+                out << std::setw(5) << score_[y*size_+x];
+            }
+        }
+
         out << std::endl;
     }
 }
+
+void Board::clearEvalMap()
+{
+    for (auto &i : score_)
+        i = 0;
+}
+
+void Board::setEvalMap(int Move, int score)
+{
+    score_[Move] = score;
+}
+
 
 int Board::eval()
 {

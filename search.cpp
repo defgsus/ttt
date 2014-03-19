@@ -27,9 +27,11 @@ Search::Search()
 }
 
 
-Move Search::bestMove(const Board& b, int * score)
+Move Search::bestMove(Board& b, int maxd, int * score)
 {
     if (score) *score = 0;
+
+    max_depth_ = maxd;
 
     Moves m;
     b.getMoves(m);
@@ -43,6 +45,11 @@ Move Search::bestMove(const Board& b, int * score)
     root_.move = InvalidMove;
     // go
     minimax(root_);
+
+    // update board's eval map
+    b.clearEvalMap();
+    for (size_t i=0; i<root_.childs.size(); ++i)
+        b.setEvalMap(root_.moves[i], root_.childs[i].x);
 
     if (root_.best == InvalidMove)
     {

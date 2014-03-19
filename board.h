@@ -66,6 +66,9 @@ public:
         InvalidMove on error. */
     Move parseMove(const std::string& str) const;
 
+    /** Returns the alphanum rep */
+    std::string toString(Move m) const;
+
     /** execute move for stm */
     void makeMove(Move m);
 
@@ -79,11 +82,11 @@ public:
     /** Returns the utility for X or O */
     int eval(PieceType p) const;
 
-    /** Returns the alphanum rep */
-    std::string toString(Move m) const;
+    void clearEvalMap();
+    void setEvalMap(int Move, int score);
 
     /** print the board as ascii */
-    void printBoard(std::ostream& out = std::cout) const;
+    void printBoard(bool witheval, std::ostream& out = std::cout) const;
 
 protected:
 
@@ -91,6 +94,7 @@ protected:
 
     unsigned int size_, cons_;
     std::vector<Piece> board_;
+    std::vector<int> score_;
 
     Piece stm_;
     unsigned int pieces_;

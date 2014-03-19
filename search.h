@@ -28,14 +28,15 @@ class Search
 public:
     Search();
 
-    /** Returns best move for current board and stm */
-    Move bestMove(const Board& b, int * score = 0);
+    /** Returns best move for current board and stm.
+        Also sets Board's evalMap */
+    Move bestMove(Board& b, int max_depth, int * score = 0);
 
     void printTree(bool bestOnly = false, int maxlevel = -1, std::ostream& out = std::cout);
 
 protected:
 
-    static const int max_depth_ = 2;
+    int max_depth_;
 
     struct Node
     {
