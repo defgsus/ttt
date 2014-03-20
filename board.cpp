@@ -42,8 +42,9 @@ void Board::setSize(unsigned int size, unsigned int cons)
     cons_ = cons;
     board_.resize(size*size);
     score_.resize(size*size);
+    rowVal_.clear();
     createRowValues();
-    //init();
+    init();
 }
 
 void Board::init()
@@ -195,7 +196,7 @@ void Board::makeMove(Move m)
     // check for captures
     #define TTT_EXECAPTURE(x_,y_) \
         if (canCapture(m, x_, y_)) \
-            { board_[m+x_+y_*size_] = stm_; board_[m] = Empty; } \
+            { board_[m+x_+y_*size_] = Empty; pieces_--; } \
                 else
 
         TTT_EXECAPTURE( 1, 0)
@@ -242,6 +243,16 @@ void Board::getMoves(Moves &m) const
             m.push_back(i);
 }
 
+bool Board::isWin(PieceType p) const
+{
+    return (eval(p) >= MaxScore / 2);
+}
+
+bool Board::isDraw() const
+{
+    return (pieces() >= size() * size());
+}
+
 std::string Board::toString(Move m) const
 {
     if (m == InvalidMove)
@@ -264,7 +275,7 @@ void Board::printBoard(bool eval, std::ostream& out) const
     {
         out << "    | ";
         for (unsigned int x=0; x<size_; ++x)
-            out << std::setw(5) << (char)(x + 'a');
+            out << std::setw(6) << (char)(x + 'a');
         out << std::endl;
     }
 
@@ -282,7 +293,10 @@ void Board::printBoard(bool eval, std::ostream& out) const
             out << "    | ";
             for (unsigned int x=0; x<size_; ++x)
             {
-                out << std::setw(5) << score_[y*size_+x];
+                if (board_[y*size_+x] == Empty)
+                    out << std::setw(6) << score_[y*size_+x];
+                else
+                    out << std::setw(6) << (char)(pieceChar[board_[y*size_+x]]+32);
             }
         }
 

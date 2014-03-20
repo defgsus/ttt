@@ -64,6 +64,7 @@ public:
 
     /** Returns sidelength. */
     unsigned int size() const { return size_; }
+
     /** Returns number of to-connect pieces */
     unsigned int consecutives() const { return cons_; }
 
@@ -89,6 +90,9 @@ public:
 
     /** Check for capture possibility from position m along direction xi,yi */
     bool canCapture(Move m, int xi, int yi) const;
+
+    bool isWin(PieceType p) const;
+    bool isDraw() const;
 
     /** Returns board value */
     int eval();

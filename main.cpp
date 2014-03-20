@@ -46,20 +46,21 @@ void printHelp(bool shrt = false)
     std::cout << "\nHello Seeker\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
               << "I also understand 'quit', 'start', 'back', 'print',\n"
-              << "'X', 'O', 'guess', 'depth x', 'tree' and 'btree',\n"
+              << "'X', 'O', 'guess', 'play x', 'depth x', 'tree' and 'btree',\n"
               << "'size x x', 'help' and 'rules'\n"
               << std::endl;
     if (shrt) return;
     std::cout << "'x' and 'o' selects the player.\n"
+              << "'play x' starts playing x two-plys\n"
+              << "'size s n' sets the board to s by s squares and \n"
+              << " the number of pieces, to be connected, to n.\n"
               << "'tree' shows previous search nodes\n"
-              << "the max. displayed depth can be set with 'tree1' to 'tree9'\n\n"
+              << " the max. displayed depth can be set with 'tree1' to 'tree9'\n\n"
               << "'btree' shows only the winner branch.\n"
 #ifndef TTT_KEEP_TREE
-              << "Note! due to compile switch, only the first level is accessible\n"
+              << " /* note, due to compile switch, only the first level is accessible */\n"
 #endif
               << "\n"
-              << "'size s n' sets the board to s by s squares and \n"
-              << "the number of pieces, to be connected, to n."
               << std::endl;
 
 }
@@ -70,6 +71,8 @@ int main(int , char **)
 
     int mdepth = 2;
     bool print_eval = true;
+    int autoplay = 0;
+
     Board b(3,3);
     Search ai;
 
@@ -92,9 +95,12 @@ int main(int , char **)
                   << " (X=" << evalx << " Y=" << evalo << ")" << std::endl;
 
     ask_:
-        std::cout << pieceChar[b.stm()] << ">";
         std::string str;
-        std::cin >> str;
+        if (autoplay<=0)
+        {
+            std::cout << pieceChar[b.stm()] << ">";
+            std::cin >> str;
+        }
 
         // check command
         if (str == "q" || str == "quit" || str == "exit")
@@ -104,6 +110,11 @@ int main(int , char **)
         {
             b.init();
             goto reprint_;
+        }
+        else if (str == "play")
+        {
+            std::cin >> autoplay;
+            if (!autoplay) goto ask_;
         }
         else if (str == "print")
             goto reprint_;
@@ -174,39 +185,59 @@ int main(int , char **)
 
         // ------ expect move here -----
 
-        // parse move
-        Move m = b.parseMove(str);
-        if (m == InvalidMove)
+        Move m = InvalidMove;
+
+        if (!autoplay)
         {
-            std::cout << "invalid move, try again" << std::endl;
-            goto ask_;
+            // parse move
+            m = b.parseMove(str);
+            if (m == InvalidMove)
+            {
+                std::cout << "invalid move, try again" << std::endl;
+                goto ask_;
+            }
+        }
+        else
+        {
+            // figure ai move
+            int score;
+            m = ai.bestMove(b, mdepth, &score);
+            if (m == InvalidMove)
+            {
+                autoplay = 0;
+                goto ask_;
+            }
+            std::cout << "best move: " << b.toString(m) << " (" << score << ")\n" << std::endl;
         }
 
 
+
+        // store history
         stack.push_back(b);
 
         // apply user move
         b.makeMove(m);
         b.flipStm();
 
+        if (autoplay>0)
+        {
+            b.printBoard(true);
+            std::cout << std::endl;
+            autoplay--;
+        }
+
         if (true)
         {
             // check for win
-            if (b.eval(X) >= MaxScore)
+            if (b.isWin(X))
             {
                 std::cout << "\nYou win!" << std::endl;
+                autoplay = 0;
                 goto reprint_;
             }
 
-            // check for draw
-            if (b.pieces() >= b.size() * b.size() - 1)
-            {
-                std::cout << std::endl;
-                b.printBoard(print_eval);
-                std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
-                std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
-                goto ask_;
-            }
+            if (b.isDraw())
+                goto draw_;
 
             // run ai
             int score;
@@ -216,22 +247,36 @@ int main(int , char **)
             if (m == InvalidMove)
             {
                 std::cout << "I'm lost!\n" << std::endl;
+                autoplay = 0;
                 goto ask_;
             }
-            else
-            {
-                std::cout << "\nai move: " << b.toString(m) << " (" << score << ")" << std::endl;
-                // apply ai move
-                b.makeMove(m);
-                b.flipStm();
-            }
 
-            if (b.eval(O) >= MaxScore)
+            // -- apply ai move --
+
+            std::cout << "ai move: " << b.toString(m) << " (" << score << ")" << std::endl;
+            b.makeMove(m);
+            b.flipStm();
+
+            if (b.isWin(O))
             {
                 std::cout << "\nI win, i'm a machine!\n" << std::endl;
+                autoplay = 0;
                 goto reprint_;
             }
+
+            if (b.isDraw())
+                goto draw_;
         }
+        goto reprint_;
+
+    draw_:
+        std::cout << std::endl;
+        if (!autoplay) b.printBoard(print_eval);
+        std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
+        std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
+        autoplay = 0;
+        goto ask_;
+
     }
 
     haveit_:
