@@ -69,6 +69,8 @@ protected:
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
 
     Node root_;
+
+    unsigned int num_nodes_;
 };
 
 #endif // SEARCH_H

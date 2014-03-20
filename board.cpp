@@ -36,12 +36,23 @@ Board::Board(unsigned int size, unsigned int cons)
     init();
 }
 
+void Board::setSize(unsigned int size, unsigned int cons)
+{
+    size_ = size;
+    cons_ = cons;
+    board_.resize(size*size);
+    score_.resize(size*size);
+    createRowValues();
+    //init();
+}
+
 void Board::init()
 {
     for (auto &i : board_)
         i = Empty;
 
     stm_ = X;
+    nstm_ = O;
     pieces_ = 0;
 }
 
@@ -128,9 +139,15 @@ void Board::init(const std::string& str)
 Piece Board::flipStm()
 {
     if (stm_ == X)
+    {
         stm_ = O;
+        nstm_ = X;
+    }
     else
+    {
         stm_ = X;
+        nstm_ = O;
+    }
     return stm_;
 }
 
@@ -173,6 +190,48 @@ void Board::makeMove(Move m)
 
     board_[m] = stm_;
     pieces_++;
+
+#ifdef TTT_CAPTURE
+    // check for captures
+    #define TTT_EXECAPTURE(x_,y_) \
+        if (canCapture(m, x_, y_)) \
+            { board_[m+x_+y_*size_] = stm_; board_[m] = Empty; } \
+                else
+
+        TTT_EXECAPTURE( 1, 0)
+        TTT_EXECAPTURE( 1, 1)
+        TTT_EXECAPTURE( 0, 1)
+        TTT_EXECAPTURE(-1, 1)
+        TTT_EXECAPTURE(-1, 0)
+        TTT_EXECAPTURE(-1,-1)
+        TTT_EXECAPTURE( 0,-1)
+        TTT_EXECAPTURE( 1,-1)
+        { }
+
+    #undef TTT_EXECAPTURE
+
+    if (board_[m] == Empty) pieces_--;
+#endif
+}
+
+bool Board::canCapture(Move m, int xi, int yi) const
+{
+    if (board_[m] == Empty) return false;
+
+    const int x = m%size_, y = m/size_;
+
+    // board limits
+    if ((xi<0 && x<2)
+     || (yi<0 && y<2)
+     || (xi>0 && x>(int)size_-3)
+     || (yi>0 && y>(int)size_-3))
+        return false;
+
+    // check if opponent is captured
+    bool r= (board_[(y+yi)*size_ + x+xi] == nstm_
+            && board_[(y+yi*2)*size_ + x+xi*2] == stm_);
+    //if (r) std::cout << "captured for " << toString(m) << "\n";
+    return r;
 }
 
 void Board::getMoves(Moves &m) const
@@ -246,13 +305,15 @@ void Board::setEvalMap(int Move, int score)
 int Board::eval()
 {
     int x = eval(X), o = eval(O);
+    if (x>=MaxScore) x *= 2;
+    if (o>=MaxScore) o *= 2;
     int v = x-o;
 
-    if (x>=MaxScore)
+    /*if (x>=MaxScore)
         v = x;
     else if (o>=MaxScore)
-        v = o;
-
+        v = -o;
+    */
     return (stm_ == X)? v : -v;
 }
 
