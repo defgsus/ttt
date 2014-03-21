@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #define TTT_CAPTURE
 //#define TTT_KEEP_TREE
+#define TTT_TRANSPOSITION_TABLE
 
 #include <vector>
 #include <string>
@@ -36,7 +37,7 @@ typedef uint                Square;
 typedef Square              Move;
 typedef std::vector<Move>   Moves;
 typedef Piece               Stm;
-typedef uint64_t            Hash;
+
 
 /** That's what goes onto a board square.
  *
@@ -46,12 +47,43 @@ enum PieceType
 {
     Empty, X = 1, O = 2
 };
+const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
 const int MaxScore = 1000;
 
+#ifdef TTT_TRANSPOSITION_TABLE
+struct Hash
+{
+    typedef uint64_t Type;
+    Type a, b;
 
-const char pieceChar[] = { '.', 'X', 'O' };
+    static void getHash(Hash& h, const Piece * board, uint s, Stm stm)
+    {
+        h.a = h.b = 0;
+        Type * a = &h.a;
+        for (uint i=0; i<s; ++i, ++board)
+        {
+            if (i == 32) a = &h.b;
+            *a |= *board;
+            *a <<= 2;
+        }
+        h.b |= ((Type)stm) << 62;
+    }
+
+    bool operator == (const Hash& r) const
+    {
+        return r.a == a && r.b == b;
+    }
+
+    bool operator < (const Hash& r) const
+    {
+        // XXX
+        return (a < r.a) || (b < r.b);
+    }
+
+};
+#endif
 
 
 class Board
@@ -106,8 +138,10 @@ public:
     bool isWin(Stm p) const;
     bool isDraw() const;
 
+#ifdef TTT_TRANSPOSITION_TABLE
     /** Returns a non-unique hash value for the current position and stm. */
-    Hash hash() const;
+    void getHash(Hash& h) const { return Hash::getHash(h, &board_[0], size_*size_, stm_); }
+#endif
 
     /** Returns board value */
     int eval();
@@ -124,7 +158,6 @@ public:
 protected:
 
     void createRowValues();
-    void createHashValues();
 
     uint size_, cons_;
     std::vector<Piece> board_;
@@ -136,7 +169,6 @@ protected:
     uint pieces_;
 
     static std::vector<int> rowVal_;
-    static std::vector<Hash> hashVal_;
 };
 
 #endif // BOARD_H

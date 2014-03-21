@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <iomanip>
 
+#include <QTime>
+
 Search::Search()
 {
 }
@@ -46,11 +48,28 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
     // setup other stuff
     num_nodes_ = 0;
+    num_cache_reuse_ = 0;
+
+#ifdef TTT_TRANSPOSITION_TABLE
+    cache_.clear();
+#endif
+    QTime time;
+
+    std::cout << "!";
+    std::cout.flush();
 
     // go
+    time.start();
     minimax(root_);
 
-    std::cout << "num. nodes : " << num_nodes_
+    float took = (float)time.elapsed()/1000;
+
+    std::cout << " nodes: " << num_nodes_
+#ifdef TTT_TRANSPOSITION_TABLE
+              << " cache: " << num_cache_reuse_
+#endif
+              << " took: " << took << "s "
+              << " nps: " << (float)num_nodes_/took
               << std::endl;
 
     // update board's eval map
@@ -123,18 +142,43 @@ void Search::minimax(Node& n)
         c->board.makeMove(n.moves[i]);
         c->board.flipStm();
 
-        // evaluate the child
-        minimax(*c);
+        int score;
+
+#ifdef TTT_TRANSPOSITION_TABLE
+        Hash hash;
+        c->board.getHash(hash);
+        auto ic = cache_.find(hash);
+
+        if (ic == cache_.end())
+        {
+#endif
+            // evaluate the child
+            minimax(*c);
+
+            score = c->x;
+
+#ifdef TTT_TRANSPOSITION_TABLE
+
+            cache_.insert( std::make_pair(hash, score) );
+        }
+        else
+        {
+            score = ic->second;
+            num_cache_reuse_++;
+        }
+#endif
 
         // get score back
         if (n.ismax)
         {
-            if (c->x > n.x) { n.x = c->x; n.best = i; }
+            if (score > n.x) { n.x = score; n.best = i; }
         }
         else
         {
-            if (c->x < n.x) { n.x = c->x; n.best = i; }
+            if (score < n.x) { n.x = score; n.best = i; }
         }
+
+
     #ifndef TTT_KEEP_TREE
         if (n.depth>0) delete c;
     #endif

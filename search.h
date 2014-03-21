@@ -23,6 +23,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "board.h"
 
+#ifdef TTT_TRANSPOSITION_TABLE
+#include <map>
+#endif
+
 class Search
 {
 public:
@@ -70,8 +74,11 @@ protected:
 
     Node root_;
 
-    uint num_nodes_;
+    uint num_nodes_, num_cache_reuse_;
 
+#ifdef TTT_TRANSPOSITION_TABLE
+    std::map<Hash,int> cache_;
+#endif
 };
 
 #endif // SEARCH_H

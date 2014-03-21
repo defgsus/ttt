@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <iomanip>
 
 std::vector<int> Board::rowVal_;
-std::vector<Hash> Board::hashVal_;
 
 Board::Board(uint size, uint cons)
     :   size_   (size),
@@ -33,7 +32,6 @@ Board::Board(uint size, uint cons)
         board_  (size*size),
         score_  (size*size)
 {
-    createHashValues();
     createRowValues();
     init();
 }
@@ -46,14 +44,14 @@ void Board::setSize(uint size, uint cons)
     score_.resize(size*size);
     rowVal_.clear();
     createRowValues();
-    hashVal_.clear();
-    createHashValues();
     init();
 }
 
 void Board::init()
 {
     for (auto &i : board_)
+        i = Empty;
+    for (auto &i : score_)
         i = Empty;
 
     stm_ = X;
@@ -67,14 +65,6 @@ Stm Board::flipStm()
     return stm_;
 }
 
-void Board::createHashValues()
-{
-    if (!hashVal_.empty()) return;
-
-    hashVal_.resize(size_ * 2);
-    for (auto &i : hashVal_)
-        i = ((Hash)rand() << 32) || (Hash)rand();
-}
 
 void Board::createRowValues()
 {
@@ -253,15 +243,6 @@ void Board::getMoves(Moves &m) const
             m.push_back(i);
 }
 
-Hash Board::hash() const
-{
-    /*Hash h = hashVal_[board_[0]];
-    for (uint i=0; i<size_; ++i)
-    {
-        h ^=
-    }*/
-    return 0;
-}
 
 bool Board::isWin(Stm p) const
 {
