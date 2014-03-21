@@ -44,7 +44,7 @@ protected:
 
     struct Node
     {
-        int depth;
+        int depth, alpha, beta;
         bool ismax;
         // score/utility
         int x;
@@ -73,6 +73,8 @@ protected:
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
 
     Node root_;
+
+    int alpha_, beta_;
 
     uint num_nodes_, num_cache_reuse_;
 

@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <iomanip>
 
 std::vector<int> Board::rowVal_;
+std::vector<Square> Board::moveOrder_;
 
 Board::Board(uint size, uint cons)
     :   size_   (size),
@@ -33,6 +34,7 @@ Board::Board(uint size, uint cons)
         score_  (size*size)
 {
     createRowValues();
+    createMoveOrder();
     init();
 }
 
@@ -44,6 +46,8 @@ void Board::setSize(uint size, uint cons)
     score_.resize(size*size);
     rowVal_.clear();
     createRowValues();
+    moveOrder_.clear();
+    createMoveOrder();
     init();
 }
 
@@ -57,14 +61,36 @@ void Board::init()
     stm_ = X;
     nstm_ = O;
     pieces_ = 0;
+    ply_ = 0;
 }
 
 Stm Board::flipStm()
 {
+    ply_++;
     std::swap(stm_, nstm_);
     return stm_;
 }
 
+void Board::createMoveOrder()
+{
+    if (!moveOrder_.empty()) return;
+
+    moveOrder_.resize(size_*size_);
+    // use an ulam spiral to create indexes
+    // that start in the middle and expand towards edges
+    const int sh = size_ >> 1;
+    for (int y = 0; y<(int)size_; ++y)
+    for (int x = 0; x<(int)size_; ++x)
+    {
+        size_t u = ulam_spiral(x-sh,y-sh);
+        if (u>=board_.size()) continue;
+
+        moveOrder_[u] = y * size_ + x;
+    }
+
+//    for (auto i : moveOrder_)
+//        std::cout << " " << i;
+}
 
 void Board::createRowValues()
 {
@@ -238,9 +264,13 @@ bool Board::canCapture(Square m, int xi, int yi) const
 void Board::getMoves(Moves &m) const
 {
     m.clear();
-    for (size_t i = 0; i<board_.size(); ++i)
-        if (board_[i] == Empty)
-            m.push_back(i);
+    for (size_t i=0; i<moveOrder_.size(); ++i)
+    {
+        const Square k = moveOrder_[i];
+
+        if (board_[k] == Empty)
+            m.push_back(k);
+    }
 }
 
 
@@ -277,6 +307,7 @@ void Board::printBoard(bool eval, std::ostream& out) const
         out << "    | ";
         for (uint x=0; x<size_; ++x)
             out << std::setw(6) << (char)(x + 'a');
+        out << "   ply: " << ply_ << " (" << pieceChar[stm_] << ")";
         out << std::endl;
     }
 
@@ -320,15 +351,15 @@ void Board::setEvalMap(Square s, int score)
 int Board::eval()
 {
     int x = eval(X), o = eval(O);
-    if (x>=MaxScore) x *= 2;
-    if (o>=MaxScore) o *= 2;
+    //if (x>=MaxScore) x *= 2;
+    //if (o>=MaxScore) o *= 2;
     int v = x-o;
 
-    /*if (x>=MaxScore)
+    if (x>=MaxScore)
         v = x;
     else if (o>=MaxScore)
         v = -o;
-    */
+
     return (stm_ == X)? v : -v;
 }
 

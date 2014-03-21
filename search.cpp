@@ -31,6 +31,8 @@ Search::Search()
 
 Move Search::bestMove(Board& b, int maxd, int * score)
 {
+    // ---------- start search -----------
+
     if (score) *score = 0;
 
     max_depth_ = maxd;
@@ -49,6 +51,11 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // setup other stuff
     num_nodes_ = 0;
     num_cache_reuse_ = 0;
+    alpha_ = -MaxScore*2;
+    beta_ = MaxScore*2;
+
+    root_.alpha = alpha_;
+    root_.beta = beta_;
 
 #ifdef TTT_TRANSPOSITION_TABLE
     cache_.clear();
@@ -135,6 +142,8 @@ void Search::minimax(Node& n)
         c->depth = n.depth + 1;
         c->ismax = !n.ismax;
         c->move = n.moves[i];
+        c->alpha = n.alpha;
+        c->beta = n.beta;
         ++num_nodes_;
 
         // advance game
@@ -142,7 +151,7 @@ void Search::minimax(Node& n)
         c->board.makeMove(n.moves[i]);
         c->board.flipStm();
 
-        int score;
+        int score = 0;
 
 #ifdef TTT_TRANSPOSITION_TABLE
         Hash hash;
@@ -168,20 +177,24 @@ void Search::minimax(Node& n)
         }
 #endif
 
+#ifndef TTT_KEEP_TREE
+        // XXX quick hack for keeping the root, this leaks memory
+        if (n.depth>0) delete c;
+#endif
+
         // get score back
         if (n.ismax)
         {
             if (score > n.x) { n.x = score; n.best = i; }
+            if (n.x >= n.beta) { /*std::cout << "beta " << beta_ << std::endl;*/ break; }
+            n.alpha = std::max(n.alpha, n.x);
         }
         else
         {
             if (score < n.x) { n.x = score; n.best = i; }
+            if (n.x <= n.alpha) { /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
+            n.beta = std::min(n.beta, n.x);
         }
-
-
-    #ifndef TTT_KEEP_TREE
-        if (n.depth>0) delete c;
-    #endif
     }
 }
 
@@ -198,6 +211,7 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
         << (n.ismax? "MAX " : "MIN ")
         << "d=" << n.depth << " c=" << n.childs.size() << " x=" << n.x
         << " " << (n.move != InvalidMove? n.board.toString(n.move) : "-")
+        //<< (n.invalid? " invalid" : "")
         //<< " " << (n.best<n.moves.size()? n.board.toString(n.moves[n.best]) : "-")
         ;
     if (n.term) out << " T";

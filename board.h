@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define BOARD_H
 
 #define TTT_CAPTURE
-//#define TTT_KEEP_TREE
-#define TTT_TRANSPOSITION_TABLE
+#define TTT_KEEP_TREE
+//#define TTT_TRANSPOSITION_TABLE
 
 #include <vector>
 #include <string>
@@ -84,6 +84,22 @@ struct Hash
 
 };
 #endif
+
+
+/** good ol' implicit ulam spiral for move ordering
+ *  [starting at zero] */
+template <typename I>
+static I ulam_spiral(I x, I y)
+{
+    I d;
+    if ((d= x)>abs(y)) return (d * 4 - 3) * d + y;
+    if ((d=-x)>abs(y)) return (d * 4 + 1) * d - y;
+    {
+        d = abs(y);
+        if (y > 0) return (d * 4 - 1) * d - x;
+              else return (d * 4 + 3) * d + x;
+    }
+}
 
 
 class Board
@@ -158,6 +174,7 @@ public:
 protected:
 
     void createRowValues();
+    void createMoveOrder();
 
     uint size_, cons_;
     std::vector<Piece> board_;
@@ -166,9 +183,10 @@ protected:
 
     Stm stm_, nstm_;
 
-    uint pieces_;
+    uint pieces_, ply_;
 
     static std::vector<int> rowVal_;
+    static std::vector<Square> moveOrder_;
 };
 
 #endif // BOARD_H

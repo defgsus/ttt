@@ -46,7 +46,7 @@ void printHelp(bool shrt = false)
     std::cout << "\nHello Seeker\n"
               << "Enter moves like: 'a1', 'c2' ...\n"
               << "I also understand 'quit', 'start', 'back', 'print',\n"
-              << "'X', 'O', 'guess', 'play x', 'depth x', 'tree' and 'btree',\n"
+              << "'X', 'O', 'moves', 'guess', 'play x', 'depth x', 'tree' and 'btree',\n"
               << "'size x x', 'help' and 'rules'\n"
               << std::endl;
     if (shrt) return;
@@ -165,6 +165,15 @@ int main(int , char **)
         else if (str == "btree")
         {
             ai.printTree(true);
+            goto ask_;
+        }
+        else if (str == "moves")
+        {
+            Moves m;
+            b.getMoves(m);
+            for (auto i : m)
+                std::cout << " " << b.toString(i);
+            std::cout << std::endl;
             goto ask_;
         }
         else if (str == "guess")
