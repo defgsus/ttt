@@ -71,6 +71,7 @@ protected:
     Node root_;
 
     unsigned int num_nodes_;
+
 };
 
 #endif // SEARCH_H

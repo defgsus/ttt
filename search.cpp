@@ -43,8 +43,11 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     root_.board = b;
     root_.ismax = true;
     root_.move = InvalidMove;
-    // go
+
+    // setup other stuff
     num_nodes_ = 0;
+
+    // go
     minimax(root_);
 
     std::cout << "num. nodes : " << num_nodes_
@@ -83,10 +86,10 @@ void Search::minimax(Node& n)
     n.best = InvalidMove;
 
     int eval = n.board.eval();
-    n.term = n.moves.empty() || abs(eval) >= MaxScore;
-    //if (n.term) std::cout << "term " << n.term << " depth " << n.depth << std::endl;
 
     // terminal node or max-depth?
+    n.term = n.moves.empty() || abs(eval) >= MaxScore;
+    //if (n.term) std::cout << "term " << n.term << " depth " << n.depth << std::endl;
     if (n.term || n.depth >= max_depth_)
     {
         n.x = eval;

@@ -116,7 +116,7 @@ int main(int , char **)
             std::cin >> autoplay;
             if (!autoplay) goto ask_;
         }
-        else if (str == "print")
+        else if (str == "p" || str == "print")
             goto reprint_;
 
         else if (str == "help" || str == "?")
@@ -124,7 +124,7 @@ int main(int , char **)
             printHelp();
             goto ask_;
         }
-        else if (str == "rules")
+        else if (str.find("rule")==0)
         {
             printRules(b);
             goto ask_;
@@ -168,7 +168,7 @@ int main(int , char **)
             std::cout << "best move: " << b.toString(m) << " (" << score << ")" << std::endl;
             goto ask_;
         }
-        else if (str == "back")
+        else if (str == "b" || str == "back")
         {
             if (stack.size())
             {
@@ -217,6 +217,9 @@ int main(int , char **)
 
         // apply user move
         b.makeMove(m);
+        std::cout << std::endl;
+        b.printBoard(true);
+        std::cout << std::endl;
         b.flipStm();
 
         if (autoplay>0)
@@ -233,11 +236,15 @@ int main(int , char **)
             {
                 std::cout << "\nYou win!" << std::endl;
                 autoplay = 0;
+                b.flipStm();
                 goto reprint_;
             }
 
             if (b.isDraw())
+            {
+                b.flipStm();
                 goto draw_;
+            }
 
             // run ai
             int score;
