@@ -44,6 +44,7 @@ void Board::setSize(uint size, uint cons)
     cons_ = cons;
     board_.resize(size*size);
     score_.resize(size*size);
+    clearEvalMap();
     rowVal_.clear();
     createRowValues();
     moveOrder_.clear();
@@ -57,6 +58,7 @@ void Board::init()
         i = Empty;
     for (auto &i : score_)
         i = Empty;
+    clearEvalMap();
 
     stm_ = X;
     nstm_ = O;
@@ -76,20 +78,23 @@ void Board::createMoveOrder()
     if (!moveOrder_.empty()) return;
 
     moveOrder_.resize(size_*size_);
+    for (auto &i : moveOrder_)
+        i = 0;
+
     // use an ulam spiral to create indexes
     // that start in the middle and expand towards edges
-    const int sh = size_ >> 1;
+    const int sh = (size_ >> 1) - !(size_&1);
     for (int y = 0; y<(int)size_; ++y)
     for (int x = 0; x<(int)size_; ++x)
     {
         size_t u = ulam_spiral(x-sh,y-sh);
-        if (u>=board_.size()) continue;
 
-        moveOrder_[u] = y * size_ + x;
+        if (u<=moveOrder_.size())
+            moveOrder_[u] = y * size_ + x;
     }
 
-//    for (auto i : moveOrder_)
-//        std::cout << " " << i;
+    for (auto i : moveOrder_)
+        std::cout << " " << i;
 }
 
 void Board::createRowValues()
@@ -118,7 +123,7 @@ void Board::createRowValues()
         uint u = 0;
 
         // start by scoring
-        // square values as: empty +1, piece +2
+        //   square values as: empty +1, piece +2
         for (i = 0; i<cons_; ++i)
             u += std::min(1, row[i]) + 1;
 
@@ -325,7 +330,7 @@ void Board::printBoard(bool eval, std::ostream& out) const
             out << "    | ";
             for (uint x=0; x<size_; ++x)
             {
-                if (board_[y*size_+x] == Empty)
+                if (board_[y*size_+x] == Empty && score_[y*size_+x] != InvalidScore)
                     out << std::setw(6) << score_[y*size_+x];
                 else
                     out << std::setw(6) << " ";//(char)(pieceChar[board_[y*size_+x]]+32);
@@ -339,7 +344,7 @@ void Board::printBoard(bool eval, std::ostream& out) const
 void Board::clearEvalMap()
 {
     for (auto &i : score_)
-        i = 0;
+        i = InvalidScore;
 }
 
 void Board::setEvalMap(Square s, int score)
@@ -386,8 +391,8 @@ int Board::eval(Stm side) const
         {                                   \
             cnt <<= 2;                      \
             Piece p = board_[cy*size_+cx];  \
-            cnt += ((p&side)>0) | \
-                   (((p&nside)>0)<<1);\
+            cnt += ((p&side)!=0) | \
+                   (((p&nside)!=0)<<1);\
             cx += xi; cy += yi;             \
         }                                   \
     /*std::cout << ":" << cnt << "\n";*/ \

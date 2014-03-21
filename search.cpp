@@ -186,13 +186,13 @@ void Search::minimax(Node& n)
         if (n.ismax)
         {
             if (score > n.x) { n.x = score; n.best = i; }
-            if (n.x >= n.beta) { /*std::cout << "beta " << beta_ << std::endl;*/ break; }
+            //if (n.x >= n.beta) { /*std::cout << "beta " << beta_ << std::endl;*/ break; }
             n.alpha = std::max(n.alpha, n.x);
         }
         else
         {
             if (score < n.x) { n.x = score; n.best = i; }
-            if (n.x <= n.alpha) { /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
+            //if (n.x <= n.alpha) { /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
             n.beta = std::min(n.beta, n.x);
         }
     }

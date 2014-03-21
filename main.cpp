@@ -293,7 +293,7 @@ int main(int , char **)
 
     draw_:
         std::cout << std::endl;
-        if (!autoplay) b.printBoard(print_eval);
+        //if (!autoplay) b.printBoard(print_eval);
         std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
         std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
         autoplay = 0;
