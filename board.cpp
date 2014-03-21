@@ -311,9 +311,11 @@ std::string Board::toString(Move m) const
 
 void Board::printBoard(bool eval, std::ostream& out) const
 {
-    out << "   ";
+    const bool bigboard_ = false;
+
+    out << "  ";
     for (uint x=0; x<size_; ++x)
-        out << (char)(x + 'a') << " ";
+        out << std::setw(2+bigboard_) << (char)(x + 'a');
     if (eval)
     {
         out << "    | ";
@@ -325,26 +327,42 @@ void Board::printBoard(bool eval, std::ostream& out) const
 
     for (uint y=0; y<size_; ++y)
     {
-        out << std::setw(2) << (y+1) << " ";
-
-        for (uint x=0; x<size_; ++x)
+        for (int y1=0; y1<=bigboard_; ++y1)
         {
-            out << pieceChar[board_[y*size_+x]] << " ";
-        }
+            if (!bigboard_ ^ y1)
+                out << std::setw(2) << (y+1) << " ";
+            else
+                out << "   ";
 
-        if (eval)
-        {
-            out << "    | ";
             for (uint x=0; x<size_; ++x)
             {
-                if (board_[y*size_+x] == Empty && score_[y*size_+x] != InvalidScore)
-                    out << std::setw(6) << score_[y*size_+x];
+                if (!bigboard_)
+                    out << pieceChar[board_[y*size_+x]] << " ";
                 else
-                    out << std::setw(6) << " ";//(char)(pieceChar[board_[y*size_+x]]+32);
+                {
+                    switch (board_[y*size_+x])
+                    {
+                    default: if (y1==0) out << "   ";  else out << ".  "; break;
+                    case X:  if (y1==0) out << "\\/ "; else out << "/\\ "; break;
+                    case O:  if (y1==0) out << "/\\ "; else out << "\\/ "; break;
+                    }
+                }
             }
-        }
 
-        out << std::endl;
+            if (eval && y1==0)
+            {
+                out << "   | ";
+                for (uint x=0; x<size_; ++x)
+                {
+                    if (board_[y*size_+x] == Empty && score_[y*size_+x] != InvalidScore)
+                        out << std::setw(6) << score_[y*size_+x];
+                    else
+                        out << std::setw(6) << " ";//(char)(pieceChar[board_[y*size_+x]]+32);
+                }
+            }
+
+            out << std::endl;
+        }
     }
 }
 
@@ -401,8 +419,8 @@ int Board::eval(Stm side) const
         {                                   \
             cnt <<= 2;                      \
             Piece p = board_[cy*size_+cx];  \
-            cnt += ((p&side)!=0) | \
-                   (((p&nside)!=0)<<1);\
+            cnt += ((p&side)!=0) |          \
+                   (((p&nside)!=0)<<1);     \
             cx += xi; cy += yi;             \
         }                                   \
     /*std::cout << ":" << cnt << "\n";*/ \

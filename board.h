@@ -50,7 +50,7 @@ enum PieceType
 const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
-const int MaxScore = 1000;
+const int MaxScore = 2000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
 

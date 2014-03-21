@@ -76,7 +76,9 @@ protected:
 
     int alpha_, beta_;
 
-    uint num_nodes_, num_cache_reuse_;
+    uint num_nodes_,
+         num_cache_reuse_,
+         num_prune_;
 
 #ifdef TTT_TRANSPOSITION_TABLE
     std::map<Hash,int> cache_;

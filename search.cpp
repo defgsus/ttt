@@ -51,6 +51,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // setup other stuff
     num_nodes_ = 0;
     num_cache_reuse_ = 0;
+    num_prune_ = 0;
     alpha_ = -MaxScore*2;
     beta_ = MaxScore*2;
 
@@ -72,6 +73,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     float took = (float)time.elapsed()/1000;
 
     std::cout << " nodes: " << num_nodes_
+              << " prune: " << num_prune_
 #ifdef TTT_TRANSPOSITION_TABLE
               << " cache: " << num_cache_reuse_
 #endif
@@ -112,9 +114,10 @@ void Search::minimax(Node& n)
     n.best = InvalidMove;
 
     int eval = n.board.eval();
+    if (!n.ismax) eval = -eval;
 
     // terminal node or max-depth?
-    n.term = n.moves.empty() || abs(eval) >= MaxScore;
+    n.term = n.moves.empty() || abs(eval) >= WinScore;
     //if (n.term) std::cout << "term " << n.term << " depth " << n.depth << std::endl;
     if (n.term || n.depth >= max_depth_)
     {
@@ -185,14 +188,14 @@ void Search::minimax(Node& n)
         // get score back
         if (n.ismax)
         {
-            if (score > n.x) { n.x = score; n.best = i; }
-            if (n.x >= n.beta) { /*std::cout << "beta " << beta_ << std::endl;*/ break; }
+            if (score > n.x) { n.x = score*0.7; n.best = i; }
+            if (n.x >= n.beta) { num_prune_++; /*std::cout << "beta " << beta_ << std::endl;*/ break; }
             n.alpha = std::max(n.alpha, n.x);
         }
         else
         {
-            if (score < n.x) { n.x = score; n.best = i; }
-            if (n.x <= n.alpha) { /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
+            if (score < n.x) { n.x = score*0.7; n.best = i; }
+            if (n.x <= n.alpha) { num_prune_++; /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
             n.beta = std::min(n.beta, n.x);
         }
     }
