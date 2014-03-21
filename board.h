@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef BOARD_H
 #define BOARD_H
 
-//#define TTT_CAPTURE
+#define TTT_CAPTURE
 //#define TTT_KEEP_TREE
-//#define TTT_TRANSPOSITION_TABLE
+#define TTT_TRANSPOSITION_TABLE
 
 #include <vector>
 #include <string>
@@ -51,7 +51,9 @@ const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
 const int MaxScore = 1000;
+const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
+
 #ifdef TTT_TRANSPOSITION_TABLE
 struct Hash
 {

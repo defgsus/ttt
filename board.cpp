@@ -90,11 +90,11 @@ void Board::createMoveOrder()
         size_t u = ulam_spiral(x-sh,y-sh);
 
         if (u<=moveOrder_.size())
-            moveOrder_[u] = y * size_ + x;
+            moveOrder_[u] = (y * size_ + x);
     }
 
-    for (auto i : moveOrder_)
-        std::cout << " " << i;
+    //for (auto i : moveOrder_)
+    //    std::cout << " " << i;
 }
 
 void Board::createRowValues()
@@ -107,28 +107,37 @@ void Board::createRowValues()
     // The value '3' in the 2 piece bits is not used.
     // The map still contains a value there for efficient access
     // (entry = rowvalue<<2)
-    uint i,j,kk,cnt,k = 0, num = pow(4, cons_);
+    uint i,j,kk,k = 0, num = pow(4, cons_);
     for (j=0; j<num; ++j, ++k)
     {
         std::vector<int> row;
         for (i=0; i<cons_; ++i)
         {
             kk = k>>(i*2);
-            if ((kk&3)==Empty) row.push_back(0); else
-            if ((kk&3)==X)     row.push_back(1); else
-            if ((kk&3)>=O)     row.push_back(2);
+            if ((kk&3)==Empty) row.push_back(Empty); else
+            if ((kk&3)==X)     row.push_back(X); else
+            if ((kk&3)>=O)     row.push_back(O);
         }
 
         // get utility value
-        uint u = 0;
+        int u = 0, full = 0;
 
         // start by scoring
-        //   square values as: empty +1, piece +2
+        //   square values as:
         for (i = 0; i<cons_; ++i)
-            u += std::min(1, row[i]) + 1;
-
+        {
+            if (row[i] == Empty)
+                u += 1;
+            else if (row[i] == X)
+            {
+                full++;
+                u += (4 + 2 * full);
+            }
+            else if (row[i] == O)
+                u -= 3;
+        }
         // full row?
-        if (u>=cons_*2)
+        if (full>=(int)cons_)
         {
             u = MaxScore; // win
         }
@@ -137,30 +146,28 @@ void Board::createRowValues()
             // additional points for consecutiveness
             for (i=0; i<cons_-1; ++i)
                 if (row[i] == 1 && row[i+1] == 1)
-                    u++;
+                    u *= 2;
+
+            // generally less points when opponent breaks row
+            for (i = 0; i<cons_; ++i)
+                if (row[i] == 2) { u /= 3; }
+#if 1
+            // no points for full-row-emptyness
+            if (full == 0) u = 0;
+#endif
+
         }
 
-        // no points when opponent breaks row
-        for (i = 0; i<cons_; ++i)
-            if (row[i] == 2) { u = 0; break; }
+        // store utility value
+        rowVal_.push_back( std::max(0, u));
 
 #if 1
-        // no points for full-row-emptyness
-        cnt = 0;
-        for (i = 0; i<cons_; ++i)
-            cnt += row[i] == 0;
-        if (cnt == cons_) u = 0;
-#endif
-        // store utility value
-        rowVal_.push_back(u);
-
-#if 0
         // debug print
         if (k%4 != 3)
         {
             std::cout << std::setw(4) << k << " ";
             for (i=0; i<cons_; ++i) std::cout << pieceChar[row[i]];
-            if (u) std::cout << " " << u;
+            if (u>0) std::cout << " " << u;
             std::cout << std::endl;
         }
 #endif
@@ -281,7 +288,7 @@ void Board::getMoves(Moves &m) const
 
 bool Board::isWin(Stm p) const
 {
-    return (eval(p) >= MaxScore / 2);
+    return (eval(p) >= WinScore);
 }
 
 bool Board::isDraw() const
@@ -355,9 +362,11 @@ void Board::setEvalMap(Square s, int score)
 
 int Board::eval()
 {
+    return eval(stm_) - eval(nstm_);
+    /*
     int x = eval(X), o = eval(O);
-    //if (x>=MaxScore) x *= 2;
-    //if (o>=MaxScore) o *= 2;
+    if (x>=MaxScore) x *= 2;
+    if (o>=MaxScore) o *= 2;
     int v = x-o;
 
     if (x>=MaxScore)
@@ -366,6 +375,7 @@ int Board::eval()
         v = -o;
 
     return (stm_ == X)? v : -v;
+    */
 }
 
 

@@ -225,8 +225,6 @@ int main(int , char **)
             std::cout << "best move: " << b.toString(m) << " (" << score << ")\n" << std::endl;
         }
 
-
-
         // store history
         stack.push_back(b);
 
@@ -293,7 +291,7 @@ int main(int , char **)
 
     draw_:
         std::cout << std::endl;
-        //if (!autoplay) b.printBoard(print_eval);
+        if (!autoplay) b.printBoard(print_eval);
         std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
         std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
         autoplay = 0;
