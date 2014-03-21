@@ -25,18 +25,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <iomanip>
 
 std::vector<int> Board::rowVal_;
+std::vector<Hash> Board::hashVal_;
 
-Board::Board(unsigned int size, unsigned int cons)
+Board::Board(uint size, uint cons)
     :   size_   (size),
         cons_   (cons),
         board_  (size*size),
         score_  (size*size)
 {
+    createHashValues();
     createRowValues();
     init();
 }
 
-void Board::setSize(unsigned int size, unsigned int cons)
+void Board::setSize(uint size, uint cons)
 {
     size_ = size;
     cons_ = cons;
@@ -44,6 +46,8 @@ void Board::setSize(unsigned int size, unsigned int cons)
     score_.resize(size*size);
     rowVal_.clear();
     createRowValues();
+    hashVal_.clear();
+    createHashValues();
     init();
 }
 
@@ -57,28 +61,48 @@ void Board::init()
     pieces_ = 0;
 }
 
+Stm Board::flipStm()
+{
+    std::swap(stm_, nstm_);
+    return stm_;
+}
+
+void Board::createHashValues()
+{
+    if (!hashVal_.empty()) return;
+
+    hashVal_.resize(size_ * 2);
+    for (auto &i : hashVal_)
+        i = ((Hash)rand() << 32) || (Hash)rand();
+}
+
 void Board::createRowValues()
 {
     if (!rowVal_.empty()) return;
 
-    // creat all permutations of empty/X/O for a row of length cons_
+    // creat all permutations of empty/self/other for a row of length cons_
     // and precalculate the utility value
-    unsigned int i,j,kk,cnt,k = 0, num = pow(4, cons_);
+    // Note.
+    // The value '3' in the 2 piece bits is not used.
+    // The map still contains a value there for efficient access
+    // (entry = rowvalue<<2)
+    uint i,j,kk,cnt,k = 0, num = pow(4, cons_);
     for (j=0; j<num; ++j, ++k)
     {
         std::vector<int> row;
         for (i=0; i<cons_; ++i)
         {
             kk = k>>(i*2);
-            if ((kk&3)==0) row.push_back(0); else
-            if ((kk&3)==1) row.push_back(1); else
-            if ((kk&3)>=2) row.push_back(2);
+            if ((kk&3)==Empty) row.push_back(0); else
+            if ((kk&3)==X)     row.push_back(1); else
+            if ((kk&3)>=O)     row.push_back(2);
         }
 
         // get utility value
-        unsigned int u = 0;
+        uint u = 0;
 
-        // count empty=1, piece=2
+        // start by scoring
+        // square values as: empty +1, piece +2
         for (i = 0; i<cons_; ++i)
             u += std::min(1, row[i]) + 1;
 
@@ -100,7 +124,7 @@ void Board::createRowValues()
             if (row[i] == 2) { u = 0; break; }
 
 #if 1
-        // no points for emptyness
+        // no points for full-row-emptyness
         cnt = 0;
         for (i = 0; i<cons_; ++i)
             cnt += row[i] == 0;
@@ -137,27 +161,13 @@ void Board::init(const std::string& str)
     }
 }
 
-Piece Board::flipStm()
-{
-    if (stm_ == X)
-    {
-        stm_ = O;
-        nstm_ = X;
-    }
-    else
-    {
-        stm_ = X;
-        nstm_ = O;
-    }
-    return stm_;
-}
 
 Move Board::parseMove(const std::string& str) const
 {
     if (str.size() < 2)
         return InvalidMove;
 
-    unsigned int x, y;
+    uint x, y;
 
     x = str[0];
     if (x>='A' && x<='Z')
@@ -196,8 +206,8 @@ void Board::makeMove(Move m)
     // check for captures
     #define TTT_EXECAPTURE(x_,y_) \
         if (canCapture(m, x_, y_)) \
-            { board_[m+x_+y_*size_] = Empty; pieces_--; } \
-                else
+            { board_[m+x_+y_*size_] = Empty; pieces_--; }
+                //else
 
         TTT_EXECAPTURE( 1, 0)
         TTT_EXECAPTURE( 1, 1)
@@ -207,7 +217,7 @@ void Board::makeMove(Move m)
         TTT_EXECAPTURE(-1,-1)
         TTT_EXECAPTURE( 0,-1)
         TTT_EXECAPTURE( 1,-1)
-        { }
+        //{ }
 
     #undef TTT_EXECAPTURE
 
@@ -215,7 +225,7 @@ void Board::makeMove(Move m)
 #endif
 }
 
-bool Board::canCapture(Move m, int xi, int yi) const
+bool Board::canCapture(Square m, int xi, int yi) const
 {
     if (board_[m] == Empty) return false;
 
@@ -243,7 +253,17 @@ void Board::getMoves(Moves &m) const
             m.push_back(i);
 }
 
-bool Board::isWin(PieceType p) const
+Hash Board::hash() const
+{
+    /*Hash h = hashVal_[board_[0]];
+    for (uint i=0; i<size_; ++i)
+    {
+        h ^=
+    }*/
+    return 0;
+}
+
+bool Board::isWin(Stm p) const
 {
     return (eval(p) >= MaxScore / 2);
 }
@@ -269,21 +289,21 @@ std::string Board::toString(Move m) const
 void Board::printBoard(bool eval, std::ostream& out) const
 {
     out << "   ";
-    for (unsigned int x=0; x<size_; ++x)
+    for (uint x=0; x<size_; ++x)
         out << (char)(x + 'a') << " ";
     if (eval)
     {
         out << "    | ";
-        for (unsigned int x=0; x<size_; ++x)
+        for (uint x=0; x<size_; ++x)
             out << std::setw(6) << (char)(x + 'a');
         out << std::endl;
     }
 
-    for (unsigned int y=0; y<size_; ++y)
+    for (uint y=0; y<size_; ++y)
     {
         out << std::setw(2) << (y+1) << " ";
 
-        for (unsigned int x=0; x<size_; ++x)
+        for (uint x=0; x<size_; ++x)
         {
             out << pieceChar[board_[y*size_+x]] << " ";
         }
@@ -291,12 +311,12 @@ void Board::printBoard(bool eval, std::ostream& out) const
         if (eval)
         {
             out << "    | ";
-            for (unsigned int x=0; x<size_; ++x)
+            for (uint x=0; x<size_; ++x)
             {
                 if (board_[y*size_+x] == Empty)
                     out << std::setw(6) << score_[y*size_+x];
                 else
-                    out << std::setw(6) << (char)(pieceChar[board_[y*size_+x]]+32);
+                    out << std::setw(6) << " ";//(char)(pieceChar[board_[y*size_+x]]+32);
             }
         }
 
@@ -310,9 +330,9 @@ void Board::clearEvalMap()
         i = 0;
 }
 
-void Board::setEvalMap(int Move, int score)
+void Board::setEvalMap(Square s, int score)
 {
-    score_[Move] = score;
+    score_[s] = score;
 }
 
 
@@ -334,27 +354,28 @@ int Board::eval()
 
 
 
-int Board::eval(PieceType p) const
+int Board::eval(Stm side) const
 {
-    if (p == Empty) return 0;
+    if (side == Empty) return 0;
+
+    Stm nside = side ^ 3;
 
     int u = 0;
-    unsigned int x,y;
+    uint x,y;
 
     // --- find consecutives ---
 
-// start at x,y, go along direction xi,yi, count row value
+// start at x,y, go along direction xi,yi, bit-fiddle row value
+// which is an index into rowVal_[]
 #define TTT_CHECK(xi, yi)                   \
     {                                       \
-        unsigned int cx = x, cy = y, cnt=0; \
-        for (unsigned int i=0; i<cons_; ++i)\
+        uint cx = x, cy = y, cnt=0;         \
+        for (uint i=0; i<cons_; ++i)        \
         {                                   \
             cnt <<= 2;                      \
-            Piece b = board_[cy*size_+cx];  \
-            if (b == p)                     \
-                ++cnt;                      \
-            else if (b != Empty)            \
-                cnt += 2;                   \
+            Piece p = board_[cy*size_+cx];  \
+            cnt += ((p&side)>0) | \
+                   (((p&nside)>0)<<1);\
             cx += xi; cy += yi;             \
         }                                   \
     /*std::cout << ":" << cnt << "\n";*/ \

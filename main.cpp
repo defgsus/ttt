@@ -66,7 +66,13 @@ void printHelp(bool shrt = false)
 }
 
 int main(int , char **)
-{
+{/*
+    .. .x x.
+    .. x. .x
+    0  1  2*/
+
+    //std::cout << (2^3) << std::endl; return 0;
+
     printHelp(true);
 
     int mdepth = 2;

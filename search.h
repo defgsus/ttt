@@ -53,7 +53,7 @@ protected:
         // child nodes
         std::vector<Node> childs;
         // best index into childs/moves
-        unsigned int best;
+        uint best;
         // terminal node?
         bool term;
 
@@ -70,7 +70,7 @@ protected:
 
     Node root_;
 
-    unsigned int num_nodes_;
+    uint num_nodes_;
 
 };
 

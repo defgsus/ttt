@@ -27,28 +27,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cinttypes>
 
-typedef unsigned char Piece;
-typedef unsigned int Move;
-typedef std::vector<Move> Moves;
+typedef unsigned int        uint;
+
+typedef unsigned char       Piece;
+typedef uint                Square;
+typedef Square              Move;
+typedef std::vector<Move>   Moves;
+typedef Piece               Stm;
+typedef uint64_t            Hash;
+
+/** That's what goes onto a board square.
+ *
+ *  alway assumed: first bit is you, second bit is other
+ */
+enum PieceType
+{
+    Empty, X = 1, O = 2
+};
 
 const Move InvalidMove = -1;
 const int MaxScore = 1000;
 
-enum PieceType
-{
-    Empty, X, O
-};
 
 const char pieceChar[] = { '.', 'X', 'O' };
+
 
 class Board
 {
 public:
-    Board(unsigned int size = 3, unsigned int consecutives = 3);
+    Board(uint size = 3, uint consecutives = 3);
 
     /** resize the board. */
-    void setSize(unsigned int size = 3, unsigned int consecutives = 3);
+    void setSize(uint size = 3, uint consecutives = 3);
 
     /** Clears board and sets stm to X */
     void init();
@@ -56,23 +68,23 @@ public:
     /** Inits board from string (row-major X, O or .) */
     void init(const std::string& str);
 
-    /** Returns side to move, either X or O */
-    Piece stm() const { return stm_; }
+    /** Returns side to move, either 0 or 1 */
+    Stm stm() const { return stm_; }
 
     /** Changes side to move, returns new value. */
-    Piece flipStm();
+    Stm flipStm();
 
     /** Returns sidelength. */
-    unsigned int size() const { return size_; }
+    uint size() const { return size_; }
 
     /** Returns number of to-connect pieces */
-    unsigned int consecutives() const { return cons_; }
+    uint consecutives() const { return cons_; }
 
     /** Returns number of pieces on board. */
-    unsigned int pieces() const { return pieces_; }
+    uint pieces() const { return pieces_; }
 
     /** Return piece at given position */
-    Piece pieceAt(Move m) const { return board_[m]; }
+    Piece pieceAt(Square m) const { return board_[m]; }
 
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */
@@ -91,17 +103,20 @@ public:
     /** Check for capture possibility from position m along direction xi,yi */
     bool canCapture(Move m, int xi, int yi) const;
 
-    bool isWin(PieceType p) const;
+    bool isWin(Stm p) const;
     bool isDraw() const;
+
+    /** Returns a non-unique hash value for the current position and stm. */
+    Hash hash() const;
 
     /** Returns board value */
     int eval();
 
-    /** Returns the utility for X or O */
-    int eval(PieceType p) const;
+    /** Returns the utility for 0 or 1 */
+    int eval(Stm p) const;
 
     void clearEvalMap();
-    void setEvalMap(int Move, int score);
+    void setEvalMap(Square s, int score);
 
     /** print the board as ascii */
     void printBoard(bool witheval, std::ostream& out = std::cout) const;
@@ -109,15 +124,19 @@ public:
 protected:
 
     void createRowValues();
+    void createHashValues();
 
-    unsigned int size_, cons_;
+    uint size_, cons_;
     std::vector<Piece> board_;
+    /** evaluation buffer */
     std::vector<int> score_;
 
-    Piece stm_, nstm_;
-    unsigned int pieces_;
+    Stm stm_, nstm_;
+
+    uint pieces_;
 
     static std::vector<int> rowVal_;
+    static std::vector<Hash> hashVal_;
 };
 
 #endif // BOARD_H
