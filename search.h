@@ -44,7 +44,11 @@ protected:
 
     struct Node
     {
-        int depth, alpha, beta;
+        int depth
+#ifdef TTT_ALPHA_BETA
+        , alpha, beta
+#endif
+        ;
         bool ismax;
         // score/utility
         int x;
@@ -66,23 +70,42 @@ protected:
         { }
     };
 
+    /** info per node-thread */
+    struct Info
+    {
+        Info() : num_nodes(0), num_cache_reuse(0), num_prune(0), num_level(0)
+            { }
+
+        void combine(const Info& r)
+        {
+            num_nodes += r.num_nodes;
+            num_cache_reuse += r.num_cache_reuse;
+            num_prune += r.num_prune;
+            num_level = std::max(num_level, r.num_level);
+        }
+
+        uint num_nodes,
+             num_cache_reuse,
+             num_prune,
+             num_level;
+#ifdef TTT_TRANSPOSITION_TABLE
+            std::map<Hash,int> cache;
+#endif
+    };
+
     /** Evaluates a Node.
         Only needs depth and board to be set. */
-    void minimax(Node& n);
+    void minimax(Info * info, Node * n);
 
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
 
     Node root_;
 
+#ifdef TTT_ALPHA_BETA
     int alpha_, beta_;
-
-    uint num_nodes_,
-         num_cache_reuse_,
-         num_prune_;
-
-#ifdef TTT_TRANSPOSITION_TABLE
-    std::map<Hash,int> cache_;
 #endif
+
+
 };
 
 #endif // SEARCH_H

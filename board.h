@@ -21,9 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef BOARD_H
 #define BOARD_H
 
-//#define TTT_CAPTURE
+#define TTT_CAPTURE
+#define TTT_ALPHA_BETA
+//#define TTT_TRANSPOSITION_TABLE
+#define TTT_THREADED
 //#define TTT_KEEP_TREE
-#define TTT_TRANSPOSITION_TABLE
 
 #include <vector>
 #include <string>
@@ -177,9 +179,13 @@ public:
 
 protected:
 
+    void staticInit();
+    void nonStaticInit();
+
     int getRowValue(int * row, int x, int o) const;
     void createRowValues();
     void createMoveOrder();
+    void createScanOrder();
 
     uint size_, sizesq_, cons_;
     std::vector<Piece> board_;
@@ -192,6 +198,7 @@ protected:
 
     static std::vector<int> rowVal_;
     static std::vector<Square> moveOrder_;
+    static std::vector<Square> scanOrder_;
 };
 
 #endif // BOARD_H

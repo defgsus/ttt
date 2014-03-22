@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 std::vector<int> Board::rowVal_;
 std::vector<Square> Board::moveOrder_;
+std::vector<Square> Board::scanOrder_;
 
 Board::Board(uint size, uint cons)
     :   size_   (size),
@@ -34,8 +35,7 @@ Board::Board(uint size, uint cons)
         board_  (sizesq_),
         score_  (sizesq_)
 {
-    createRowValues();
-    createMoveOrder();
+    nonStaticInit();
     init();
 }
 
@@ -47,10 +47,7 @@ void Board::setSize(uint size, uint cons)
     board_.resize(size*size);
     score_.resize(size*size);
     clearEvalMap();
-    rowVal_.clear();
-    createRowValues();
-    moveOrder_.clear();
-    createMoveOrder();
+    staticInit();
     init();
 }
 
@@ -66,6 +63,21 @@ void Board::init()
     nstm_ = O;
     pieces_ = 0;
     ply_ = 0;
+}
+
+void Board::staticInit()
+{
+    rowVal_.clear();
+    moveOrder_.clear();
+    scanOrder_.clear();
+    nonStaticInit();
+}
+
+void Board::nonStaticInit()
+{
+    createRowValues();
+    createMoveOrder();
+    createScanOrder();
 }
 
 Stm Board::flipStm()
@@ -185,6 +197,46 @@ void Board::createRowValues()
     }
 }
 
+void Board::createScanOrder()
+{
+    if (!scanOrder_.empty()) return;
+
+#define TTT_SCAN(xi, yi)                       \
+    {                                          \
+        uint cx = x, cy = y;                   \
+        for (uint i=0; i<cons_; ++i)           \
+        {                                      \
+            scanOrder_.push_back(cy*size_+cx); \
+            cx += xi; cy += yi;                \
+        }                                      \
+    }
+
+    uint x,y;
+
+    // horizontal
+    for (y=0; y<size_; ++y)
+        for (x=0; x<=size_-cons_; ++x)
+            TTT_SCAN(1,0);
+
+    // vertically
+    for (x=0; x<size_; ++x)
+        for (y=0; y<=size_-cons_; ++y)
+            TTT_SCAN(0,1);
+
+    // diagonally right
+    for (y=0; y<=size_-cons_; ++y)
+        for (x=0; x<=size_-cons_; ++x)
+            TTT_SCAN(1,1);
+
+    // diagonally left
+    for (y=0; y<=size_-cons_; ++y)
+        for (x=size_-1; x>=cons_-1; --x)
+            TTT_SCAN(-1,1);
+
+    #undef TTT_SCAN
+
+}
+
 void Board::init(const std::string& str)
 {
     init();
@@ -241,6 +293,7 @@ void Board::makeMove(Move m)
     board_[m] = stm_;
     pieces_++;
 
+#ifdef TTT_CAPTURE
     exeCapture(m, 1, 0);
     exeCapture(m, 1, 1);
     exeCapture(m, 0, 1);
@@ -249,6 +302,7 @@ void Board::makeMove(Move m)
     exeCapture(m,-1,-1);
     exeCapture(m, 0,-1);
     exeCapture(m, 1,-1);
+#endif
 }
 
 bool Board::exeCapture(Square m, int xi, int yi)
@@ -413,53 +467,22 @@ int Board::eval()
 int Board::evalX() const
 {
     int u = 0;
-    uint x,y;
 
     // --- find consecutives ---
 
-// start at x,y, go along direction xi,yi, bit-fiddle row value
-// which is an index into rowVal_[]
-#define TTT_CHECK(xi, yi)                   \
-    {                                       \
-        uint cx = x, cy = y, cnt=0;         \
-        for (uint i=0; i<cons_; ++i)        \
-        {                                   \
-            cnt <<= 2;                      \
-            Piece p = board_[cy*size_+cx];  \
-            cnt += p/*((p&side)!=0) |          \
-                   (((p&nside)!=0)<<1)*/;     \
-            cx += xi; cy += yi;             \
-        }                                   \
-    /*std::cout << ":" << cnt << "\n";*/ \
-        u += rowVal_[cnt];                  \
-        if (u >= WinScore) return u;        \
-    }
-
-    // horizontal
-    for (y=0; y<size_; ++y)
+    for (uint i=0; i<scanOrder_.size(); )
     {
-        for (x=0; x<=size_-cons_; ++x)
-            TTT_CHECK(1,0);
+        // bit-fiddle row value
+        // which is an index into rowVal_[]
+        uint cnt = 0;
+        for (uint j=0; j<cons_; ++j, ++i)
+        {
+            cnt <<= 2;
+            cnt += board_[scanOrder_[i]];
+        }
+        // add evaluation value
+        u += rowVal_[cnt];
     }
-
-    // vertically
-    for (x=0; x<size_; ++x)
-    {
-        for (y=0; y<=size_-cons_; ++y)
-            TTT_CHECK(0,1);
-    }
-
-    // diagonally right
-    for (y=0; y<=size_-cons_; ++y)
-    for (x=0; x<=size_-cons_; ++x)
-        TTT_CHECK(1,1);
-
-    // diagonally left
-    for (y=0; y<=size_-cons_; ++y)
-    for (x=size_-1; x>=cons_-1; --x)
-        TTT_CHECK(-1,1);
-
-    #undef TTT_CHECK
 
     return u;
 }
