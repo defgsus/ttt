@@ -127,12 +127,12 @@ int Board::getRowValue(int * row, const int X, const int O) const
     {
         // additional points for consecutiveness
         for (uint i=0; i<cons_-1; ++i)
-            if (row[i] == 1 && row[i+1] == 1)
+            if (row[i] == X && row[i+1] == X)
                 u *= 2;
 
         // generally less points when opponent breaks row
         for (uint i = 0; i<cons_; ++i)
-            if (row[i] == 2) { u /= 3; }
+            if (row[i] == O) { u /= 3; break; }
 #if 1
         // no points for full-row-emptyness
         if (full == 0) u = 0;
@@ -140,7 +140,7 @@ int Board::getRowValue(int * row, const int X, const int O) const
 
     }
 
-    return std::max(0,u);
+    return u;//std::max(0,u);
 }
 
 void Board::createRowValues()
@@ -249,29 +249,6 @@ void Board::makeMove(Move m)
     exeCapture(m,-1,-1);
     exeCapture(m, 0,-1);
     exeCapture(m, 1,-1);
-/*
-#ifdef TTT_CAPTURE
-    // check for captures
-    #define TTT_EXECAPTURE(x_,y_) \
-        if (canCapture(m, x_, y_)) \
-            { board_[m+x_+y_*size_] = Empty; board_[m+(x_+1)+(y_+1)*size_] = Empty; pieces_--; }
-                //else
-
-        TTT_EXECAPTURE( 1, 0)
-        TTT_EXECAPTURE( 1, 1)
-        TTT_EXECAPTURE( 0, 1)
-        TTT_EXECAPTURE(-1, 1)
-        TTT_EXECAPTURE(-1, 0)
-        TTT_EXECAPTURE(-1,-1)
-        TTT_EXECAPTURE( 0,-1)
-        TTT_EXECAPTURE( 1,-1)
-        //{ }
-
-    #undef TTT_EXECAPTURE
-
-    //if (board_[m] == Empty) pieces_--;
-#endif
-*/
 }
 
 bool Board::exeCapture(Square m, int xi, int yi)
@@ -316,22 +293,6 @@ bool Board::exeCapture(Square m, int xi, int yi)
         }
     }
     return false;
-/*
-    const int x = m%size_, y = m/size_;
-
-    // board limits
-    if ((xi<0 && x<2)
-     || (yi<0 && y<2)
-     || (xi>0 && x>(int)size_-3)
-     || (yi>0 && y>(int)size_-3))
-        return false;
-
-    // check if opponent is captured
-    bool r= (board_[(y+yi)*size_ + x+xi] == nstm_
-            && board_[(y+yi*2)*size_ + x+xi*2] == stm_);
-    //if (r) std::cout << "captured for " << toString(m) << "\n";
-    return r;
-*/
 }
 
 void Board::getMoves(Moves &m) const
@@ -444,19 +405,6 @@ void Board::setEvalMap(Square s, int score)
 int Board::eval()
 {
     return (stm_==X)? evalX() : -evalX();// - eval(nstm_);
-    /*
-    int x = eval(X), o = eval(O);
-    if (x>=MaxScore) x *= 2;
-    if (o>=MaxScore) o *= 2;
-    int v = x-o;
-
-    if (x>=MaxScore)
-        v = x;
-    else if (o>=MaxScore)
-        v = -o;
-
-    return (stm_ == X)? v : -v;
-    */
 }
 
 
@@ -484,7 +432,7 @@ int Board::evalX() const
         }                                   \
     /*std::cout << ":" << cnt << "\n";*/ \
         u += rowVal_[cnt];                  \
-        if (u >= MaxScore) return MaxScore; \
+        if (u >= WinScore) return u;        \
     }
 
     // horizontal
