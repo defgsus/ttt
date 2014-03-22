@@ -55,11 +55,7 @@ protected:
     struct Node
     {
         Node * parent;
-        int depth
-#ifdef TTT_ALPHA_BETA
-        , alpha, beta
-#endif
-        ;
+        int depth;
         bool ismax;
         // score/utility
         int x;
@@ -84,7 +80,8 @@ protected:
     /** info per node-thread */
     struct Info
     {
-        Info() : num_nodes(0), num_cache_reuse(0), num_prune(0),
+        Info() : alpha(-MaxScore), beta(MaxScore),
+                num_nodes(0), num_cache_reuse(0), num_prune(0),
                 num_cuts(0), num_level(0)
             { }
 
@@ -96,6 +93,10 @@ protected:
             num_cuts += r.num_cuts;
             num_level = std::max(num_level, r.num_level);
         }
+
+#ifdef TTT_ALPHA_BETA
+        int alpha, beta;
+#endif
 
         uint num_nodes,
              num_cache_reuse,
@@ -114,10 +115,6 @@ protected:
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
 
     Node root_;
-
-#ifdef TTT_ALPHA_BETA
-    int alpha_, beta_;
-#endif
 
 #ifdef TTT_GREEDY
     int greed_;

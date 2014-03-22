@@ -44,8 +44,6 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // setup search stuff
     max_depth_ = maxd;
     Info info;
-    alpha_ = -MaxScore;
-    beta_ = MaxScore;
 
     // prepare root node
     root_.childs.clear();
@@ -55,10 +53,6 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     root_.move = InvalidMove;
     root_.x = InvalidScore;
     root_.best = InvalidMove;
-#ifdef TTT_ALPHA_BETA
-    root_.alpha = alpha_;
-    root_.beta = beta_;
-#endif
     b.getMoves(root_.moves);
     if (root_.moves.empty()) return InvalidMove;
 
@@ -88,10 +82,6 @@ Move Search::bestMove(Board& b, int maxd, int * score)
         c->depth = root_.depth + 1;
         c->ismax = !root_.ismax;
         c->move = root_.moves[i];
-#ifdef TTT_ALPHA_BETA
-        c->alpha = root_.alpha;
-        c->beta = root_.beta;
-#endif
         ++info->num_nodes;
 
         // advance game
@@ -247,10 +237,6 @@ void Search::minimax(Info * info, Node * n)
         c->depth = n->depth + 1;
         c->ismax = !n->ismax;
         c->move = n->moves[i];
-#ifdef TTT_ALPHA_BETA
-        c->alpha = n->alpha;
-        c->beta = n->beta;
-#endif
         ++info->num_nodes;
 
         // advance game
@@ -294,16 +280,16 @@ void Search::minimax(Info * info, Node * n)
             // decrease further-down score to encourage closest finishing-move
             if (score > n->x) { n->x = score * 0.9; n->best = i; }
 #ifdef TTT_ALPHA_BETA
-            if (n->x >= n->beta) { info->num_prune++; /*std::cout << "beta " << beta_ << std::endl;*/ break; }
-            n->alpha = std::max(n->alpha, n->x);
+            if (n->x >= info->beta) { info->num_prune++; /*std::cout << "beta " << beta_ << std::endl;*/ break; }
+            info->alpha = std::max(info->alpha, n->x);
 #endif
         }
         else
         {
             if (score < n->x) { n->x = score * 0.9; n->best = i; }
 #ifdef TTT_ALPHA_BETA
-            if (n->x <= n->alpha) { info->num_prune++; /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
-            n->beta = std::min(n->beta, n->x);
+            if (n->x <= info->alpha) { info->num_prune++; /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
+            info->beta = std::min(info->beta, n->x);
 #endif
         }
     }
