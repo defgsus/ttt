@@ -150,8 +150,9 @@ public:
         m will be cleared before. */
     void getMoves(Moves& m) const;
 
-    /** Check for capture possibility from position m along direction xi,yi */
-    bool canCapture(Move m, int xi, int yi) const;
+    /** Check for capture possibility from position m along direction xi,yi
+        and execute */
+    bool exeCapture(Move m, int xi, int yi);
 
     bool isWin(Stm p) const;
     bool isDraw() const;
@@ -178,7 +179,7 @@ protected:
     void createRowValues();
     void createMoveOrder();
 
-    uint size_, cons_;
+    uint size_, sizesq_, cons_;
     std::vector<Piece> board_;
     /** evaluation buffer */
     std::vector<int> score_;

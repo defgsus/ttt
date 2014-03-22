@@ -29,9 +29,10 @@ std::vector<Square> Board::moveOrder_;
 
 Board::Board(uint size, uint cons)
     :   size_   (size),
+        sizesq_ (size*size),
         cons_   (cons),
-        board_  (size*size),
-        score_  (size*size)
+        board_  (sizesq_),
+        score_  (sizesq_)
 {
     createRowValues();
     createMoveOrder();
@@ -41,6 +42,7 @@ Board::Board(uint size, uint cons)
 void Board::setSize(uint size, uint cons)
 {
     size_ = size;
+    sizesq_ = size*size;
     cons_ = cons;
     board_.resize(size*size);
     score_.resize(size*size);
@@ -77,7 +79,7 @@ void Board::createMoveOrder()
 {
     if (!moveOrder_.empty()) return;
 
-    moveOrder_.resize(size_*size_);
+    moveOrder_.resize(sizesq_);
     for (auto &i : moveOrder_)
         i = 0;
 
@@ -224,17 +226,26 @@ Move Board::parseMove(const std::string& str) const
 
 void Board::makeMove(Move m)
 {
-    assert(m < size_*size_ && board_[m] == Empty &&
+    assert(m < sizesq_ && board_[m] == Empty &&
            "invalid move in Board::makeMove");
 
     board_[m] = stm_;
     pieces_++;
 
+    exeCapture(m, 1, 0);
+    exeCapture(m, 1, 1);
+    exeCapture(m, 0, 1);
+    exeCapture(m,-1, 1);
+    exeCapture(m,-1, 0);
+    exeCapture(m,-1,-1);
+    exeCapture(m, 0,-1);
+    exeCapture(m, 1,-1);
+/*
 #ifdef TTT_CAPTURE
     // check for captures
     #define TTT_EXECAPTURE(x_,y_) \
         if (canCapture(m, x_, y_)) \
-            { board_[m+x_+y_*size_] = Empty; pieces_--; }
+            { board_[m+x_+y_*size_] = Empty; board_[m+(x_+1)+(y_+1)*size_] = Empty; pieces_--; }
                 //else
 
         TTT_EXECAPTURE( 1, 0)
@@ -249,14 +260,54 @@ void Board::makeMove(Move m)
 
     #undef TTT_EXECAPTURE
 
-    if (board_[m] == Empty) pieces_--;
+    //if (board_[m] == Empty) pieces_--;
 #endif
+*/
 }
 
-bool Board::canCapture(Square m, int xi, int yi) const
+bool Board::exeCapture(Square m, int xi, int yi)
 {
-    if (board_[m] == Empty) return false;
+    if (board_[m] != stm_) return false;
 
+    int pos = m, px = m%size_;
+    const int inc = xi + yi * size_;
+
+    // opponent count
+    int op = 0;
+
+    for (int i=0; i<(int)size_; ++i)
+    {
+        pos += inc;
+        px += xi;
+
+        if (px < 0 || px >= (int)size_ ||
+            pos < 0 || pos >= (int)sizesq_)
+            return false;
+
+        if (board_[pos] == Empty)
+            return false;
+        else
+        if (board_[pos] == nstm_)
+            ++op;
+        else
+        if (board_[pos] == stm_)
+        {
+            if (op>0)
+            {
+                // remove pieces
+                for (int j=0; j<op; ++j)
+                {
+                    pos -= inc;
+                    board_[pos] = Empty;
+                }
+                pieces_ -= op;
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+/*
     const int x = m%size_, y = m/size_;
 
     // board limits
@@ -271,6 +322,7 @@ bool Board::canCapture(Square m, int xi, int yi) const
             && board_[(y+yi*2)*size_ + x+xi*2] == stm_);
     //if (r) std::cout << "captured for " << toString(m) << "\n";
     return r;
+*/
 }
 
 void Board::getMoves(Moves &m) const

@@ -25,17 +25,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 void printRules(Board b)
 {
-    b.init("XO.");
-    b.makeMove(2);
+    b.init("XOO.");
+    b.makeMove(3);
     std::cout << "\n - X in a row in a N^2 - \n"
               << "-----------------------------\n"
               << "try to connect " << b.consecutives() << " of your pieces (X).\n"
 #ifdef TTT_CAPTURE
               << "surround the other player to capture/exchange.\n"
-              << "placing an X at the empty square\n"
-              << "\n X O . \n"
+              << "e.g. placing an X at the empty square\n"
+              << "\n X O O . \n"
               << "\ncreates\n"
-              << "\n "<<pieceChar[b.pieceAt(0)]<<" "<<pieceChar[b.pieceAt(1)]<<" "<<pieceChar[b.pieceAt(2)]<<" \n"
+              << "\n "<<pieceChar[b.pieceAt(0)]<<" "<<pieceChar[b.pieceAt(1)]
+                      <<" "<<pieceChar[b.pieceAt(2)]<<" "<<pieceChar[b.pieceAt(3)]<<" \n"
 
 #endif
               << std::endl;
@@ -214,7 +215,7 @@ int main(int , char **)
         }
         else
         {
-            // figure ai move
+            // figure user's ai move
             int score;
             m = ai.bestMove(b, mdepth, &score);
             if (m == InvalidMove)
@@ -241,6 +242,8 @@ int main(int , char **)
             std::cout << std::endl;
             autoplay--;
         }
+
+        //goto ask_;
 
         if (true)
         {
