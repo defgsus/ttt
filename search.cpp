@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
 Search::Search()
+    :   greed_  (-MaxScore)
 {
 }
 
@@ -43,8 +44,8 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // setup search stuff
     max_depth_ = maxd;
     Info info;
-    alpha_ = -MaxScore*2;
-    beta_ = MaxScore*2;
+    alpha_ = -MaxScore;
+    beta_ = MaxScore;
 
     // prepare root node
     root_.childs.clear();
@@ -83,6 +84,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
         infos.push_back(info);
 
         // setup node
+        c->parent = &root_;
         c->depth = root_.depth + 1;
         c->ismax = !root_.ismax;
         c->move = root_.moves[i];
@@ -99,6 +101,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     }
     // execute
     std::deque<std::thread> threads;
+    //int k=0;
     for (uint i = 0; i<root_.childs.size(); ++i)
     {
         if (threads.size() >= 8)
@@ -107,6 +110,11 @@ Move Search::bestMove(Board& b, int maxd, int * score)
             threads.pop_front();
             std::cout << "*";
             std::cout.flush();
+/*#ifdef TTT_ALPHA_BETA
+            Node * n = &root_.childs[k];
+            if (n->x >= root_.beta) { infos[k]->num_prune++; std::cout << "beta " << beta_ << std::endl; break; }
+            ++k;
+#endif*/
         }
         threads.push_back( std::thread(std::bind(&Search::minimax, this,
                                 infos[i], &root_.childs[i])));
@@ -118,6 +126,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
         std::cout << "*";
         std::cout.flush();
     }
+    std::cout << "\n ";
 
     // get best child
     for (size_t i=0; i<root_.childs.size(); ++i)
@@ -139,9 +148,9 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
     float took = (float)time.elapsed()/1000;
 
-    std::cout << "\n"
-              << " nodes: " << info.num_nodes
-              << " prune: " << info.num_prune
+    std::cout << " nodes: " << info.num_nodes
+              << " prunes: " << info.num_prune
+              << " cuts: " << info.num_cuts
 #ifdef TTT_TRANSPOSITION_TABLE
               << " cache: " << info.num_cache_reuse
 #endif
@@ -177,11 +186,11 @@ void Search::minimax(Info * info, Node * n)
 
     if (n->ismax)
     {
-        n->x = -MaxScore*2;
+        n->x = -MaxScore;
     }
     else
     {
-        n->x = MaxScore*2;
+        n->x = MaxScore;
     }
 
     n->board.getMoves(n->moves);
@@ -191,9 +200,28 @@ void Search::minimax(Info * info, Node * n)
     if (!n->ismax) eval = -eval;
 
     // terminal node or max-depth?
-    n->term = n->moves.empty() || abs(eval) >= WinScore;
+    n->term = n->moves.empty() || abs(eval) >= WinScore ||
+                n->depth >= max_depth_;
+
+#ifdef TTT_GREEDY
+    // greedy cut-off
+    if (!n->term && n->depth >= 2)
+    {
+        Node * prn = n->parent->parent;
+        int diff = (eval - prn->x);
+        if (!n->ismax) diff = -diff;
+        if (abs(prn->x) < WinScore && diff < greed_)
+        {
+            //std::cout << "cut l=" << n->depth << " p=" << prn->x << " this=" << eval << "\n";
+            n->x = eval;
+            info->num_cuts++;
+            return;
+        }
+    }
+#endif
+
     //if (n->term) std::cout << "term " << n->term << " depth " << n->depth << std::endl;
-    if (n->term || n->depth >= max_depth_)//(std::max(2, (int)max_depth_ - (int)n->moves.size()/2)/2)*2)
+    if (n->term)//(std::max(2, (int)max_depth_ - (int)n->moves.size()/2)/2)*2)
     {
         n->x = eval;
         return;
@@ -215,6 +243,7 @@ void Search::minimax(Info * info, Node * n)
             else c = new Node;
     #endif
         // setup node
+        c->parent = n;
         c->depth = n->depth + 1;
         c->ismax = !n->ismax;
         c->move = n->moves[i];
@@ -262,7 +291,8 @@ void Search::minimax(Info * info, Node * n)
         // get score back
         if (n->ismax)
         {
-            if (score > n->x) { n->x = score; n->best = i; }
+            // decrease further-down score to encourage closest finishing-move
+            if (score > n->x) { n->x = score * 0.9; n->best = i; }
 #ifdef TTT_ALPHA_BETA
             if (n->x >= n->beta) { info->num_prune++; /*std::cout << "beta " << beta_ << std::endl;*/ break; }
             n->alpha = std::max(n->alpha, n->x);
@@ -270,7 +300,7 @@ void Search::minimax(Info * info, Node * n)
         }
         else
         {
-            if (score < n->x) { n->x = score; n->best = i; }
+            if (score < n->x) { n->x = score * 0.9; n->best = i; }
 #ifdef TTT_ALPHA_BETA
             if (n->x <= n->alpha) { info->num_prune++; /*std::cout << "alpha " << alpha_ << std::endl;*/ break; }
             n->beta = std::min(n->beta, n->x);

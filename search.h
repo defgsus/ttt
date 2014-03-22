@@ -36,6 +36,16 @@ public:
         Also sets Board's evalMap */
     Move bestMove(Board& b, int max_depth, int * score = 0);
 
+#ifdef TTT_GREEDY
+    /** Sets the greedyness.
+        A positive value means, the engine discards nodes that are
+        not at least @p greed points better than parent branch.
+        A negative value means, the engine discards nodes that are
+        worse then abs(@p greed) points than the parent node. */
+    void greed(int greed) { greed_ = greed; }
+    int  greed() const { return greed_; }
+#endif
+
     void printTree(bool bestOnly = false, int maxlevel = -1, std::ostream& out = std::cout);
 
 protected:
@@ -44,6 +54,7 @@ protected:
 
     struct Node
     {
+        Node * parent;
         int depth
 #ifdef TTT_ALPHA_BETA
         , alpha, beta
@@ -73,7 +84,8 @@ protected:
     /** info per node-thread */
     struct Info
     {
-        Info() : num_nodes(0), num_cache_reuse(0), num_prune(0), num_level(0)
+        Info() : num_nodes(0), num_cache_reuse(0), num_prune(0),
+                num_cuts(0), num_level(0)
             { }
 
         void combine(const Info& r)
@@ -81,12 +93,14 @@ protected:
             num_nodes += r.num_nodes;
             num_cache_reuse += r.num_cache_reuse;
             num_prune += r.num_prune;
+            num_cuts += r.num_cuts;
             num_level = std::max(num_level, r.num_level);
         }
 
         uint num_nodes,
              num_cache_reuse,
              num_prune,
+             num_cuts,
              num_level;
 #ifdef TTT_TRANSPOSITION_TABLE
             std::map<Hash,int> cache;
@@ -105,6 +119,9 @@ protected:
     int alpha_, beta_;
 #endif
 
+#ifdef TTT_GREEDY
+    int greed_;
+#endif
 
 };
 

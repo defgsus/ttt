@@ -152,7 +152,7 @@ int Board::getRowValue(int * row, const int X, const int O) const
 
     }
 
-    return u;//std::max(0,u);
+    return std::max(0,u);
 }
 
 void Board::createRowValues()
@@ -177,14 +177,13 @@ void Board::createRowValues()
             if ((kk&3)>=O)     row.push_back(O);
         }
 
-        int u =
-                getRowValue(&row[0], X, O)
+        int u = getRowValue(&row[0], X, O)
               - getRowValue(&row[0], O, X);
 
         // store utility value
-        rowVal_.push_back( u );//std::max(0, u));
+        rowVal_.push_back( u );
 
-#if 1
+#if 0
         // debug print
         if (k%4 != 3)
         {

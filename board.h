@@ -21,10 +21,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef BOARD_H
 #define BOARD_H
 
-#define TTT_CAPTURE
-#define TTT_ALPHA_BETA
-//#define TTT_TRANSPOSITION_TABLE
+// --------- compile settings --------------
+
+/** Multi-threading support (fixed to 8 in Search::bestMove()) */
 #define TTT_THREADED
+/** Allow captures */
+#define TTT_CAPTURE
+/** Use Alpha-Beta pruning */
+#define TTT_ALPHA_BETA
+/** Use a greedyness value to cut-off nodes */
+#define TTT_GREEDY
+/** Use a hash table (worse performance in threading mode */
+//#define TTT_TRANSPOSITION_TABLE
+/** Keep the entire search tree (for display). */
 //#define TTT_KEEP_TREE
 
 #include <vector>
@@ -43,7 +52,7 @@ typedef Piece               Stm;
 
 /** That's what goes onto a board square.
  *
- *  alway assumed: first bit is you, second bit is other
+ *  always assumed: first bit is you, second bit is other
  */
 enum PieceType
 {
@@ -52,9 +61,10 @@ enum PieceType
 const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
-const int MaxScore = 9000;
+const int MaxScore = 7000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
+
 
 #ifdef TTT_TRANSPOSITION_TABLE
 struct Hash

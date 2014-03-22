@@ -48,15 +48,24 @@ void printHelp(bool shrt = false)
               << "Enter moves like: 'a1', 'c2' ...\n"
               << "I also understand 'quit', 'start', 'back', 'print',\n"
               << "'X', 'O', 'moves', 'guess', 'play x', 'depth x', 'tree' and 'btree',\n"
-              << "'size x x', 'help' and 'rules'\n"
+              << "'size x x', "
+#ifdef TTT_GREEDY
+              << "'greed x', "
+#endif
+              << "'help' and 'rules'\n"
               << std::endl;
     if (shrt) return;
     std::cout << "'x' and 'o' selects the player.\n"
               << "'play x' starts playing x two-plys\n"
               << "'size s n' sets the board to s by s squares and \n"
               << " the number of pieces, to be connected, to n.\n"
-              << "'tree' shows previous search nodes\n"
-              << " the max. displayed depth can be set with 'tree1' to 'tree9'\n\n"
+#ifdef TTT_GREEDY
+              << "\n'greed x' sets my greed value. a positive value leads me\n"
+              << " to consider child nodes with less improvement unworthy.\n"
+              << " a negative value cuts off nodes that declined more than this.\n"
+#endif
+              << "\n'tree' shows previous search nodes\n"
+              << " the max. displayed depth can be set with 'tree1' to 'tree9'\n"
               << "'btree' shows only the winner branch.\n"
 #ifndef TTT_KEEP_TREE
               << " /* note, due to compile switch, only the first level is accessible */\n"
@@ -140,6 +149,13 @@ int main(int , char **)
             std::cin >> s >> c;
             b.setSize(s,c);
             goto reprint_;
+        }
+        else if (str.find("greed")==0)
+        {
+            int g;
+            std::cin >> g;
+            ai.greed(g);
+            goto ask_;
         }
         else if (str == "X" || str == "x")
         {
@@ -248,7 +264,9 @@ int main(int , char **)
             // check for win
             if (b.isWin(X))
             {
-                std::cout << "\nYou win!" << std::endl;
+                std::cout << "\n--------"
+                             "\nYou win!"
+                             "\n--------\n" << std::endl;
                 autoplay = 0;
                 b.flipStm();
                 goto reprint_;
@@ -280,7 +298,9 @@ int main(int , char **)
 
             if (b.isWin(O))
             {
-                std::cout << "\nI win, i'm a machine!\n" << std::endl;
+                std::cout << "\n---------------------"
+                             "\nI win, i'm a machine!"
+                             "\n---------------------\n" << std::endl;
                 autoplay = 0;
                 goto reprint_;
             }
@@ -293,7 +313,9 @@ int main(int , char **)
     draw_:
         std::cout << std::endl;
         if (!autoplay) b.printBoard(print_eval);
-        std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
+        std::cout << "\n------------------------------------"
+                     "\nDraw! I wasn't really trying, though"
+                     "\n------------------------------------" << std::endl;
         std::cout << "final score " << b.eval() << std::endl;
         autoplay = 0;
         goto ask_;
