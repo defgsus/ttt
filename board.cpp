@@ -99,6 +99,50 @@ void Board::createMoveOrder()
     //    std::cout << " " << i;
 }
 
+int Board::getRowValue(int * row, const int X, const int O) const
+{
+    // get utility value
+    int u = 0, full = 0;
+
+    // start by scoring
+    //   square values as:
+    for (uint i = 0; i<cons_; ++i)
+    {
+        if (row[i] == Empty)
+            u += 1;
+        else if (row[i] == X)
+        {
+            full++;
+            u += (4 + 2 * full);
+        }
+        else if (row[i] == O)
+            u -= 3;
+    }
+    // full row?
+    if (full>=(int)cons_)
+    {
+        u = MaxScore; // win
+    }
+    else
+    {
+        // additional points for consecutiveness
+        for (uint i=0; i<cons_-1; ++i)
+            if (row[i] == 1 && row[i+1] == 1)
+                u *= 2;
+
+        // generally less points when opponent breaks row
+        for (uint i = 0; i<cons_; ++i)
+            if (row[i] == 2) { u /= 3; }
+#if 1
+        // no points for full-row-emptyness
+        if (full == 0) u = 0;
+#endif
+
+    }
+
+    return std::max(0,u);
+}
+
 void Board::createRowValues()
 {
     if (!rowVal_.empty()) return;
@@ -121,47 +165,12 @@ void Board::createRowValues()
             if ((kk&3)>=O)     row.push_back(O);
         }
 
-        // get utility value
-        int u = 0, full = 0;
-
-        // start by scoring
-        //   square values as:
-        for (i = 0; i<cons_; ++i)
-        {
-            if (row[i] == Empty)
-                u += 1;
-            else if (row[i] == X)
-            {
-                full++;
-                u += (4 + 2 * full);
-            }
-            else if (row[i] == O)
-                u -= 3;
-        }
-        // full row?
-        if (full>=(int)cons_)
-        {
-            u = MaxScore; // win
-        }
-        else
-        {
-            // additional points for consecutiveness
-            for (i=0; i<cons_-1; ++i)
-                if (row[i] == 1 && row[i+1] == 1)
-                    u *= 2;
-
-            // generally less points when opponent breaks row
-            for (i = 0; i<cons_; ++i)
-                if (row[i] == 2) { u /= 3; }
-#if 1
-            // no points for full-row-emptyness
-            if (full == 0) u = 0;
-#endif
-
-        }
+        int u =
+                getRowValue(&row[0], X, O)
+              - getRowValue(&row[0], O, X);
 
         // store utility value
-        rowVal_.push_back( std::max(0, u));
+        rowVal_.push_back( u );//std::max(0, u));
 
 #if 1
         // debug print
@@ -169,7 +178,7 @@ void Board::createRowValues()
         {
             std::cout << std::setw(4) << k << " ";
             for (i=0; i<cons_; ++i) std::cout << pieceChar[row[i]];
-            if (u>0) std::cout << " " << u;
+            if (u!=0) std::cout << " " << u;
             std::cout << std::endl;
         }
 #endif
@@ -340,7 +349,9 @@ void Board::getMoves(Moves &m) const
 
 bool Board::isWin(Stm p) const
 {
-    return (eval(p) >= WinScore);
+    int e = evalX();
+    return ((p == X && e >= WinScore)
+            || (p == O && -e >= WinScore));
 }
 
 bool Board::isDraw() const
@@ -432,7 +443,7 @@ void Board::setEvalMap(Square s, int score)
 
 int Board::eval()
 {
-    return eval(stm_) - eval(nstm_);
+    return (stm_==X)? evalX() : -evalX();// - eval(nstm_);
     /*
     int x = eval(X), o = eval(O);
     if (x>=MaxScore) x *= 2;
@@ -451,12 +462,8 @@ int Board::eval()
 
 
 
-int Board::eval(Stm side) const
+int Board::evalX() const
 {
-    if (side == Empty) return 0;
-
-    Stm nside = side ^ 3;
-
     int u = 0;
     uint x,y;
 
@@ -471,8 +478,8 @@ int Board::eval(Stm side) const
         {                                   \
             cnt <<= 2;                      \
             Piece p = board_[cy*size_+cx];  \
-            cnt += ((p&side)!=0) |          \
-                   (((p&nside)!=0)<<1);     \
+            cnt += p/*((p&side)!=0) |          \
+                   (((p&nside)!=0)<<1)*/;     \
             cx += xi; cy += yi;             \
         }                                   \
     /*std::cout << ":" << cnt << "\n";*/ \

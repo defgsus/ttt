@@ -50,7 +50,7 @@ enum PieceType
 const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
-const int MaxScore = 2000;
+const int MaxScore = 9000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
 
@@ -165,8 +165,9 @@ public:
     /** Returns board value */
     int eval();
 
-    /** Returns the utility for 0 or 1 */
-    int eval(Stm p) const;
+    /** Returns the guessed utility for X (+/-).
+        Y's utility values is -evalX() */
+    int evalX() const;
 
     void clearEvalMap();
     void setEvalMap(Square s, int score);
@@ -176,6 +177,7 @@ public:
 
 protected:
 
+    int getRowValue(int * row, int x, int o) const;
     void createRowValues();
     void createMoveOrder();
 

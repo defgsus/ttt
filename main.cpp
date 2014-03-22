@@ -95,11 +95,9 @@ int main(int , char **)
         std::cout << std::endl;
         b.printBoard(print_eval);
 
-        int evalx = b.eval(X),
-            evalo = b.eval(O),
-            eval = b.eval();
+        int eval = b.eval();
         std::cout << std::setw(b.size()*8+10) << "eval " << eval
-                  << " (X=" << evalx << " Y=" << evalo << ")" << std::endl;
+                  << std::endl;
 
     ask_:
         std::string str;
@@ -296,7 +294,7 @@ int main(int , char **)
         std::cout << std::endl;
         if (!autoplay) b.printBoard(print_eval);
         std::cout << "\nDraw! I wasn't really trying, though" << std::endl;
-        std::cout << "final score " << b.eval(X) << ":" << b.eval(O) << std::endl;
+        std::cout << "final score " << b.eval() << std::endl;
         autoplay = 0;
         goto ask_;
 
