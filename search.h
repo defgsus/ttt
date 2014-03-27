@@ -80,7 +80,10 @@ protected:
     /** info per node-thread */
     struct Info
     {
-        Info() : alpha(-MaxScore), beta(MaxScore),
+        Info() :
+#ifdef TTT_ALPHA_BETA
+                alpha(-MaxScore), beta(MaxScore),
+#endif
                 num_nodes(0), num_cache_reuse(0), num_prune(0),
                 num_cuts(0), num_level(0)
             { }

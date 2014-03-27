@@ -140,7 +140,9 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
     std::cout << " depth: " << info.num_level
               << " nodes: " << info.num_nodes
+#ifdef TTT_ALPHA_BETA
               << " prunes: " << info.num_prune
+#endif
               << " cuts: " << info.num_cuts
 #ifdef TTT_TRANSPOSITION_TABLE
               << " cache: " << info.num_cache_reuse
