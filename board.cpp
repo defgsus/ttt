@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <iomanip>
 
 std::vector<int> Board::rowVal_;
-std::vector<Square> Board::moveOrder_;
-std::vector<Square> Board::scanOrder_;
+std::vector<uint> Board::moveOrder_;
+std::vector<uint> Board::scanOrder_;
 
 Board::Board(uint size, uint cons)
     :   size_   (size),
@@ -171,10 +171,10 @@ void Board::createRowValues()
         std::vector<int> row;
         for (i=0; i<cons_; ++i)
         {
-            kk = k>>(i*2);
-            if ((kk&3)==Empty) row.push_back(Empty); else
-            if ((kk&3)==X)     row.push_back(X); else
-            if ((kk&3)>=O)     row.push_back(O);
+            kk = (k>>(i*2)) & pieceMask;
+            if ((kk)==Empty) row.push_back(Empty); else
+            if ((kk)==X)     row.push_back(X); else
+            if ((kk)>=O)     row.push_back(O);
         }
 
         int u = getRowValue(&row[0], X, O)
@@ -188,7 +188,7 @@ void Board::createRowValues()
         if (k%4 != 3)
         {
             std::cout << std::setw(4) << k << " ";
-            for (i=0; i<cons_; ++i) std::cout << pieceChar[row[i]];
+            for (i=0; i<cons_; ++i) std::cout << pieceChar(row[i]);
             if (u!=0) std::cout << " " << u;
             std::cout << std::endl;
         }
@@ -278,7 +278,7 @@ Move Board::parseMove(const std::string& str) const
         return InvalidMove;
 
     x = y * size_ + x;
-    if (board_[x] != Empty)
+    if (pieceAt(x) != Empty)
         return InvalidMove;
 
     return x;
@@ -286,10 +286,10 @@ Move Board::parseMove(const std::string& str) const
 
 void Board::makeMove(Move m)
 {
-    assert(m < sizesq_ && board_[m] == Empty &&
+    assert(m < sizesq_ && pieceAt(m) == Empty &&
            "invalid move in Board::makeMove");
 
-    board_[m] = stm_;
+    setPieceAt(m, stm_);
     pieces_++;
 
 #ifdef TTT_CAPTURE
@@ -306,7 +306,7 @@ void Board::makeMove(Move m)
 
 bool Board::exeCapture(Square m, int xi, int yi)
 {
-    if (board_[m] != stm_) return false;
+    if (pieceAt(m) != stm_) return false;
 
     int pos = m, px = m%size_;
     const int inc = xi + yi * size_;
@@ -323,13 +323,14 @@ bool Board::exeCapture(Square m, int xi, int yi)
             pos < 0 || pos >= (int)sizesq_)
             return false;
 
-        if (board_[pos] == Empty)
+        const Piece piece = pieceAt(pos);
+        if (piece == Empty)
             return false;
         else
-        if (board_[pos] == nstm_)
+        if (piece == nstm_)
             ++op;
         else
-        if (board_[pos] == stm_)
+        if (piece == stm_)
         {
             if (op>0)
             {
@@ -337,7 +338,8 @@ bool Board::exeCapture(Square m, int xi, int yi)
                 for (int j=0; j<op; ++j)
                 {
                     pos -= inc;
-                    board_[pos] = Empty;
+                    // set empty + flags
+                    board_[pos] = Defunkt << (stm_ - 1); // 4 or 8
                 }
                 pieces_ -= op;
                 return true;
@@ -355,7 +357,7 @@ void Board::getMoves(Moves &m) const
     {
         const Square k = moveOrder_[i];
 
-        if (board_[k] == Empty)
+        if (pieceAt(k) == Empty)
             m.push_back(k);
     }
 }
@@ -389,18 +391,30 @@ std::string Board::toString(Move m) const
 void Board::printBoard(bool eval, std::ostream& out) const
 {
     const bool bigboard_ = false;
+    const bool bitboard = false;
+
+    // -- header --
 
     out << "  ";
     for (uint x=0; x<size_; ++x)
         out << std::setw(2+bigboard_) << (char)(x + 'a');
+    out << " ";
+
+    if (bitboard)
+    {
+        out << "    |";
+        for (uint x=0; x<size_; ++x)
+            out << "    " << (char)(x + 'a');
+    }
+
     if (eval)
     {
         out << "    | ";
         for (uint x=0; x<size_; ++x)
             out << std::setw(6) << (char)(x + 'a');
-        out << "   ply: " << ply_ << " (" << pieceChar[stm_] << ")";
-        out << std::endl;
+        out << "   ply: " << ply_ << " (" << pieceChar(stm_) << ")";
     }
+    out << std::endl;
 
     for (uint y=0; y<size_; ++y)
     {
@@ -411,10 +425,11 @@ void Board::printBoard(bool eval, std::ostream& out) const
             else
                 out << "   ";
 
+            // ascii board
             for (uint x=0; x<size_; ++x)
             {
                 if (!bigboard_)
-                    out << pieceChar[board_[y*size_+x]] << " ";
+                    out << pieceChar(board_[y*size_+x]) << " ";
                 else
                 {
                     switch (board_[y*size_+x])
@@ -426,15 +441,28 @@ void Board::printBoard(bool eval, std::ostream& out) const
                 }
             }
 
-            if (eval && y1==0)
+            // bit board
+            if (bitboard)
             {
-                out << "   | ";
+                out << "    |";
                 for (uint x=0; x<size_; ++x)
                 {
-                    if (board_[y*size_+x] == Empty && score_[y*size_+x] != InvalidScore)
+                    std::cout << " ";
+                    for (int b=3; b>=0; --b)
+                        std::cout << (int)(board_[y*size_+x] & (1<<b));
+                }
+            }
+
+            // eval board
+            if (eval && y1==0)
+            {
+                out << "    | ";
+                for (uint x=0; x<size_; ++x)
+                {
+                    if (pieceAt(y*size_+x) == Empty && score_[y*size_+x] != InvalidScore)
                         out << std::setw(6) << score_[y*size_+x];
                     else
-                        out << std::setw(6) << " ";//(char)(pieceChar[board_[y*size_+x]]+32);
+                        out << std::setw(6) << " ";//(char)(pieceChar(pieceAt(y*size_+x))+32);
                 }
             }
 
@@ -477,7 +505,7 @@ int Board::evalX() const
         for (uint j=0; j<cons_; ++j, ++i)
         {
             cnt <<= 2;
-            cnt += board_[scanOrder_[i]];
+            cnt += pieceAt(scanOrder_[i]);
         }
         // add evaluation value
         u += rowVal_[cnt];

@@ -56,15 +56,21 @@ typedef Piece               Stm;
  */
 enum PieceType
 {
-    Empty, X = 1, O = 2
+    Empty, X = 1, O = 2, Defunkt = 4
 };
-const char pieceChar[] = { '.', 'X', 'O' };
 
 const Move InvalidMove = -1;
 const int MaxScore = 7000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
+const Piece pieceMask = 3;
 
+inline char pieceChar(Piece p)
+{
+    return p == 0 ?
+        '.' : (p&pieceMask) != 0 ?
+                (p&X ? 'X' : 'O') : '~';
+}
 
 #ifdef TTT_TRANSPOSITION_TABLE
 struct Hash
@@ -146,7 +152,9 @@ public:
     uint pieces() const { return pieces_; }
 
     /** Return piece at given position */
-    Piece pieceAt(Square m) const { return board_[m]; }
+    Piece pieceAt(Square m) const { return board_[m] & pieceMask; }
+    /** Sets piece flags, nothing else. @p p must be piece bits only! */
+    void setPieceAt(Square m, Piece p) { board_[m] &= ~pieceMask; board_[m] |= p; }
 
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */
@@ -166,7 +174,10 @@ public:
         and execute */
     bool exeCapture(Move m, int xi, int yi);
 
-    bool isWin(Stm p) const;
+    /** win or draw? */
+    bool isOver() const { return isWin(X) || isWin(O); }
+    /** Returns whether the side to move has reached the win-utility. */
+    bool isWin(Stm stm) const;
     bool isDraw() const;
 
 #ifdef TTT_TRANSPOSITION_TABLE
@@ -206,9 +217,11 @@ protected:
 
     uint pieces_, ply_;
 
+    // evaluation of all row combinations
     static std::vector<int> rowVal_;
-    static std::vector<Square> moveOrder_;
-    static std::vector<Square> scanOrder_;
+    // indices
+    static std::vector<uint> moveOrder_;
+    static std::vector<uint> scanOrder_;
 };
 
 #endif // BOARD_H

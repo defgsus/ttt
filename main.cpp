@@ -35,8 +35,8 @@ void printRules(Board b)
               << "e.g. placing an X at the empty square\n"
               << "\n X O O . \n"
               << "\ncreates\n"
-              << "\n "<<pieceChar[b.pieceAt(0)]<<" "<<pieceChar[b.pieceAt(1)]
-                      <<" "<<pieceChar[b.pieceAt(2)]<<" "<<pieceChar[b.pieceAt(3)]<<" \n"
+              << "\n "<<pieceChar(b.pieceAt(0))<<" "<<pieceChar(b.pieceAt(1))
+                      <<" "<<pieceChar(b.pieceAt(2))<<" "<<pieceChar(b.pieceAt(3))<<" \n"
 
 #endif
               << std::endl;
@@ -85,7 +85,7 @@ int main(int , char **)
 
     printHelp(true);
 
-    int mdepth = 2;
+    int mdepth = 2 << 1;
     bool print_eval = true;
     int autoplay = 0;
 
@@ -109,10 +109,12 @@ int main(int , char **)
                   << std::endl;
 
     ask_:
+
+        // ask for input or autoplay
         std::string str;
         if (autoplay<=0)
         {
-            std::cout << pieceChar[b.stm()] << ">";
+            std::cout << pieceChar(b.stm()) << ">";
             std::cin >> str;
         }
 
@@ -214,6 +216,12 @@ int main(int , char **)
         }
 
         // ------ expect move here -----
+
+        if (b.isOver())
+        {
+            std::cout << "the game is over, buddy" << std::endl;
+            goto ask_;
+        }
 
         Move m = InvalidMove;
 

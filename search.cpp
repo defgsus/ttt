@@ -138,13 +138,13 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
     float took = (float)time.elapsed()/1000;
 
-    std::cout << " nodes: " << info.num_nodes
+    std::cout << " depth: " << info.num_level
+              << " nodes: " << info.num_nodes
               << " prunes: " << info.num_prune
               << " cuts: " << info.num_cuts
 #ifdef TTT_TRANSPOSITION_TABLE
               << " cache: " << info.num_cache_reuse
 #endif
-              << " level: " << info.num_level
            << "\n  took: " << took << "s"
               << " nps: " << (float)info.num_nodes/took
               << std::endl;
