@@ -25,21 +25,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 void printRules(Board b)
 {
-    b.init("XOO.");
-    b.makeMove(3);
-    std::cout << "\n - X in a row in a N^2 - \n"
-              << "-----------------------------\n"
+    // prepare board for rules
+    std::string bs = "X";
+    for (int i=0; i<(int)b.size()-2; ++i)
+        bs += "O";
+    bs += ".";
+    b.init(bs);
+
+    std::cout << "\n - X in a row in N^2 - \n"
+              << "---------------------------\n"
               << "try to connect " << b.consecutives() << " of your pieces (X).\n"
 #ifdef TTT_CAPTURE
               << "surround the other player to capture/exchange.\n"
-              << "e.g. placing an X at the empty square\n"
-              << "\n X O O . \n"
-              << "\ncreates\n"
-              << "\n "<<pieceChar(b.pieceAt(0))<<" "<<pieceChar(b.pieceAt(1))
-                      <<" "<<pieceChar(b.pieceAt(2))<<" "<<pieceChar(b.pieceAt(3))<<" \n"
+              << "e.g. placing an X at the empty square\n";
+    for (size_t i=0; i<b.size(); ++i)
+        std::cout << " " << b.pieceCharAt(i);
+    std::cout << "\n\ncreates\n\n";
+    b.makeMove(b.size()-1);
+    for (size_t i=0; i<b.size(); ++i)
+        std::cout << " " << b.pieceCharAt(i);
+#ifdef TTT_CAPTURE_WAIT
+    std::cout << "\n\nwhile the ~ square is blocked for two plies.";
+#endif
 
 #endif
-              << std::endl;
+    std::cout << "\n" << std::endl;
 }
 
 void printHelp(bool shrt = false)

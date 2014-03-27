@@ -27,6 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_THREADED
 /** Allow captures */
 #define TTT_CAPTURE
+/** Force one move pause for captured squares */
+#define TTT_CAPTURE_WAIT
 /** Use Alpha-Beta pruning */
 #define TTT_ALPHA_BETA
 /** Use a greedyness value to cut-off nodes */
@@ -64,6 +66,7 @@ const int MaxScore = 7000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
 const Piece pieceMask = 3;
+const Piece captureMask = 4+8;
 
 inline char pieceChar(Piece p)
 {
@@ -85,7 +88,7 @@ struct Hash
         for (uint i=0; i<s; ++i, ++board)
         {
             if (i == 32) a = &h.b;
-            *a |= *board;
+            *a |= *board & pieceMask;
             *a <<= 2;
         }
         h.b |= ((Type)stm) << 62;
@@ -98,8 +101,7 @@ struct Hash
 
     bool operator < (const Hash& r) const
     {
-        // XXX
-        return (a < r.a) || (b < r.b);
+        return (b == r.b)? (a < r.a) : (b < r.b);
     }
 
 };
@@ -153,8 +155,14 @@ public:
 
     /** Return piece at given position */
     Piece pieceAt(Square m) const { return board_[m] & pieceMask; }
+    char pieceCharAt(Square m) const { return pieceChar(board_[m]); }
     /** Sets piece flags, nothing else. @p p must be piece bits only! */
     void setPieceAt(Square m, Piece p) { board_[m] &= ~pieceMask; board_[m] |= p; }
+
+    bool isCaptured(Square m) const { return board_[m] & captureMask; }
+
+    /** Is this a value move? */
+    bool canMoveTo(Stm stm, Move m) const;
 
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */

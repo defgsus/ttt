@@ -278,16 +278,34 @@ Move Board::parseMove(const std::string& str) const
         return InvalidMove;
 
     x = y * size_ + x;
-    if (pieceAt(x) != Empty)
+
+    if (!canMoveTo(stm_, x))
         return InvalidMove;
 
     return x;
 }
 
+bool Board::canMoveTo(Stm stm, Move m) const
+{
+    return
+           m < sizesq_
+        && pieceAt(m) == Empty
+#ifdef TTT_CAPTURE_WAIT
+        && !isCaptured(m)
+#endif
+    ;
+}
+
+
 void Board::makeMove(Move m)
 {
-    assert(m < sizesq_ && pieceAt(m) == Empty &&
-           "invalid move in Board::makeMove");
+    assert(canMoveTo(stm_, m)
+           && "invalid move in Board::makeMove");
+
+    #ifdef TTT_CAPTURE_WAIT
+    for (auto &i : board_)
+        i = (i & pieceMask) | (((i & captureMask) >> 1) & captureMask);
+    #endif
 
     setPieceAt(m, stm_);
     pieces_++;
@@ -339,7 +357,7 @@ bool Board::exeCapture(Square m, int xi, int yi)
                 {
                     pos -= inc;
                     // set empty + flags
-                    board_[pos] = Defunkt << (stm_ - 1); // 4 or 8
+                    board_[pos] = 8;
                 }
                 pieces_ -= op;
                 return true;
@@ -357,7 +375,7 @@ void Board::getMoves(Moves &m) const
     {
         const Square k = moveOrder_[i];
 
-        if (pieceAt(k) == Empty)
+        if (canMoveTo(stm_, k))
             m.push_back(k);
     }
 }
