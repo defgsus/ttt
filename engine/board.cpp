@@ -184,15 +184,6 @@ void BoardHelper::createScanOrder()
 
 
 
-
-
-
-
-
-
-
-
-
 // -------------------------- board ---------------------------
 
 Board::Board(uint size, uint cons)
@@ -343,10 +334,11 @@ void Board::makeMove(Move m)
     assert(canMoveTo(stm_, m)
            && "invalid move in Board::makeMove");
 
-    #ifdef TTT_CAPTURE_WAIT
+#ifdef TTT_CAPTURE_WAIT
+    // decrease the capture-block value
     for (auto &i : board_)
         i = (i & pieceMask) | (((i & captureMask) >> 1) & captureMask);
-    #endif
+#endif
 
     setPieceAt(m, stm_);
     pieces_++;
