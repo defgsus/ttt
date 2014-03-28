@@ -126,11 +126,47 @@ static I ulam_spiral(I x, I y)
     }
 }
 
+class BoardHelper
+{
+public:
+
+    BoardHelper(uint size, uint consecutives)
+        :   size(size), cons(consecutives)
+    {
+        createRowValues();
+        createMoveOrder();
+        createScanOrder();
+    }
+
+    /** return the evaluation value of one row */
+    int getRowValue(int * row, int x, int o) const;
+    void createRowValues();
+    void createMoveOrder();
+    void createScanOrder();
+
+    uint size,
+         cons;
+
+    /** evaluation of all row combinations */
+    std::vector<int> rowValues;
+    /** indices to fixed order of moves (which square to analyze first) */
+    std::vector<uint> moveOrder;
+    /** indices to all possible rows. */
+    std::vector<uint> scanOrder;
+
+};
+
+
 
 class Board
 {
 public:
     Board(uint size = 3, uint consecutives = 3);
+    ~Board();
+
+    Board(const Board& rhs);
+
+    Board& operator = (const Board& rhs);
 
     /** resize the board. */
     void setSize(uint size = 3, uint consecutives = 3);
@@ -211,16 +247,13 @@ public:
 
 protected:
 
-    void staticInit();
-    void nonStaticInit();
-
-    int getRowValue(int * row, int x, int o) const;
-    void createRowValues();
-    void createMoveOrder();
-    void createScanOrder();
+    BoardHelper * helper_;
+    bool ownHelper_;
 
     uint size_, sizesq_, cons_;
+
     std::vector<Piece> board_;
+
     /** evaluation buffer */
     std::vector<int> score_;
 
@@ -228,11 +261,6 @@ protected:
 
     uint pieces_, ply_;
 
-    // evaluation of all row combinations
-    static std::vector<int> rowVal_;
-    // indices
-    static std::vector<uint> moveOrder_;
-    static std::vector<uint> scanOrder_;
 };
 
 } // namespace TTT
