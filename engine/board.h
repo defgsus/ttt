@@ -43,6 +43,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <iostream>
 #include <cinttypes>
 
+namespace TTT {
+
+
 typedef unsigned int        uint;
 
 typedef unsigned char       Piece;
@@ -231,5 +234,8 @@ protected:
     static std::vector<uint> moveOrder_;
     static std::vector<uint> scanOrder_;
 };
+
+} // namespace TTT
+
 
 #endif // BOARD_H

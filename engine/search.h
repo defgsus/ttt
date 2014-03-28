@@ -27,6 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <map>
 #endif
 
+namespace TTT {
+
 class Search
 {
 public:
@@ -124,5 +126,9 @@ protected:
 #endif
 
 };
+
+
+} // namespace TTT
+
 
 #endif // SEARCH_H

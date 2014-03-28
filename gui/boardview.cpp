@@ -20,7 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "boardview.h"
 
-BoardView::BoardView(QWidget *parent) :
-    QWidget(parent)
+BoardView::BoardView(QWidget *parent)
+    : QWidget(parent)
 {
+}
+
+
+void BoardView::setBoard(const TTT::Board& b)
+{
+    board_ = b;
 }

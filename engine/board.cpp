@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <cmath>
 #include <iomanip>
 
+namespace TTT {
+
 std::vector<int> Board::rowVal_;
 std::vector<uint> Board::moveOrder_;
 std::vector<uint> Board::scanOrder_;
@@ -285,7 +287,7 @@ Move Board::parseMove(const std::string& str) const
     return x;
 }
 
-bool Board::canMoveTo(Stm stm, Move m) const
+bool Board::canMoveTo(Stm /*stm*/, Move m) const
 {
     return
            m < sizesq_
@@ -533,5 +535,5 @@ int Board::evalX() const
 }
 
 
-
+} // namespace TTT
 

@@ -30,12 +30,17 @@ class BoardView : public QWidget
 public:
     explicit BoardView(QWidget *parent = 0);
 
-    void setBoard(const Board& b);
+    /** Sets a new position */
+    void setBoard(const TTT::Board& b);
 
 signals:
 
 public slots:
 
+
+private:
+
+    TTT::Board board_;
 };
 
 #endif // BOARDVIEW_H

@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <iomanip>
 
+using namespace TTT;
+
 void printRules(Board b)
 {
     // prepare board for rules

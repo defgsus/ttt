@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QTime>
 
 
+namespace TTT {
+
+
 Search::Search()
     :   greed_  (-MaxScore)
 {
@@ -327,3 +330,6 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
     }
     //out << std::endl;
 }
+
+
+} // namespace TTT
