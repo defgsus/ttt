@@ -49,14 +49,15 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     Info info;
 
     // prepare root node
-    root_.childs.clear();
+    root_.freeChilds();
     root_.depth = 0;
-    root_.board = b;
     root_.ismax = true;
     root_.move = InvalidMove;
     root_.x = InvalidScore;
     root_.best = InvalidMove;
-    b.getMoves(root_.moves);
+    if (root_.board) delete root_.board;
+    root_.board = new Board(b);
+    root_.board->getMoves(root_.moves);
     if (root_.moves.empty()) return InvalidMove;
 
     // -- go --
@@ -73,9 +74,9 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 #else
     // prepare child node for each thread
     std::vector<Info*> infos;
+    root_.allocChilds(root_.moves.size());
     for (uint i=0; i<root_.moves.size(); ++i)
-    {
-        root_.childs.push_back(Node());
+    {   
         Node * c = &root_.childs[i];
         Info * info = new Info;
         infos.push_back(info);
@@ -88,14 +89,14 @@ Move Search::bestMove(Board& b, int maxd, int * score)
         ++info->num_nodes;
 
         // advance game
-        c->board = root_.board;
-        c->board.makeMove(c->move);
-        c->board.flipStm();
+        c->board = new Board(*root_.board);
+        c->board->makeMove(c->move);
+        c->board->flipStm();
     }
     // execute
     std::deque<std::thread> threads;
     //int k=0;
-    for (uint i = 0; i<root_.childs.size(); ++i)
+    for (uint i = 0; i<root_.numChilds; ++i)
     {
         if (threads.size() >= 8)
         {
@@ -122,7 +123,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     std::cout << "\n ";
 
     // get best child
-    for (size_t i=0; i<root_.childs.size(); ++i)
+    for (size_t i=0; i<root_.numChilds; ++i)
     {
         if (root_.x == InvalidScore ||
                 root_.childs[i].x > root_.x)
@@ -156,7 +157,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
     // update board's eval map
     b.clearEvalMap();
-    for (size_t i=0; i<root_.childs.size(); ++i)
+    for (size_t i=0; i<root_.numChilds; ++i)
         if (root_.childs[i].x != InvalidScore)
             b.setEvalMap(root_.moves[i], root_.childs[i].x);
 
@@ -188,10 +189,10 @@ void Search::minimax(Info * info, Node * n)
         n->x = MaxScore;
     }
 
-    n->board.getMoves(n->moves);
+    n->board->getMoves(n->moves);
     n->best = InvalidMove;
 
-    int eval = n->board.eval();
+    int eval = n->board->eval();
     if (!n->ismax) eval = -eval;
 
     // terminal node or max-depth?
@@ -222,22 +223,14 @@ void Search::minimax(Info * info, Node * n)
         return;
     }
 
+    // child nodes
+    n->allocChilds(n->moves.size());
     for (size_t i=0; i<n->moves.size(); ++i)
     {
-    #ifdef TTT_KEEP_TREE
-        // create child node
-        n->childs.push_back(Node());
-        Node * c = &n->childs.back();
-    #else
-        Node * c;
-        if (n->depth == 0)
-        {
-            n->childs.push_back(Node());
-            c = &n->childs.back();
-        }
-            else c = new Node;
-    #endif
+        Node * c = &n->childs[i];
+
         // setup node
+        c->init();
         c->parent = n;
         c->depth = n->depth + 1;
         c->ismax = !n->ismax;
@@ -245,9 +238,9 @@ void Search::minimax(Info * info, Node * n)
         ++info->num_nodes;
 
         // advance game
-        c->board = n->board;
-        c->board.makeMove(n->moves[i]);
-        c->board.flipStm();
+        c->board = new Board(*n->board);
+        c->board->makeMove(n->moves[i]);
+        c->board->flipStm();
 
         int score = 0;
 
@@ -275,10 +268,6 @@ void Search::minimax(Info * info, Node * n)
         }
 #endif
 
-#ifndef TTT_KEEP_TREE
-        if (n->depth>0) delete c;
-#endif
-
         // get score back
         if (n->ismax)
         {
@@ -298,6 +287,11 @@ void Search::minimax(Info * info, Node * n)
 #endif
         }
     }
+
+#ifndef TTT_KEEP_TREE
+    if (n->depth>0) n->freeChilds();
+#endif
+
 }
 
 
@@ -311,8 +305,8 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
 {
     out << std::setw(n.depth) << ""
         << (n.ismax? "MAX " : "MIN ")
-        << "d=" << n.depth << " c=" << n.childs.size() << " x=" << n.x
-        << " " << (n.move != InvalidMove? n.board.toString(n.move) : "-")
+        << "d=" << n.depth << " c=" << n.numChilds << " x=" << n.x
+        << " " << (n.move != InvalidMove? n.board->toString(n.move) : "-")
         //<< (n.invalid? " invalid" : "")
         //<< " " << (n.best<n.moves.size()? n.board.toString(n.moves[n.best]) : "-")
         ;
@@ -322,7 +316,7 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
 
     if (maxlevel >= 0 && n.depth >= maxlevel) return;
 
-    for (size_t i=0; i<n.childs.size(); ++i)
+    for (size_t i=0; i<n.numChilds; ++i)
     if (!bestOnly || i == n.best)
     {
         //out << std::setw(n.depth) << " " << "\\";

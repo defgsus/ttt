@@ -62,21 +62,44 @@ protected:
         // score/utility
         int x;
         // Node's board position
-        Board board;
+        Board * board;
         // all possible moves
         Moves moves;
-        // move that led to this node
+        // move which led to this node
         Move move;
         // child nodes
-        std::vector<Node> childs;
+        Node * childs;
+        size_t numChilds;
         // best index into childs/moves
         uint best;
         // terminal node?
         bool term;
 
         Node()
-            : depth(0),ismax(false),move(InvalidMove),best(-1),term(false)
+            : depth(0),ismax(false),board(0),move(InvalidMove),childs(0),numChilds(0),best(-1),term(false)
         { }
+        ~Node()
+        {
+            if (board) delete board;
+            if (childs) free(childs);
+        }
+
+        void init()
+        {
+            depth = 0; ismax=false; board=0; move=InvalidMove; childs=0; numChilds=0; best=-1; term=false;
+        }
+
+        void allocChilds(size_t num)
+        {
+            childs = (Node*)calloc(num, sizeof(Node));
+            numChilds = num;
+        }
+
+        void freeChilds()
+        {
+            if (childs) delete childs;
+            childs = 0; numChilds = 0;
+        }
     };
 
     /** info per node-thread */

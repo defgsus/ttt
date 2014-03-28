@@ -38,6 +38,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Keep the entire search tree (for display). */
 //#define TTT_KEEP_TREE
 
+
+#define TTT_DEBUG(arg__) { std::cerr << arg__ << std::endl; }
+
 #include <vector>
 #include <string>
 #include <iostream>
@@ -75,7 +78,7 @@ inline char pieceChar(Piece p)
 {
     return p == 0 ?
         '.' : (p&pieceMask) != 0 ?
-                (p&X ? 'X' : 'O') : '~';
+                ((p&X) ? 'X' : 'O') : (((p&captureMask)==8)? '2' : '1');
 }
 
 #ifdef TTT_TRANSPOSITION_TABLE

@@ -87,13 +87,18 @@ void printHelp(bool shrt = false)
 
 }
 
-int main(int , char **)
-{/*
-    .. .x x.
-    .. x. .x
-    0  1  2*/
+void test()
+{
+    Board b(3,3);
+    Board * b2 = new Board(b),
+          * b3 = new Board(*b2);
+    delete b2;
+    delete b3;
+}
 
-    //std::cout << (2^3) << std::endl; return 0;
+int main(int , char **)
+{
+    //test(); return 0;
 
     printHelp(true);
 

@@ -195,6 +195,7 @@ Board::Board(uint size, uint cons)
         board_  (sizesq_),
         score_  (sizesq_)
 {
+    std::cerr << "Board::Board(" << size << ", " << cons << ")" << std::endl;
     init();
 }
 
