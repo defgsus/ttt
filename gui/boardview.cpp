@@ -18,23 +18,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "boardview.h"
 
-#include <QMainWindow>
-
-namespace Ui { class MainWindow; }
-
-class MainWindow : public QMainWindow
+BoardView::BoardView(QWidget *parent) :
+    QWidget(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private:
-    Ui::MainWindow *ui_;
-};
-
-#endif // MAINWINDOW_H
+}

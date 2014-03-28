@@ -11,10 +11,22 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = tictactoe_gui
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += --std=c++0x
+QMAKE_CXXFLAGS_RELEASE += -O2 -DNDEBUG
 
-SOURCES += main.cpp\
-        mainwindow.cpp
 
-HEADERS  += mainwindow.h
+SOURCES += \
+    main.cpp \
+    engine/board.cpp \
+    engine/search.cpp \
+    gui/mainwindow.cpp \
+    gui/boardview.cpp
 
-FORMS    += mainwindow.ui
+HEADERS += \
+    engine/board.h \
+    engine/search.h \
+    gui/mainwindow.h \
+    gui/boardview.h
+
+FORMS += \
+    gui/mainwindow.ui
