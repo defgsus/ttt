@@ -18,35 +18,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef ENGINE_H
+#define ENGINE_H
 
-#include <QMainWindow>
+#include <QObject>
+
 #include "engine/board.h"
 
-namespace Ui { class MainWindow; }
+namespace TTT {
+class Search;
+}
 
-class Engine;
-
-class MainWindow : public QMainWindow
+class Engine : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit Engine(QObject *parent = 0);
+    ~Engine();
 
-private slots:
-    /** Move from user */
-    void slotMoveMade(TTT::Move s);
+    bool thinking() const { return thinking_; }
+
+signals:
+
+    /** Engine has a move */
+    void moveMade(TTT::Move);
+
+public slots:
+
+    /** Sets a position and starts search */
+    void setBoard(const TTT::Board& b);
 
 private:
-    Ui::MainWindow * ui_;
 
-    TTT::Board board_;
-    Engine * engine_;
-
-    TTT::Stm playerStm_, engineStm_;
+    TTT::Search * ai_;
+    bool thinking_;
 };
 
-#endif // MAINWINDOW_H
+#endif // ENGINE_H

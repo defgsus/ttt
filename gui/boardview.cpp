@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QRect>
 #include <QColor>
 #include <QPainter>
-
+#include <QMessageBox>
 
 BoardView::BoardView(QWidget *parent)
     : QWidget       (parent),
@@ -60,7 +60,7 @@ void BoardView::setBoard(const TTT::Board& b)
         boardp_.resize(size_*size_);
 
     // copy board to paint board
-    for (size_t i=0; i<size_; ++i)
+    for (size_t i=0; i<size_*size_; ++i)
     {
         PaintWhat w = Nothing;
         int c = board_.capturedAt(i);
@@ -81,6 +81,14 @@ void BoardView::setBoard(const TTT::Board& b)
     }
 }
 
+
+
+void BoardView::message(const QString& m)
+{
+    QMessageBox::information(this,
+                             "X in a row in N²",
+                             m);
+}
 
 
 // ----------------- events ---------------------
@@ -119,11 +127,15 @@ void BoardView::paintEvent(QPaintEvent * )
 
     for (size_t i = 0; i < boardp_.size(); ++i)
     {
-        const QRect r = squareRect(i);
+        const int wi = xPen_.width();
+        const QRect
+            r0 = squareRect(i),
+            r = QRect(r0.left()+wi, r0.top()+wi, r0.width()-wi*2, r0.height()-wi*2);
 
         // draw background square
+        p.setPen(Qt::NoPen);
         p.setBrush((int)i == hoverSquare_ ? bBrushH_ : bBrush_);
-        p.drawRect(r);
+        p.drawRect(r0);
 
         // draw piece
         p.setBrush(Qt::NoBrush);
@@ -143,6 +155,14 @@ void BoardView::paintEvent(QPaintEvent * )
     }
 }
 
+void BoardView::leaveEvent(QEvent *)
+{
+    if (hoverSquare_)
+    {
+        hoverSquare_ = TTT::InvalidMove;
+        update();
+    }
+}
 
 void BoardView::mouseMoveEvent(QMouseEvent * e)
 {
@@ -165,6 +185,27 @@ void BoardView::mouseMoveEvent(QMouseEvent * e)
     if (hoverSquare_ != oldHoverSquare_)
         update();
 }
+
+
+void BoardView::mousePressEvent(QMouseEvent * e)
+{
+    TTT::Square s = squareAt(e->x(), e->y());
+
+    // click
+    if (e->button() == Qt::LeftButton)
+    {
+        if (canMoveTo(s))
+        {
+            hoverSquare_ = TTT::InvalidMove;
+            e->accept();
+            emit moveMade(s);
+            update();
+            return;
+        }
+    }
+
+}
+
 
 // -------------------- private stuff ------------
 
@@ -194,6 +235,9 @@ TTT::Square BoardView::squareAt(int x, int y) const
 
 bool BoardView::canMoveTo(TTT::Square s) const
 {
+    if (board_.stm() == TTT::O)
+        return false;
+
     if (s == TTT::InvalidMove || s >= board_.size() * board_.size())
         return false;
 

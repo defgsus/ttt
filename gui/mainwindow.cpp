@@ -20,16 +20,51 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "engine.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui_(new Ui::MainWindow),
-    board_(3,3)
+    QMainWindow (parent),
+    ui_         (new Ui::MainWindow),
+    board_      (3,3),
+    engine_     (new Engine),
+    playerStm_  (TTT::X),
+    engineStm_  (TTT::O)
 {
     ui_->setupUi(this);
+
+    connect(ui_->boardView, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+    connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui_;
+}
+
+
+
+void MainWindow::slotMoveMade(TTT::Move s)
+{
+    if (s == TTT::InvalidMove)
+    {
+        // means engine gives up
+        if (board_.stm() == engineStm_)
+        {
+            ui_->boardView->message("I'm lost, you win!");
+        }
+        return;
+    }
+
+    // apply move
+    board_.makeMove(s);
+    board_.flipStm();
+
+    ui_->boardView->setBoard(board_);
+
+    // engine's turn?
+    if (board_.stm() == engineStm_)
+    {
+        engine_->setBoard(board_);
+    }
 }

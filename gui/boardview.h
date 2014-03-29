@@ -43,12 +43,19 @@ public:
     virtual void resizeEvent(QResizeEvent *);
     virtual void paintEvent(QPaintEvent *);
     
+    virtual void leaveEvent(QEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
+    virtual void mousePressEvent(QMouseEvent *);
 
 signals:
 
+    /** Signals that user has made a move */
+    void moveMade(TTT::Move s);
+
 public slots:
 
+    /** display a message */
+    void message(const QString&);
 
 protected:
     // ______ PROTECTED FUNCS _______

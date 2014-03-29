@@ -133,7 +133,8 @@ bool Board::canMoveTo(Stm /*stm*/, Move m) const
 
 void Board::makeMove(Move m)
 {
-    TTT_ASSERT(canMoveTo(stm_, m), "invalid move in Board::makeMove");
+    TTT_ASSERT(canMoveTo(stm_, m),
+               "invalid move in Board::makeMove (" << m << ")");
 
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value

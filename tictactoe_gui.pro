@@ -20,7 +20,8 @@ SOURCES += \
     engine/board.cpp \
     engine/boardhelper.cpp \
     gui/mainwindow.cpp \
-    gui/boardview.cpp
+    gui/boardview.cpp \
+    gui/engine.cpp
 
 HEADERS += \
     engine/board.h \
@@ -28,7 +29,8 @@ HEADERS += \
     engine/negamax.h \
     engine/search.h \
     gui/mainwindow.h \
-    gui/boardview.h
+    gui/boardview.h \
+    gui/engine.h
 
 FORMS += \
     gui/mainwindow.ui
