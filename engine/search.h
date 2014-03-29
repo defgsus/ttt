@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 namespace TTT {
 
 
-
+/** Implementation of a NegaMax Node for playing <X in a row> */
 struct Node
 {
     typedef int Score;
@@ -102,7 +102,7 @@ void Node::setBestChild(Node * c)
 {
     //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
     //if (depth == 1)
-        board.setEvalMap(c->move, c->score);
+        //board.setEvalMap(c->move, c->score);
     bestChildMove = c->move;
 }
 
@@ -123,6 +123,8 @@ class Search
     int score;
     /** evaluated nodes */
     int nodes;
+    /** number of pruned nodes */
+    int prunes;
     /** time of last search in milliseconds */
     int time;
     /** archived nodes per seconds */
@@ -159,13 +161,17 @@ Move Search::bestMove(const Board &b, int maxdepth)
     // stats
     time = ti.elapsed();
     score = n.score;
+    nodes = search_.numNodes();
+    prunes = search_.numPrunes();
+    nps = (int)( (double)nodes / std::max(1, time) * 1000 );
 
 #ifndef TTT_NO_PRINT
     std::cout << std::endl;
 
-    std::cout << " depth "
-              << " nodes "
-              << " nps "
+    std::cout << " depth " << maxdepth
+              << " nodes " << nodes
+              << " prunes " << prunes
+              << " nps " << nps
               << " took " << ((double)time/1000) << "s"
               << std::endl;
 #endif
