@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QThread>
+
 #include "engine/board.h"
 
 namespace Ui { class MainWindow; }
@@ -40,11 +42,16 @@ private slots:
     /** Move from user */
     void slotMoveMade(TTT::Move s);
 
+    /** Start new game */
+    void slotStart();
+
 private:
     Ui::MainWindow * ui_;
 
     TTT::Board board_;
     Engine * engine_;
+
+    QThread * engineThread_;
 
     TTT::Stm playerStm_, engineStm_;
 };

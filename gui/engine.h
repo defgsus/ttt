@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define ENGINE_H
 
 #include <QObject>
+#include <QThread>
 
 #include "engine/board.h"
 
@@ -48,10 +49,17 @@ public slots:
     /** Sets a position and starts search */
     void setBoard(const TTT::Board& b);
 
+private slots:
+
+    void slotStarted_();
+
 private:
+
+    QThread thread_;
 
     TTT::Search * ai_;
     bool thinking_;
+    TTT::Board board_;
 };
 
 #endif // ENGINE_H

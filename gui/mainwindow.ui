@@ -45,7 +45,7 @@
   <customwidget>
    <class>BoardView</class>
    <extends>QWidget</extends>
-   <header>boardview.h</header>
+   <header>gui/boardview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

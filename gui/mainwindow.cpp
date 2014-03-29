@@ -27,15 +27,22 @@ MainWindow::MainWindow(QWidget *parent) :
     ui_         (new Ui::MainWindow),
     board_      (5,4),
     engine_     (new Engine),
-    playerStm_  (TTT::X),
-    engineStm_  (TTT::O)
+    playerStm_  (TTT::O),
+    engineStm_  (TTT::X)
 {
+    // setup ui
     ui_->setupUi(this);
 
+    // init boardview with correct size
     ui_->boardView->setBoard(board_);
 
+    // connect boardview
     connect(ui_->boardView, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+
+    // setup engine
     connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+
+    slotStart();
 }
 
 
@@ -45,6 +52,15 @@ MainWindow::~MainWindow()
 }
 
 
+
+void MainWindow::slotStart()
+{
+    board_.init();
+    if (board_.stm() != playerStm_)
+        board_.flipStm();
+
+
+}
 
 void MainWindow::slotMoveMade(TTT::Move s)
 {

@@ -29,8 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 BoardView::BoardView(QWidget *parent)
     : QWidget       (parent),
-      board_        (3,3),
-      size_         (3),
+      board_        (),
+      size_         (board_.size()),
       hoverSquare_  (-1)
 {
     setMouseTracking(true);
@@ -245,11 +245,10 @@ TTT::Square BoardView::squareAt(int x, int y) const
 
 bool BoardView::canMoveTo(TTT::Square s) const
 {
-    if (board_.stm() == TTT::O)
-        return false;
+    const TTT::Stm stm = board_.stm();
 
     if (s == TTT::InvalidMove || s >= board_.size() * board_.size())
         return false;
 
-    return board_.canMoveTo(TTT::X, s);
+    return board_.canMoveTo(stm, s);
 }
