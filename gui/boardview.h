@@ -22,6 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define BOARDVIEW_H
 
 #include <QWidget>
+#include <QRect>
+#include <QBrush>
+#include <QPen>
+
 #include "engine/board.h"
 
 class BoardView : public QWidget
@@ -29,10 +33,16 @@ class BoardView : public QWidget
     Q_OBJECT
 public:
     explicit BoardView(QWidget *parent = 0);
+    ~BoardView();
 
     /** Sets a new position */
     void setBoard(const TTT::Board& b);
 
+    // ------- event ------------
+    
+    void resizeEvent(QResizeEvent *);
+    void paintEvent(QPaintEvent *);
+    
 signals:
 
 public slots:
@@ -40,7 +50,19 @@ public slots:
 
 private:
 
-    TTT::Board board_;
+    QRect squareRect(TTT::Square s) const;
+
+    //TTT::Board board_;
+
+    int margin_,
+        sqmargin_,
+        size_,
+        sqs_, xo_, yo_;
+
+    // --- pens and brushes ---
+
+    QBrush background_;
+    QPen xPen_, oPen_, cPen_;
 };
 
 #endif // BOARDVIEW_H

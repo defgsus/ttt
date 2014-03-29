@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "engine/board.h"
 
 namespace Ui { class MainWindow; }
 
@@ -34,7 +35,9 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui_;
+    Ui::MainWindow * ui_;
+
+    TTT::Board board_;
 };
 
 #endif // MAINWINDOW_H
