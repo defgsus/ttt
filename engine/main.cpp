@@ -21,10 +21,86 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "board.h"
 #include "boardhelper.h"
 #include "search.h"
+#include "negamax.h"
 
 #include <iomanip>
 
 using namespace TTT;
+
+namespace TEST
+{
+    static const char * goal = "he";
+    static const int goallen = 3;
+
+    struct Node
+    {
+        typedef int Score;
+        typedef int Index;
+
+        static Score maxScore() { return 9999999; }
+
+        Score evaluate() const;
+
+        void createChilds() { };
+        Index numChilds() const;
+        Node child(Index i) const;
+        void setBestChild(Node * c);
+
+        // ----- member -----
+
+        Score score;
+
+        char str[goallen];
+    };
+
+    Node::Score Node::evaluate() const
+    {
+        Score s = 0;
+        for (Index i=0; i<goallen-1; ++i)
+            s += (Score)256 - (Score)abs((Score)goal[i] - (Score)str[i]);
+        return s;
+    }
+
+    Node::Index Node::numChilds() const { return goallen - 1; }
+
+    Node Node::child(Index i) const
+    {
+        Node n(*this);
+        n.str[i]++;
+        TTT_DEBUG("child " << n.str);
+        return n;
+    }
+
+    void Node::setBestChild(Node * c)
+    {
+        std::cout << c->str << " " << c->evaluate() << std::endl;
+        for (int i=0; i<goallen; ++i)
+            str[i] = c->str[i];
+    }
+
+    int testNegaMax()
+    {
+        NegaMax<Node> search;
+
+        Node n;
+        for (int i=0; i<goallen-1; ++i)
+            n.str[i] = 'a';
+
+        search.search(6, &n);
+
+        std::cout << "str = '" << n.str << "'" << std::endl;
+
+        return 0;
+    }
+
+}
+
+
+
+
+
+
+
 
 void printRules(Board b)
 {
@@ -99,6 +175,7 @@ void test()
 
 int main(int , char **)
 {
+    return TEST::testNegaMax();
     //test(); return 0;
 
     printHelp(true);

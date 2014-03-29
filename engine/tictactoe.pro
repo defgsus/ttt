@@ -26,4 +26,5 @@ HEADERS += \
     board.h \
     search.h \
     boardhelper.h \
-    common.h
+    common.h \
+    negamax.h
