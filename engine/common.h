@@ -23,7 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // --------- compile settings --------------
 
-/** Multi-threading support (fixed to 8 in Search::bestMove()) */
+/** Multi-threading support (fixed to 8 in Search::bestMove())
+    NOT USED RIGHT NOW */
 //#define TTT_THREADED
 /** Allow captures */
 #define TTT_CAPTURE
@@ -33,16 +34,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_ALPHA_BETA
 /** Use a greedyness value to cut-off nodes */
 #define TTT_GREEDY
-/** Use a hash table (worse performance in threading mode */
+/** Use a hash table (worse performance in threading mode
+    NOT USED RIGHT NOW */
 //#define TTT_TRANSPOSITION_TABLE
-/** Keep the entire search tree (for display). */
+/** Keep the entire search tree (for display).
+    NOT USED RIGHT NOW */
 //#define TTT_KEEP_TREE
 
+#ifndef NDEBUG
+#   define TTT_DEBUG(stream_arg__) { std::cerr << stream_arg__ << std::endl; }
+#   define TTT_ASSERT(expr__, stream_arg__) { \
+        if (!(expr__)) { std::cerr << stream_arg__ << "\n" << __FILE__ << " : " << __LINE__ << std::endl; exit(-1); } }
+#else
+#   define TTT_DEBUG(unused__) { }
+#   define TTT_ASSERT(expr__, unused__) { }
+#endif
 
-#define TTT_DEBUG(stream_arg__) { std::cerr << stream_arg__ << std::endl; }
-#define TTT_ASSERT(expr__, stream_arg__) { \
-    if (!(expr__)) { std::cerr << stream_arg__ << "\n" << __FILE__ << " : " << __LINE__ << std::endl; exit(-1); } }
-
+#ifndef TTT_NO_PRINT
+#   define TTT_PRINT(stream_arg__) { std::cerr << stream_arg__ << std::endl; }
+#else
+#   define TTT_PRINT(unused__) { }
+#endif
 
 #include <vector>
 #include <string>

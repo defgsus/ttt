@@ -298,12 +298,13 @@ int main(int , char **)
                 b.flipStm();
             goto ask_;
         }
+        /*
         else if (str.find("tree") == 0)
         {
             int level = -1;
             if (str.size() >= 5)
                 level = str[4] - '0';
-            //ai.printTree(false, level);
+            ai.printTree(false, level);
             goto ask_;
         }
         else if (str == "btree")
@@ -311,6 +312,7 @@ int main(int , char **)
             //ai.printTree(true);
             goto ask_;
         }
+        */
         else if (str == "moves")
         {
             Moves m;
@@ -322,9 +324,8 @@ int main(int , char **)
         }
         else if (str == "guess")
         {
-            int score;
-            Move m = ai.bestMove(b, mdepth, &score);
-            std::cout << "best move: " << b.toString(m) << " (" << score << ")" << std::endl;
+            Move m = ai.bestMove(b, mdepth);
+            std::cout << "best move: " << b.toString(m) << " (" << ai.score << ")" << std::endl;
             goto ask_;
         }
         else if (str == "b" || str == "back")
@@ -365,14 +366,13 @@ int main(int , char **)
         else
         {
             // figure user's ai move
-            int score;
-            m = ai.bestMove(b, mdepth, &score);
+            m = ai.bestMove(b, mdepth);
             if (m == InvalidMove)
             {
                 autoplay = 0;
                 goto ask_;
             }
-            std::cout << "best move: " << b.toString(m) << " (" << score << ")\n" << std::endl;
+            std::cout << "best move: " << b.toString(m) << " (" << ai.score << ")\n" << std::endl;
         }
 
         // store history
@@ -414,8 +414,7 @@ int main(int , char **)
             }
 
             // run ai
-            int score;
-            m = ai.bestMove(b, mdepth, &score);
+            m = ai.bestMove(b, mdepth);
 
             // ai is clueless ???
             if (m == InvalidMove)
@@ -427,7 +426,7 @@ int main(int , char **)
 
             // -- apply ai move --
 
-            std::cout << "ai move: " << b.toString(m) << " (" << score << ")" << std::endl;
+            std::cout << "ai move: " << b.toString(m) << " (" << ai.score << ")" << std::endl;
             b.makeMove(m);
             b.flipStm();
 

@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef TTT_ENGINE_SEARCH_H
 #define TTT_ENGINE_SEARCH_H
 
+#include <QTime>
+
 #include "board.h"
 #include "boardhelper.h"
 #include "negamax.h"
@@ -112,7 +114,20 @@ class Search
 
     Search() : helper_(3,3) { }
 
-    Move bestMove(const Board& b, int maxdepth, int * score);
+    /** Return best move for current side-to-move */
+    Move bestMove(const Board& b, int maxdepth);
+
+    // ---------- public member ------------
+
+    /** last best score */
+    int score;
+    /** evaluated nodes */
+    int nodes;
+    /** time of last search in milliseconds */
+    int time;
+    /** archived nodes per seconds */
+    int nps;
+
 
 private:
 
@@ -122,17 +137,38 @@ private:
 };
 
 
-Move Search::bestMove(const Board &b, int maxdepth, int *score)
+Move Search::bestMove(const Board &b, int maxdepth)
 {
     // update helper size
     helper_.setSize(b);
 
+    // setup root node
     Node n(b, &helper_);
+
+#ifndef TTT_NO_PRINT
+    std::cout << "!";
+#endif
+
+    // search (and messure time)
+
+    QTime ti;
+    ti.start();
 
     search_.search_ab(maxdepth, &n);
 
-    if (score)
-        *score = n.score;
+    // stats
+    time = ti.elapsed();
+    score = n.score;
+
+#ifndef TTT_NO_PRINT
+    std::cout << std::endl;
+
+    std::cout << " depth "
+              << " nodes "
+              << " nps "
+              << " took " << ((double)time/1000) << "s"
+              << std::endl;
+#endif
 
     return n.bestChildMove;
 }
