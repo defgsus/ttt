@@ -63,13 +63,13 @@ protected:
         // score/utility
         int x;
         // Node's board position
-        Board board;
+        //Board board;
         // all possible moves
         Moves moves;
         // move which led to this node
         Move move;
         // child nodes
-        Node * childs;
+        //Node * childs;
         size_t numChilds;
         // best index into childs/moves
         uint best;
@@ -77,19 +77,19 @@ protected:
         bool term;
 
         Node()
-            : depth(0),ismax(false),move(InvalidMove),childs(0),numChilds(0),best(-1),term(false)
+            : depth(0),ismax(false),move(InvalidMove),/*childs(0),numChilds(0),*/best(-1),term(false)
         { }
-
+        /*
         ~Node()
         {
             if (childs) free(childs);
-        }
+        }*/
 
         void init()
         {
-            depth = 0; ismax=false; move=InvalidMove; childs=0; numChilds=0; best=-1; term=false;
+            depth = 0; ismax=false; move=InvalidMove;/*childs=0; numChilds=0;*/ best=-1; term=false;
         }
-
+        /*
         void allocChilds(size_t num)
         {
             childs = (Node*)calloc(num, sizeof(Node));
@@ -101,6 +101,7 @@ protected:
             if (childs) delete childs;
             childs = 0; numChilds = 0;
         }
+        */
     };
 
     /** info per node-thread */
@@ -123,6 +124,8 @@ protected:
             num_level = std::max(num_level, r.num_level);
         }
 
+        Board board;
+
 #ifdef TTT_ALPHA_BETA
         int alpha, beta;
 #endif
@@ -138,7 +141,7 @@ protected:
     };
 
     /** Evaluates a Node.
-        Only needs depth and board to be set. */
+        Needs depth and moves to be set. */
     void minimax(Info * info, Node * n);
 
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);

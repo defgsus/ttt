@@ -51,16 +51,17 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // setup search stuff
     max_depth_ = maxd;
     Info info;
+    info.board = b;
 
     // prepare root node
-    root_.freeChilds();
+    //root_.freeChilds();
     root_.depth = 0;
     root_.ismax = true;
     root_.move = InvalidMove;
     root_.x = InvalidScore;
     root_.best = InvalidMove;
-    root_.board = b;
-    helper_.getMoves(root_.board, root_.moves);
+    //root_.board = b;
+    helper_.getMoves(info.board, root_.moves);
     if (root_.moves.empty())
         return InvalidMove;
 
@@ -158,13 +159,13 @@ Move Search::bestMove(Board& b, int maxd, int * score)
            << "\n  took: " << took << "s"
               << " nps: " << (float)info.num_nodes/took
               << std::endl;
-
+/*
     // update board's eval map
     b.clearEvalMap();
     for (size_t i=0; i<root_.numChilds; ++i)
         if (root_.childs[i].x != InvalidScore)
             b.setEvalMap(root_.moves[i], root_.childs[i].x);
-
+*/
     if (root_.best == InvalidMove)
     {
         //std::cout << "no best move " << root_.childs.size() << std::endl;
@@ -182,6 +183,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
 
 void Search::minimax(Info * info, Node * n)
 {
+    // keep track of max reached depth
     info->num_level = std::max(info->num_level, (uint)n->depth);
 
     if (n->ismax)
@@ -194,10 +196,10 @@ void Search::minimax(Info * info, Node * n)
     }
 
     // get all moves from hereon
-    helper_.getMoves(n->board, n->moves);
+    //helper_.getMoves(->board, n->moves);
     n->best = InvalidMove;
 
-    int eval = helper_.eval(n->board);
+    int eval = helper_.eval(info->board);
     if (!n->ismax) eval = -eval;
 
     // terminal node or max-depth?
@@ -228,24 +230,27 @@ void Search::minimax(Info * info, Node * n)
         return;
     }
 
+    Board board;
+
     // child nodes
-    n->allocChilds(n->moves.size());
+    //n->allocChilds(n->moves.size());
+    Node c;
     for (size_t i=0; i<n->moves.size(); ++i)
     {
-        Node * c = &n->childs[i];
+        //Node * c = &n->childs[i];
 
         // setup node
-        c->init();
-        c->parent = n;
-        c->depth = n->depth + 1;
-        c->ismax = !n->ismax;
-        c->move = n->moves[i];
+        c.init();
+        c.parent = n;
+        c.depth = n->depth + 1;
+        c.ismax = !n->ismax;
+        c.move = n->moves[i];
         ++info->num_nodes;
 
         // advance game
-        c->board = n->board;
-        c->board.makeMove(n->moves[i]);
-        c->board.flipStm();
+        board = info->board;
+        board.makeMove(n->moves[i]);
+        board.flipStm();
 
         int score = 0;
 
@@ -258,9 +263,9 @@ void Search::minimax(Info * info, Node * n)
         {
 #endif
             // evaluate the child
-            minimax(info, c);
+            minimax(info, &c);
 
-            score = c->x;
+            score = c.x;
 
 #ifdef TTT_TRANSPOSITION_TABLE
 
@@ -294,7 +299,7 @@ void Search::minimax(Info * info, Node * n)
     }
 
 #ifndef TTT_KEEP_TREE
-    if (n->depth>0) n->freeChilds();
+    //if (n->depth>0) n->freeChilds();
 #endif
 
 }
@@ -311,7 +316,7 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
     out << std::setw(n.depth) << ""
         << (n.ismax? "MAX " : "MIN ")
         << "d=" << n.depth << " c=" << n.numChilds << " x=" << n.x
-        << " " << (n.move != InvalidMove? n.board.toString(n.move) : "-")
+        //<< " " << (n.move != InvalidMove? n.board.toString(n.move) : "-")
         //<< (n.invalid? " invalid" : "")
         //<< " " << (n.best<n.moves.size()? n.board.toString(n.moves[n.best]) : "-")
         ;
@@ -325,7 +330,7 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
     if (!bestOnly || i == n.best)
     {
         //out << std::setw(n.depth) << " " << "\\";
-        printNode(n.childs[i], bestOnly, maxlevel, out);
+        //printNode(n.childs[i], bestOnly, maxlevel, out);
     }
     //out << std::endl;
 }

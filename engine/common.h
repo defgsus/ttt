@@ -24,12 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // --------- compile settings --------------
 
 /** Multi-threading support (fixed to 8 in Search::bestMove()) */
-#define TTT_THREADED
+//#define TTT_THREADED
 /** Allow captures */
 #define TTT_CAPTURE
 /** Force one move pause for captured squares */
 #define TTT_CAPTURE_WAIT
-/** Use Alpha-Beta pruning */
+/** Use Alpha-Beta-Pruning */
 #define TTT_ALPHA_BETA
 /** Use a greedyness value to cut-off nodes */
 #define TTT_GREEDY
