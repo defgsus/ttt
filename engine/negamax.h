@@ -135,6 +135,12 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Node * n)
 
     n->createChilds();
 
+    // terminal?
+    if (!n->numChilds())
+    {
+        return n->score = n->evaluate();
+    }
+
     for (Index i = 0; i < n->numChilds(); ++i)
     {
         Node c = n->child(i);
@@ -166,6 +172,13 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
 //        return n->evaluate();
 
     n->createChilds();
+
+    // terminal?
+    if (!n->numChilds())
+    {
+        return n->score = n->evaluate();
+    }
+
     for (Index i = 0; i < n->numChilds(); ++i)
     {
         Node c = n->child(i);

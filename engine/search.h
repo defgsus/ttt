@@ -83,6 +83,7 @@ bool Node::isTerminal() const
 void Node::createChilds()
 {
     helper->getMoves(board, moves);
+    TTT_DEBUG("moves " << moves.size());
 }
 
 Node::Index Node::numChilds() const { return moves.size(); }
@@ -156,7 +157,11 @@ Move Search::bestMove(const Board &b, int maxdepth)
     QTime ti;
     ti.start();
 
+#ifdef TTT_ALPHA_BETA
     search_.search_ab(maxdepth, &n);
+#else
+    search_.search(maxdepth, &n);
+#endif
 
     // stats
     time = ti.elapsed();
@@ -170,7 +175,9 @@ Move Search::bestMove(const Board &b, int maxdepth)
 
     std::cout << " depth " << maxdepth
               << " nodes " << nodes
+#ifdef TTT_ALPHA_BETA
               << " prunes " << prunes
+#endif
               << " nps " << nps
               << " took " << ((double)time/1000) << "s"
               << std::endl;
