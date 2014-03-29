@@ -28,8 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 BoardView::BoardView(QWidget *parent)
     : QWidget   (parent),
+      board_    (3,3),
       size_     (3)
-      //board_    (new TTT::Board)
 {
     background_ = QBrush(QColor(0,0,0));
     xPen_ = QPen(QColor(220,255,220));
@@ -84,7 +84,7 @@ void BoardView::paintEvent(QPaintEvent * )
     p.drawRect(rect());
 
     p.setBrush(Qt::NoBrush);
-    for (size_t i = 0; i < size_*size_; ++i)
+    for (int i = 0; i < size_*size_; ++i)
     {
         const QRect r = squareRect(i);
 

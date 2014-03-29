@@ -52,7 +52,7 @@ private:
 
     QRect squareRect(TTT::Square s) const;
 
-    //TTT::Board board_;
+    TTT::Board board_;
 
     int margin_,
         sqmargin_,

@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "board.h"
+#include "boardhelper.h"
 #include "search.h"
 
 #include <iomanip>
@@ -107,6 +108,7 @@ int main(int , char **)
     int autoplay = 0;
 
     Board b(3,3);
+    BoardHelper bh(b);
     Search ai;
 
     b.init();
@@ -121,7 +123,7 @@ int main(int , char **)
         std::cout << std::endl;
         b.printBoard(print_eval);
 
-        int eval = b.eval();
+        int eval = bh.eval(b);
         std::cout << std::setw(b.size()*8+10) << "eval " << eval
                   << std::endl;
 
@@ -167,6 +169,8 @@ int main(int , char **)
             int s, c;
             std::cin >> s >> c;
             b.setSize(s,c);
+            bh.setSize(b);
+            stack.clear();
             goto reprint_;
         }
         else if (str.find("greed")==0)
@@ -204,7 +208,7 @@ int main(int , char **)
         else if (str == "moves")
         {
             Moves m;
-            b.getMoves(m);
+            bh.getMoves(b, m);
             for (auto i : m)
                 std::cout << " " << b.toString(i);
             std::cout << std::endl;
@@ -234,7 +238,7 @@ int main(int , char **)
 
         // ------ expect move here -----
 
-        if (b.isOver())
+        if (bh.isOver(b))
         {
             std::cout << "the game is over, buddy" << std::endl;
             goto ask_;
@@ -287,7 +291,7 @@ int main(int , char **)
         if (true)
         {
             // check for win
-            if (b.isWin(X))
+            if (bh.isWin(b, X))
             {
                 std::cout << "\n--------"
                              "\nYou win!"
@@ -321,7 +325,7 @@ int main(int , char **)
             b.makeMove(m);
             b.flipStm();
 
-            if (b.isWin(O))
+            if (bh.isWin(b, O))
             {
                 std::cout << "\n---------------------"
                              "\nI win, i'm a machine!"
@@ -341,7 +345,7 @@ int main(int , char **)
         std::cout << "\n------------------------------------"
                      "\nDraw! I wasn't really trying, though"
                      "\n------------------------------------" << std::endl;
-        std::cout << "final score " << b.eval() << std::endl;
+        std::cout << "final score " << bh.eval(b) << std::endl;
         autoplay = 0;
         goto ask_;
 

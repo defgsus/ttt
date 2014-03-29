@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define SEARCH_H
 
 #include "board.h"
+#include "boardhelper.h"
 
 #ifdef TTT_TRANSPOSITION_TABLE
 #include <map>
@@ -62,7 +63,7 @@ protected:
         // score/utility
         int x;
         // Node's board position
-        Board * board;
+        Board board;
         // all possible moves
         Moves moves;
         // move which led to this node
@@ -76,17 +77,17 @@ protected:
         bool term;
 
         Node()
-            : depth(0),ismax(false),board(0),move(InvalidMove),childs(0),numChilds(0),best(-1),term(false)
+            : depth(0),ismax(false),move(InvalidMove),childs(0),numChilds(0),best(-1),term(false)
         { }
+
         ~Node()
         {
-            if (board) delete board;
             if (childs) free(childs);
         }
 
         void init()
         {
-            depth = 0; ismax=false; board=0; move=InvalidMove; childs=0; numChilds=0; best=-1; term=false;
+            depth = 0; ismax=false; move=InvalidMove; childs=0; numChilds=0; best=-1; term=false;
         }
 
         void allocChilds(size_t num)
@@ -141,6 +142,10 @@ protected:
     void minimax(Info * info, Node * n);
 
     void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
+
+    // ____________ MEMBER _____________
+
+    BoardHelper helper_;
 
     Node root_;
 

@@ -23,7 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui_(new Ui::MainWindow)
+    ui_(new Ui::MainWindow),
+    board_(3,3)
 {
     ui_->setupUi(this);
 }

@@ -33,13 +33,17 @@ namespace TTT {
 
 
 Search::Search()
-    :   greed_  (-MaxScore)
+    :   helper_ (3,3),
+        greed_  (-MaxScore)
 {
 }
 
 
 Move Search::bestMove(Board& b, int maxd, int * score)
 {
+    // update accel. structure
+    helper_.setSize(b);
+
     // ---------- start search -----------
 
     if (score) *score = 0;
@@ -55,10 +59,10 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     root_.move = InvalidMove;
     root_.x = InvalidScore;
     root_.best = InvalidMove;
-    if (root_.board) delete root_.board;
-    root_.board = new Board(b);
-    root_.board->getMoves(root_.moves);
-    if (root_.moves.empty()) return InvalidMove;
+    root_.board = b;
+    helper_.getMoves(root_.board, root_.moves);
+    if (root_.moves.empty())
+        return InvalidMove;
 
     // -- go --
 
@@ -72,7 +76,7 @@ Move Search::bestMove(Board& b, int maxd, int * score)
     // process single root
     minimax(&info, &root_);
 #else
-    // prepare child node for each thread
+    // prepare child node for each move
     std::vector<Info*> infos;
     root_.allocChilds(root_.moves.size());
     for (uint i=0; i<root_.moves.size(); ++i)
@@ -89,9 +93,9 @@ Move Search::bestMove(Board& b, int maxd, int * score)
         ++info->num_nodes;
 
         // advance game
-        c->board = new Board(*root_.board);
-        c->board->makeMove(c->move);
-        c->board->flipStm();
+        c->board = root_.board;
+        c->board.makeMove(c->move);
+        c->board.flipStm();
     }
     // execute
     std::deque<std::thread> threads;
@@ -189,10 +193,11 @@ void Search::minimax(Info * info, Node * n)
         n->x = MaxScore;
     }
 
-    n->board->getMoves(n->moves);
+    // get all moves from hereon
+    helper_.getMoves(n->board, n->moves);
     n->best = InvalidMove;
 
-    int eval = n->board->eval();
+    int eval = helper_.eval(n->board);
     if (!n->ismax) eval = -eval;
 
     // terminal node or max-depth?
@@ -238,9 +243,9 @@ void Search::minimax(Info * info, Node * n)
         ++info->num_nodes;
 
         // advance game
-        c->board = new Board(*n->board);
-        c->board->makeMove(n->moves[i]);
-        c->board->flipStm();
+        c->board = n->board;
+        c->board.makeMove(n->moves[i]);
+        c->board.flipStm();
 
         int score = 0;
 
@@ -306,7 +311,7 @@ void Search::printNode(const Node &n, bool bestOnly, int maxlevel, std::ostream 
     out << std::setw(n.depth) << ""
         << (n.ismax? "MAX " : "MIN ")
         << "d=" << n.depth << " c=" << n.numChilds << " x=" << n.x
-        << " " << (n.move != InvalidMove? n.board->toString(n.move) : "-")
+        << " " << (n.move != InvalidMove? n.board.toString(n.move) : "-")
         //<< (n.invalid? " invalid" : "")
         //<< " " << (n.best<n.moves.size()? n.board.toString(n.moves[n.best]) : "-")
         ;

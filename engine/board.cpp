@@ -20,231 +20,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "board.h"
 
-#include <cassert>
-#include <cmath>
 #include <iomanip>
 
 namespace TTT {
-
-void BoardHelper::createMoveOrder()
-{
-    moveOrder.resize(size * size);
-
-    for (auto &i : moveOrder)
-        i = 0;
-
-    // use an ulam spiral to create indexes
-    // that start in the middle and expand towards edges
-    const int sh = (size >> 1) - !(size&1);
-    for (int y = 0; y<(int)size; ++y)
-    for (int x = 0; x<(int)size; ++x)
-    {
-        size_t u = ulam_spiral(x-sh,y-sh);
-
-        if (u<=moveOrder.size())
-            moveOrder[u] = (y * size + x);
-    }
-
-    //for (auto i : moveOrder_)
-    //    std::cout << " " << i;
-}
-
-int BoardHelper::getRowValue(int * row, const int X, const int O) const
-{
-    // get utility value
-    int u = 0, full = 0;
-
-    // start by scoring
-    //   square values as:
-    for (uint i = 0; i<cons; ++i)
-    {
-        if (row[i] == Empty)
-            u += 1;
-        else if (row[i] == X)
-        {
-            full++;
-            u += (4 + 2 * full);
-        }
-        else if (row[i] == O)
-            u -= 3;
-    }
-    // full row?
-    if (full>=(int)cons)
-    {
-        u = MaxScore; // win
-    }
-    else
-    {
-        // additional points for consecutiveness
-        for (uint i=0; i<cons-1; ++i)
-            if (row[i] == X && row[i+1] == X)
-                u *= 2;
-
-        // generally less points when opponent breaks row
-        for (uint i = 0; i<cons; ++i)
-            if (row[i] == O) { u /= 3; break; }
-#if 1
-        // no points for full-row-emptyness
-        if (full == 0) u = 0;
-#endif
-
-    }
-
-    return std::max(0,u);
-}
-
-
-void BoardHelper::createRowValues()
-{
-    rowValues.clear();
-
-    // creat all permutations of empty/self/other for a row of length cons
-    // and precalculate the utility value
-    // Note.
-    // The value '3' in the 2 piece bits is not used.
-    // The map still contains a value there for efficient access
-    // (entry = rowvalue<<2)
-    uint i,j,kk,k = 0, num = pow(4, cons);
-    for (j=0; j<num; ++j, ++k)
-    {
-        std::vector<int> row;
-        for (i=0; i<cons; ++i)
-        {
-            kk = (k>>(i*2)) & pieceMask;
-            if ((kk)==Empty) row.push_back(Empty); else
-            if ((kk)==X)     row.push_back(X); else
-            if ((kk)>=O)     row.push_back(O);
-        }
-
-        int u = getRowValue(&row[0], X, O)
-              - getRowValue(&row[0], O, X);
-
-        // store utility value
-        rowValues.push_back( u );
-
-#if 0
-        // debug print
-        if (k%4 != 3)
-        {
-            std::cout << std::setw(4) << k << " ";
-            for (i=0; i<cons_; ++i) std::cout << pieceChar(row[i]);
-            if (u!=0) std::cout << " " << u;
-            std::cout << std::endl;
-        }
-#endif
-    }
-}
-
-
-void BoardHelper::createScanOrder()
-{
-    scanOrder.clear();
-
-#define TTT_SCAN(xi, yi)                       \
-    {                                          \
-        uint cx = x, cy = y;                   \
-        for (uint i=0; i<cons; ++i)            \
-        {                                      \
-            scanOrder.push_back(cy*size+cx);   \
-            cx += xi; cy += yi;                \
-        }                                      \
-    }
-
-    uint x,y;
-
-    // horizontal
-    for (y=0; y<size; ++y)
-        for (x=0; x<=size-cons; ++x)
-            TTT_SCAN(1,0);
-
-    // vertically
-    for (x=0; x<size; ++x)
-        for (y=0; y<=size-cons; ++y)
-            TTT_SCAN(0,1);
-
-    // diagonally right
-    for (y=0; y<=size-cons; ++y)
-        for (x=0; x<=size-cons; ++x)
-            TTT_SCAN(1,1);
-
-    // diagonally left
-    for (y=0; y<=size-cons; ++y)
-        for (x=size-1; x>=cons-1; --x)
-            TTT_SCAN(-1,1);
-
-    #undef TTT_SCAN
-
-}
-
-
-
-
-
-
-
 
 
 // -------------------------- board ---------------------------
 
 Board::Board(uint size, uint cons)
-    :   helper_ (new BoardHelper(size, cons)),
-        ownHelper_(true),
-        size_   (size),
+    :   size_   (size),
         sizesq_ (size*size),
         cons_   (cons),
         board_  (sizesq_),
         score_  (sizesq_)
 {
-    std::cerr << "Board::Board(" << size << ", " << cons << ")" << std::endl;
-    init();
-}
-
-Board::~Board()
-{
-    if (ownHelper_)
-        delete helper_;
-}
-
-Board::Board(const Board& r)
-{
-    *this = r;
-}
-
-Board& Board::operator = (const Board& r)
-{
-    helper_ = r.helper_;
-    ownHelper_ = false;
-
-    size_ = r.size_;
-    sizesq_ = r.sizesq_;
-    cons_ = r.cons_;
-
-    stm_ = r.stm_;
-    nstm_ = r.nstm_;
-    pieces_ = r.pieces_;
-    ply_ = r.ply_;
-
-    board_ = r.board_;
-    score_ = r.score_;
-
-    return *this;
-}
-
-
-void Board::setSize(uint size, uint cons)
-{
-    if (ownHelper_)
-        delete helper_;
-
-    helper_ = new BoardHelper(size, cons);
-    ownHelper_ = true;
-
-    size_ = size;
-    sizesq_ = size*size;
-    cons_ = cons;
-    board_.resize(size*size);
-    score_.resize(size*size);
-    clearEvalMap();
+    TTT_DEBUG("Board::Board(" << size << ", " << cons << ")");
     init();
 }
 
@@ -258,6 +48,17 @@ void Board::init()
     nstm_ = O;
     pieces_ = 0;
     ply_ = 0;
+}
+
+void Board::setSize(uint size, uint cons)
+{
+    size_ = size;
+    sizesq_ = size*size;
+    cons_ = cons;
+    board_.resize(sizesq_);
+    score_.resize(sizesq_);
+
+    init();
 }
 
 
@@ -332,8 +133,7 @@ bool Board::canMoveTo(Stm /*stm*/, Move m) const
 
 void Board::makeMove(Move m)
 {
-    assert(canMoveTo(stm_, m)
-           && "invalid move in Board::makeMove");
+    TTT_ASSERT(canMoveTo(stm_, m), "invalid move in Board::makeMove");
 
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value
@@ -402,25 +202,8 @@ bool Board::exeCapture(Square m, int xi, int yi)
     return false;
 }
 
-void Board::getMoves(Moves &m) const
-{
-    m.clear();
-    for (size_t i=0; i<helper_->moveOrder.size(); ++i)
-    {
-        const Square k = helper_->moveOrder[i];
-
-        if (canMoveTo(stm_, k))
-            m.push_back(k);
-    }
-}
 
 
-bool Board::isWin(Stm p) const
-{
-    int e = evalX();
-    return ((p == X && e >= WinScore)
-            || (p == O && -e >= WinScore));
-}
 
 bool Board::isDraw() const
 {
@@ -534,37 +317,6 @@ void Board::setEvalMap(Square s, int score)
     score_[s] = score;
 }
 
-
-int Board::eval()
-{
-    return (stm_==X)? evalX() : -evalX();// - eval(nstm_);
-}
-
-
-
-
-int Board::evalX() const
-{
-    int u = 0;
-
-    // --- find consecutives ---
-
-    for (uint i=0; i<helper_->scanOrder.size(); )
-    {
-        // bit-fiddle row value
-        // which is an index into rowVal_[]
-        uint cnt = 0;
-        for (uint j=0; j<cons_; ++j, ++i)
-        {
-            cnt <<= 2;
-            cnt += pieceAt(helper_->scanOrder[i]);
-        }
-        // add evaluation value
-        u += helper_->rowValues[cnt];
-    }
-
-    return u;
-}
 
 
 } // namespace TTT
