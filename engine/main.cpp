@@ -29,19 +29,23 @@ using namespace TTT;
 
 namespace TEST
 {
-    static const char * goal = "he";
-    static const int goallen = 3;
 
     struct Node
     {
         typedef int Score;
         typedef int Index;
 
-        static Score maxScore() { return 9999999; }
+        static Score maxScore() { return MaxScore; }
+
+        Node()
+            :   score(0), depth(0), bestChildMove(0)
+        { }
 
         Score evaluate() const;
 
-        void createChilds() { };
+        bool isTerminal() const;
+
+        void createChilds();
         Index numChilds() const;
         Node child(Index i) const;
         void setBestChild(Node * c);
@@ -49,47 +53,72 @@ namespace TEST
         // ----- member -----
 
         Score score;
+        Moves moves;
+        int depth;
 
-        char str[goallen];
+        Board board;
+        BoardHelper * helper;
+
+        Move move,
+            bestChildMove;
+
     };
 
     Node::Score Node::evaluate() const
     {
-        Score s = 0;
-        for (Index i=0; i<goallen-1; ++i)
-            s += (Score)256 - (Score)abs((Score)goal[i] - (Score)str[i]);
-        return s;
+        const Score s = helper->eval(board);
+        return depth & 1 ? -s : s;
     }
 
-    Node::Index Node::numChilds() const { return goallen - 1; }
+    bool Node::isTerminal() const
+    {
+        return helper->isOver(board);
+    }
+
+    void Node::createChilds()
+    {
+        helper->getMoves(board, moves);
+    }
+
+    Node::Index Node::numChilds() const { return moves.size(); }
 
     Node Node::child(Index i) const
     {
         Node n(*this);
-        n.str[i]++;
-        TTT_DEBUG("child " << n.str);
+        n.move = moves[i];
+        n.board.makeMove(n.move);
+        n.board.flipStm();
+        n.depth++;
+//        TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(n.move));
         return n;
     }
 
     void Node::setBestChild(Node * c)
     {
-        std::cout << c->str << " " << c->evaluate() << std::endl;
-        for (int i=0; i<goallen; ++i)
-            str[i] = c->str[i];
+        //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
+        //if (depth == 1)
+            board.setEvalMap(c->move, c->score);
+        bestChildMove = c->move;
     }
 
     int testNegaMax()
     {
         NegaMax<Node> search;
 
+        Board board(3,3);
+        BoardHelper helper(board);
+
         Node n;
-        for (int i=0; i<goallen-1; ++i)
-            n.str[i] = 'a';
+        n.board = board;
+        n.helper = &helper;
 
-        search.search(6, &n);
+        search.search(10, &n);
 
-        std::cout << "str = '" << n.str << "'" << std::endl;
+        std::cout << "best = "
+                  << board.toString(n.bestChildMove)
+                  << " (" << n.score << ")" << std::endl;
 
+        n.board.printBoard(true);
         return 0;
     }
 
@@ -175,7 +204,7 @@ void test()
 
 int main(int , char **)
 {
-    return TEST::testNegaMax();
+    //return TEST::testNegaMax();
     //test(); return 0;
 
     printHelp(true);
@@ -254,7 +283,7 @@ int main(int , char **)
         {
             int g;
             std::cin >> g;
-            ai.greed(g);
+            //ai.greed(g);
             goto ask_;
         }
         else if (str == "X" || str == "x")
@@ -274,12 +303,12 @@ int main(int , char **)
             int level = -1;
             if (str.size() >= 5)
                 level = str[4] - '0';
-            ai.printTree(false, level);
+            //ai.printTree(false, level);
             goto ask_;
         }
         else if (str == "btree")
         {
-            ai.printTree(true);
+            //ai.printTree(true);
             goto ask_;
         }
         else if (str == "moves")

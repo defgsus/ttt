@@ -42,6 +42,7 @@ public:
     typedef typename Node::Index Index;
 
     void search(int maxDepth, Node * n);
+    void search_ab(int maxDepth, Node * n);
 
     Score negamax(int depth, Node * n);
     Score negamax(int depth, Score alpha, Score beta, Node * n);
@@ -56,6 +57,12 @@ public:
 
 template <class Node>
 void NegaMax<Node>::search(int maxDepth, Node * n)
+{
+    negamax(maxDepth, n);
+}
+
+template <class Node>
+void NegaMax<Node>::search_ab(int maxDepth, Node * n)
 {
     alpha = -Node::maxScore();
     beta = Node::maxScore();
@@ -76,6 +83,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax(int depth, Node * n)
     Score maxv = -Node::maxScore();
 
     n->createChilds();
+
     for (Index i = 0; i < n->numChilds(); ++i)
     {
         Node c = n->child(i);
@@ -83,12 +91,12 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax(int depth, Node * n)
 
         if (score > maxv)
         {
-            maxv = score;
+            n->score = maxv = score;
             n->setBestChild(&c);
         }
     }
 
-    return maxv;
+    return n->score = maxv;
 }
 
 
@@ -101,6 +109,9 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax(int depth, Score alpha, Sco
         return n->score;
     }
 
+//    if (n->isTerminal())
+//        return n->evaluate();
+
     n->createChilds();
     for (Index i = 0; i < n->numChilds(); ++i)
     {
@@ -110,17 +121,19 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax(int depth, Score alpha, Sco
 
         if (score >= beta)
         {
+            n->score = score;
             n->setBestChild(&c);
             return beta;
         }
 
         if (score > alpha)
         {
-            alpha = score;
+            n->score = alpha = score;
             n->setBestChild(&c);
         }
     }
 
+    n->score = alpha;
     return alpha;
 }
 

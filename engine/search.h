@@ -18,148 +18,127 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef SEARCH_H
-#define SEARCH_H
+#ifndef TTT_ENGINE_SEARCH_H
+#define TTT_ENGINE_SEARCH_H
 
 #include "board.h"
 #include "boardhelper.h"
-
-#ifdef TTT_TRANSPOSITION_TABLE
-#include <map>
-#endif
+#include "negamax.h"
 
 namespace TTT {
 
-class Search
+
+
+struct Node
 {
-public:
-    Search();
+    typedef int Score;
+    typedef int Index;
 
-    /** Returns best move for current board and stm.
-        Also sets Board's evalMap */
-    Move bestMove(Board& b, int max_depth, int * score = 0);
+    static Score maxScore() { return MaxScore; }
 
-#ifdef TTT_GREEDY
-    /** Sets the greedyness.
-        A positive value means, the engine discards nodes that are
-        not at least @p greed points better than parent branch.
-        A negative value means, the engine discards nodes that are
-        worse then abs(@p greed) points than the parent node. */
-    void greed(int greed) { greed_ = greed; }
-    int  greed() const { return greed_; }
-#endif
+    Node(const Board& b, BoardHelper * helper)
+        :   score(0), depth(0), board(b), helper(helper), bestChildMove(InvalidMove)
+    { }
 
-    void printTree(bool bestOnly = false, int maxlevel = -1, std::ostream& out = std::cout);
+    Node()
+        :   score(0), depth(0), bestChildMove(InvalidMove)
+    { }
 
-protected:
+    Score evaluate() const;
 
-    int max_depth_;
+    bool isTerminal() const;
 
-    struct Node
-    {
-        Node * parent;
-        int depth;
-        bool ismax;
-        // score/utility
-        int x;
-        // Node's board position
-        //Board board;
-        // all possible moves
-        Moves moves;
-        // move which led to this node
-        Move move;
-        // child nodes
-        //Node * childs;
-        size_t numChilds;
-        // best index into childs/moves
-        uint best;
-        // terminal node?
-        bool term;
+    void createChilds();
+    Index numChilds() const;
+    Node child(Index i) const;
+    void setBestChild(Node * c);
 
-        Node()
-            : depth(0),ismax(false),move(InvalidMove),/*childs(0),numChilds(0),*/best(-1),term(false)
-        { }
-        /*
-        ~Node()
-        {
-            if (childs) free(childs);
-        }*/
+    // ----- member -----
 
-        void init()
-        {
-            depth = 0; ismax=false; move=InvalidMove;/*childs=0; numChilds=0;*/ best=-1; term=false;
-        }
-        /*
-        void allocChilds(size_t num)
-        {
-            childs = (Node*)calloc(num, sizeof(Node));
-            numChilds = num;
-        }
+    Score score;
+    Moves moves;
+    int depth;
 
-        void freeChilds()
-        {
-            if (childs) delete childs;
-            childs = 0; numChilds = 0;
-        }
-        */
-    };
+    Board board;
+    BoardHelper * helper;
 
-    /** info per node-thread */
-    struct Info
-    {
-        Info() :
-#ifdef TTT_ALPHA_BETA
-                alpha(-MaxScore), beta(MaxScore),
-#endif
-                num_nodes(0), num_cache_reuse(0), num_prune(0),
-                num_cuts(0), num_level(0)
-            { }
-
-        void combine(const Info& r)
-        {
-            num_nodes += r.num_nodes;
-            num_cache_reuse += r.num_cache_reuse;
-            num_prune += r.num_prune;
-            num_cuts += r.num_cuts;
-            num_level = std::max(num_level, r.num_level);
-        }
-
-        Board board;
-
-#ifdef TTT_ALPHA_BETA
-        int alpha, beta;
-#endif
-
-        uint num_nodes,
-             num_cache_reuse,
-             num_prune,
-             num_cuts,
-             num_level;
-#ifdef TTT_TRANSPOSITION_TABLE
-            std::map<Hash,int> cache;
-#endif
-    };
-
-    /** Evaluates a Node.
-        Needs depth and moves to be set. */
-    void minimax(Info * info, Node * n);
-
-    void printNode(const Node& n, bool bestOnly, int maxlevel, std::ostream& out = std::cout);
-
-    // ____________ MEMBER _____________
-
-    BoardHelper helper_;
-
-    Node root_;
-
-#ifdef TTT_GREEDY
-    int greed_;
-#endif
+    Move move,
+        bestChildMove;
 
 };
+
+Node::Score Node::evaluate() const
+{
+    const Score s = helper->eval(board);
+    return depth & 1 ? -s : s;
+}
+
+bool Node::isTerminal() const
+{
+    return helper->isOver(board);
+}
+
+void Node::createChilds()
+{
+    helper->getMoves(board, moves);
+}
+
+Node::Index Node::numChilds() const { return moves.size(); }
+
+Node Node::child(Index i) const
+{
+    Node n(*this);
+    n.move = moves[i];
+    n.board.makeMove(n.move);
+    n.board.flipStm();
+    n.depth++;
+//        TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(n.move));
+    return n;
+}
+
+void Node::setBestChild(Node * c)
+{
+    //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
+    //if (depth == 1)
+        board.setEvalMap(c->move, c->score);
+    bestChildMove = c->move;
+}
+
+
+
+class Search
+{
+    public:
+
+    Search() : helper_(3,3) { }
+
+    Move bestMove(const Board& b, int maxdepth, int * score);
+
+private:
+
+    NegaMax<Node> search_;
+
+    BoardHelper helper_;
+};
+
+
+Move Search::bestMove(const Board &b, int maxdepth, int *score)
+{
+    // update helper size
+    helper_.setSize(b);
+
+    Node n(b, &helper_);
+
+    search_.search_ab(maxdepth, &n);
+
+    if (score)
+        *score = n.score;
+
+    return n.bestChildMove;
+}
+
 
 
 } // namespace TTT
 
-
-#endif // SEARCH_H
+#endif // TTT_ENGINE_SEARCH_H

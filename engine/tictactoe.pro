@@ -19,12 +19,11 @@ QMAKE_CXXFLAGS += --std=c++0x
 SOURCES += \
     main.cpp \
     board.cpp \
-    search.cpp \
     boardhelper.cpp
 
 HEADERS += \
     board.h \
-    search.h \
     boardhelper.h \
     common.h \
-    negamax.h
+    negamax.h \
+    search.h
