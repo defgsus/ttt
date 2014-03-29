@@ -40,28 +40,60 @@ public:
 
     // ------- event ------------
     
-    void resizeEvent(QResizeEvent *);
-    void paintEvent(QPaintEvent *);
+    virtual void resizeEvent(QResizeEvent *);
+    virtual void paintEvent(QPaintEvent *);
     
+    virtual void mouseMoveEvent(QMouseEvent *);
+
 signals:
 
 public slots:
 
 
-private:
+protected:
+    // ______ PROTECTED FUNCS _______
 
     QRect squareRect(TTT::Square s) const;
 
+    /** Returns the square for mouse coords, or TTT::InvalidMove */
+    TTT::Square squareAt(int x, int y) const;
+
+    /** Returns wheter the square can be set. */
+    bool canMoveTo(TTT::Square s) const;
+
+    // ____________ MEMBER __________
+
+    enum PaintWhat
+    {
+        Nothing,
+        PlayerX,
+        PlayerO,
+        Locked1,
+        Locked2
+    };
+
+    struct PaintSquare
+    {
+        PaintWhat what;
+    };
+
     TTT::Board board_;
 
+    /** What to paint */
+    std::vector<PaintSquare> boardp_;
+
     int margin_,
-        sqmargin_,
-        size_,
-        sqs_, xo_, yo_;
+        sqmargin_;
+    size_t size_;
+    int sqs_, xo_, yo_;
+
+    // ---- gui interaction
+
+    int hoverSquare_;
 
     // --- pens and brushes ---
 
-    QBrush background_;
+    QBrush background_, bBrush_, bBrushH_;
     QPen xPen_, oPen_, cPen_;
 };
 

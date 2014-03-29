@@ -65,7 +65,11 @@ public:
     /** Sets piece flags, nothing else. @p p must be piece bits only! */
     void setPieceAt(Square m, Piece p) { board_[m] &= ~pieceMask; board_[m] |= p; }
 
-    bool isCaptured(Square m) const { return board_[m] & captureMask; }
+    /** Return whatever value is at position @p m */
+    Piece valueAt(Square m) const { return board_[m]; }
+
+    /** Returns 1, 2 or 0 */
+    int capturedAt(Square m) const { return (board_[m] & captureMask) >> 2; }
 
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */

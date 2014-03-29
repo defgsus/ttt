@@ -125,7 +125,7 @@ bool Board::canMoveTo(Stm /*stm*/, Move m) const
            m < sizesq_
         && pieceAt(m) == Empty
 #ifdef TTT_CAPTURE_WAIT
-        && !isCaptured(m)
+        && !capturedAt(m)
 #endif
     ;
 }

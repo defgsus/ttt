@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "boardview.h"
+#include "engine/board.h"
 
 #include <QResizeEvent>
 #include <QRect>
@@ -27,14 +28,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
 BoardView::BoardView(QWidget *parent)
-    : QWidget   (parent),
-      board_    (3,3),
-      size_     (3)
+    : QWidget       (parent),
+      board_        (3,3),
+      size_         (3),
+      hoverSquare_  (-1)
 {
+    setMouseTracking(true);
+
+    // config
     background_ = QBrush(QColor(0,0,0));
+    bBrush_ = QBrush(QColor(30,30,30));
+    bBrushH_ = QBrush(QColor(40,50,40));
     xPen_ = QPen(QColor(220,255,220));
     oPen_ = QPen(QColor(220,220,255));
     cPen_ = QPen(QColor(100,100,100));
+
+    setBoard(board_);
 }
 
 BoardView::~BoardView()
@@ -45,7 +54,31 @@ BoardView::~BoardView()
 void BoardView::setBoard(const TTT::Board& b)
 {
     size_ = b.size();
-    //board_ = b;
+    board_ = b;
+
+    if (boardp_.size() != size_*size_)
+        boardp_.resize(size_*size_);
+
+    // copy board to paint board
+    for (size_t i=0; i<size_; ++i)
+    {
+        PaintWhat w = Nothing;
+        int c = board_.capturedAt(i);
+        if (c>1)
+            w = Locked2;
+        else if (c)
+            w = Locked1;
+        else
+        {
+            c = board_.pieceAt(i);
+            if (c == TTT::X)
+                w = PlayerX;
+            else if (c == TTT::O)
+                w = PlayerO;
+        }
+
+        boardp_[i].what = w;
+    }
 }
 
 
@@ -78,33 +111,60 @@ void BoardView::resizeEvent(QResizeEvent *e)
 
 void BoardView::paintEvent(QPaintEvent * )
 {
+    // full background
     QPainter p(this);
     p.setPen(Qt::NoPen);
     p.setBrush(background_);
     p.drawRect(rect());
 
-    p.setBrush(Qt::NoBrush);
-    for (int i = 0; i < size_*size_; ++i)
+    for (size_t i = 0; i < boardp_.size(); ++i)
     {
         const QRect r = squareRect(i);
 
+        // draw background square
+        p.setBrush((int)i == hoverSquare_ ? bBrushH_ : bBrush_);
+        p.drawRect(r);
 
-        if (true)//board_.pieceAt(i) == TTT::X)
+        // draw piece
+        p.setBrush(Qt::NoBrush);
+        switch (boardp_[i].what)
         {
+        default: break;
+        case PlayerX:
             p.setPen(xPen_);
             p.drawLine(r.left(), r.top(), r.right(), r.bottom());
             p.drawLine(r.left(), r.bottom(), r.right(), r.top());
-        }
-        /*
-        else
-        if (board_.pieceAt(i) == TTT::O)
-        {
+        break;
+        case PlayerO:
             p.setPen(oPen_);
             p.drawEllipse(r);
-        }*/
+        break;
+        }
     }
 }
 
+
+void BoardView::mouseMoveEvent(QMouseEvent * e)
+{
+    TTT::Square s = squareAt(e->x(), e->y());
+
+    int oldHoverSquare_ = hoverSquare_;
+
+    // on hover
+    if (!e->buttons())
+    {
+        if (canMoveTo(s))
+        {
+            // set highlight
+            hoverSquare_ = s;
+        }
+        else
+            hoverSquare_ = TTT::InvalidMove;
+    }
+
+    if (hoverSquare_ != oldHoverSquare_)
+        update();
+}
 
 // -------------------- private stuff ------------
 
@@ -118,4 +178,24 @@ QRect BoardView::squareRect(TTT::Square sq) const
     return QRect(xo_ + x * sqs_ + sqmargin_/2,
                  yo_ + y * sqs_ + sqmargin_/2,
                  sqs_ - sqmargin_, sqs_ - sqmargin_);
+}
+
+TTT::Square BoardView::squareAt(int x, int y) const
+{
+    const int
+        sx = (x - xo_) / sqs_,
+        sy = (y - yo_) / sqs_;
+
+    return (sx >= 0 && sx < (int)size_ &&
+            sy >= 0 && sy < (int)size_)?
+                sy * size_ + sx : TTT::InvalidMove;
+
+}
+
+bool BoardView::canMoveTo(TTT::Square s) const
+{
+    if (s == TTT::InvalidMove || s >= board_.size() * board_.size())
+        return false;
+
+    return board_.canMoveTo(TTT::X, s);
 }
