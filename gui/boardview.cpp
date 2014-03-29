@@ -127,10 +127,11 @@ void BoardView::paintEvent(QPaintEvent * )
 
     for (size_t i = 0; i < boardp_.size(); ++i)
     {
-        const int wi = xPen_.width();
+        const int wi = xPen_.width(), wi2 = sqs_/4;
         const QRect
             r0 = squareRect(i),
-            r = QRect(r0.left()+wi, r0.top()+wi, r0.width()-wi*2, r0.height()-wi*2);
+            r = QRect(r0.left()+wi, r0.top()+wi, r0.width()-wi*2, r0.height()-wi*2),
+            r1 = QRect(r0.left()+wi2, r0.top()+wi2, r0.width()-wi2*2, r0.height()-wi2*2);
 
         // draw background square
         p.setPen(Qt::NoPen);
@@ -150,6 +151,15 @@ void BoardView::paintEvent(QPaintEvent * )
         case PlayerO:
             p.setPen(oPen_);
             p.drawEllipse(r);
+        break;
+        case Locked2:
+            p.setPen(cPen_);
+            p.drawLine(r1.left(), r1.top(), r1.right(), r1.bottom());
+            p.drawLine(r1.left(), r1.bottom(), r1.right(), r1.top());
+        break;
+        case Locked1:
+            p.setPen(cPen_);
+            p.drawEllipse(r1);
         break;
         }
     }

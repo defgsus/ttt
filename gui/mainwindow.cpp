@@ -25,12 +25,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow (parent),
     ui_         (new Ui::MainWindow),
-    board_      (3,3),
+    board_      (5,4),
     engine_     (new Engine),
     playerStm_  (TTT::X),
     engineStm_  (TTT::O)
 {
     ui_->setupUi(this);
+
+    ui_->boardView->setBoard(board_);
 
     connect(ui_->boardView, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
     connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
@@ -48,7 +50,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
 {
     if (s == TTT::InvalidMove)
     {
-        // means engine gives up
+        // means engine gives up (That's an error actually!)
         if (board_.stm() == engineStm_)
         {
             ui_->boardView->message("I'm lost, you win!");

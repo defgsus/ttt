@@ -32,8 +32,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_CAPTURE_WAIT
 /** Use Alpha-Beta-Pruning */
 #define TTT_ALPHA_BETA
-/** Use a greedyness value to cut-off nodes */
-#define TTT_GREEDY
+/** Use a greedyness value to cut-off nodes
+    NOT USED RIGHT NOW */
+//#define TTT_GREEDY
 /** Use a hash table (worse performance in threading mode
     NOT USED RIGHT NOW */
 //#define TTT_TRANSPOSITION_TABLE

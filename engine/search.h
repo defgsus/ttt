@@ -83,7 +83,6 @@ bool Node::isTerminal() const
 void Node::createChilds()
 {
     helper->getMoves(board, moves);
-    TTT_DEBUG("moves " << moves.size());
 }
 
 Node::Index Node::numChilds() const { return moves.size(); }
