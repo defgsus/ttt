@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QThread>
 
 #include "engine/board.h"
+#include "engine/boardhelper.h"
 
 namespace Ui { class MainWindow; }
 
@@ -49,6 +50,7 @@ private:
     Ui::MainWindow * ui_;
 
     TTT::Board board_;
+    TTT::BoardHelper helper_;
     Engine * engine_;
 
     QThread * engineThread_;

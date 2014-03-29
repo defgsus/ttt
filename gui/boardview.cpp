@@ -79,6 +79,8 @@ void BoardView::setBoard(const TTT::Board& b)
 
         boardp_[i].what = w;
     }
+
+    update();
 }
 
 

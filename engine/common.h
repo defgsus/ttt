@@ -136,6 +136,12 @@ struct Hash
 };
 #endif
 
+template <typename S>
+S abs(S n)
+{
+    return n < 0? -n : n;
+}
+
 
 /** good ol' implicit ulam spiral for move ordering
  *  [starting at zero] */

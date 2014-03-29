@@ -18,6 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
+#include <QDebug>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "engine.h"
@@ -25,10 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow (parent),
     ui_         (new Ui::MainWindow),
-    board_      (5,4),
+    board_      (5,3),
+    helper_     (board_),
     engine_     (new Engine),
-    playerStm_  (TTT::O),
-    engineStm_  (TTT::X)
+    playerStm_  (TTT::X),
+    engineStm_  (TTT::O)
 {
     // setup ui
     ui_->setupUi(this);
@@ -59,7 +62,7 @@ void MainWindow::slotStart()
     if (board_.stm() != playerStm_)
         board_.flipStm();
 
-
+    ui_->boardView->setBoard(board_);
 }
 
 void MainWindow::slotMoveMade(TTT::Move s)
@@ -71,6 +74,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
         {
             ui_->boardView->message("I'm lost, you win!");
         }
+        slotStart();
         return;
     }
 
@@ -79,6 +83,30 @@ void MainWindow::slotMoveMade(TTT::Move s)
     board_.flipStm();
 
     ui_->boardView->setBoard(board_);
+
+    // check result
+    QString m;
+    if (board_.isDraw())
+    {
+        m = tr("Draw!");
+    }
+    else
+    if (helper_.isWin(board_, playerStm_))
+    {
+        m = tr("You win!");
+    }
+    else
+    if (helper_.isWin(board_, engineStm_))
+    {
+        m = tr("I win, i'm a machine!");
+    }
+
+    if (!m.isNull())
+    {
+        ui_->boardView->message(m);
+        slotStart();
+        return;
+    }
 
     // engine's turn?
     if (board_.stm() == engineStm_)
