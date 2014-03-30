@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "boardview.h"
 #include "messagebox.h"
+#include "particles.h"
 
 #include "engine/board.h"
 
@@ -34,12 +35,15 @@ BoardView::BoardView(QWidget *parent)
       board_        (),
       size_         (board_.size()),
       hoverSquare_  (-1),
-      showMessage_  (-1)
+      showMessage_  (-1),
+      particles_    (new Particles(this))
 {
     setMouseTracking(true);
 
     updateTimer_.setSingleShot(true);
     connect(&updateTimer_, SIGNAL(timeout()), SLOT(update()));
+
+    connect(particles_, SIGNAL(needDraw()), SLOT(update()));
 
     // config
     background_ = QBrush(QColor(0,0,0));
@@ -71,9 +75,15 @@ void BoardView::setBoard(const TTT::Board& b)
         PaintWhat w = Nothing;
         int c = board_.capturedAt(i);
         if (c>1)
+        {
             w = Locked2;
+            addParticles(i);
+        }
         else if (c)
+        {
             w = Locked1;
+        //    addParticles(i);
+        }
         else
         {
             c = board_.pieceAt(i);
@@ -109,6 +119,10 @@ void BoardView::updateIn(int ms)
     updateTimer_.start(ms);
 }
 
+void BoardView::addParticles(TTT::Square s)
+{
+    particles_->addParticles(squareRect(s).center(), sqs_/10, 10);
+}
 
 // ----------------- events ---------------------
 
@@ -205,6 +219,7 @@ void BoardView::paintEvent(QPaintEvent * )
         updateIn(200);
     }
 
+    particles_->draw(p);
 //    QWidget::paintEvent(e);
 }
 
@@ -219,6 +234,9 @@ void BoardView::leaveEvent(QEvent *)
 
 void BoardView::mouseMoveEvent(QMouseEvent * e)
 {
+    if (showMessage_>=0)
+        return;
+
     TTT::Square s = squareAt(e->x(), e->y());
 
     int oldHoverSquare_ = hoverSquare_;
@@ -247,6 +265,13 @@ void BoardView::mousePressEvent(QMouseEvent * e)
     // click
     if (e->button() == Qt::LeftButton)
     {
+        if (showMessage_>=0)
+        {
+            showMessage_ = -1;
+            e->accept();
+            return;
+        }
+
         if (canMoveTo(s))
         {
             hoverSquare_ = TTT::InvalidMove;

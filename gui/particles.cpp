@@ -28,7 +28,7 @@ Particles::Particles(QObject *parent) :
     timer_.setInterval(1000 / 60);
     timer_.setSingleShot(false);
 
-    connect(&timer_, SIGNAL(timeout()), SLOT(forward_(qreal)));
+    connect(&timer_, SIGNAL(timeout()), SLOT(onTimer_()));
 }
 
 
@@ -37,8 +37,11 @@ void Particles::addParticles(const QPointF& where, qreal size, int num)
     for (int i=0; i<num; ++i)
     {
         QPointF dir((qreal)rand()/RAND_MAX-0.5, (qreal)rand()/RAND_MAX-0.5);
-        addParticle_(where, dir, size);
+        addParticle_(where, dir * 100 * size, size);
     }
+
+    if (!timer_.isActive())
+        timer_.start();
 }
 
 
@@ -63,8 +66,13 @@ void Particles::addParticle_(const QPointF &where, const QPointF &dir, qreal siz
     p->active = true;
     p->pos = where;
     p->dir = dir;
-    p->lifetime = 3;
-    p->size = size;
+    p->lifetime = 1.5;
+    p->size = size * (0.5 + 0.5 * (qreal)rand()/RAND_MAX);
+}
+
+void Particles::onTimer_()
+{
+    forward_((qreal)timer_.interval()/1000);
 }
 
 void Particles::forward_(qreal delta)
@@ -85,22 +93,26 @@ void Particles::forward_(qreal delta)
         p_[i].pos += delta * p_[i].dir;
 
         // damping
-        p_[i].dir *= (1.0 - delta * 0.05);
+        p_[i].dir *= (1.0 - delta * 0.9);
 
         // gravity
-        p_[i].dir.setY(p_[i].dir.ry() + 0.2 * delta);
+        p_[i].dir.setY(p_[i].dir.ry() + 0.9 * delta);
     }
 
     if (did_something)
         emit needDraw();
+    else
+        timer_.stop();
 }
 
 
 void Particles::draw(QPainter& p)
 {
+    p.setPen(Qt::NoPen);
     for (int i=0; i<p_.size(); ++i)
     if (p_[i].active)
     {
+        p.setBrush(QBrush(QColor(255,255,255,std::min(255, (int)(p_[i].lifetime*255)))));
         qreal s = p_[i].size;
         p.drawEllipse(p_[i].pos, s, s);
     }

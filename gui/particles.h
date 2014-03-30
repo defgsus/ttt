@@ -46,6 +46,7 @@ public slots:
 protected slots:
 
     void forward_(qreal delta);
+    void onTimer_();
 
 protected:
 

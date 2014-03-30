@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "engine/board.h"
 
+class Particles;
+
 class BoardView : public QWidget
 {
     Q_OBJECT
@@ -61,6 +63,8 @@ public slots:
 
     /** update after @p ms millisecs */
     void updateIn(int ms);
+
+    void addParticles(TTT::Square s);
 
 protected:
     // ______ PROTECTED FUNCS _______
@@ -107,6 +111,8 @@ protected:
     int showMessage_;
 
     QTimer updateTimer_;
+
+    Particles * particles_;
 
     // --- pens and brushes ---
 
