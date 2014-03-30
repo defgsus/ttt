@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // connect boardview
     connect(ui_->boardView, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+    connect(ui_->boardView, SIGNAL(messageAccepted()), SLOT(slotStart()));
 
     // setup engine
     connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
@@ -74,7 +75,6 @@ void MainWindow::slotMoveMade(TTT::Move s)
         {
             ui_->boardView->message("I'm lost!");
         }
-        slotStart();
         return;
     }
 
@@ -104,7 +104,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
     if (!m.isNull())
     {
         ui_->boardView->message(m);
-        slotStart();
+        //slotStart();
         return;
     }
 
@@ -114,3 +114,4 @@ void MainWindow::slotMoveMade(TTT::Move s)
         engine_->setBoard(board_);
     }
 }
+

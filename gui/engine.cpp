@@ -22,35 +22,79 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "engine/search.h"
 
 #include <QTimer>
+#include <QDebug>
+
+/*
+class EngineThread : public QThread
+{
+    Q_OBJECT
+public:
+    EngineThread(Engine * parent)
+        :   QThread(parent),
+          ai  (parent)
+    {
+
+    }
+
+    virtual void run()
+    {
+        QTime t;
+        t.start();
+
+        TTT::Move m = ai->ai_->bestMove(ai->board_, 6);
+
+        while (t.elapsed() < ai->minWaitTime_);
+
+        emit moveMade(m);
+    }
+
+signals:
+
+    void moveMade(TTT::Move);
+
+    Engine * ai;
+};
+*/
+
 
 Engine::Engine(QObject *parent)
-    :   QObject (parent),
-        thread_ (this),
-        ai_     (new TTT::Search)
+    :   QThread (parent),
+        ai_     (new TTT::Search),
+        minWaitTime_    (350)
 {
-    connect(&thread_, SIGNAL(started()), SLOT(slotStarted_()));
+
 }
 
 Engine::~Engine()
 {
-    thread_.quit();
-    thread_.wait();
-
     delete ai_;
 }
 
-void Engine::slotStarted_()
-{
-    TTT::Move m = ai_->bestMove(board_, 4);
-    //thread_.msleep(100);
-    emit moveMade(m);
-    thread_.quit();
-    thread_.wait();
 
+void Engine::run()
+{
+    qDebug() << "Engine::run()";
+
+    QTime t;
+    t.start();
+
+    TTT::Move m = ai_->bestMove(board_, 6);
+
+    //while (t.elapsed() < minWaitTime_);
+
+    int e = t.elapsed();
+    if (e<minWaitTime_)
+        msleep(minWaitTime_ - e);
+
+    emit moveMade(m);
 }
+
+
 
 void Engine::setBoard(const TTT::Board &b)
 {
+    qDebug() << "Engine::setBoard()";
     board_ = b;
-    thread_.start();
+
+    start();//thread_->start();
 }

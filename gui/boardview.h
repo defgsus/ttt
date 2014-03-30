@@ -56,6 +56,9 @@ signals:
     /** Signals that user has made a move */
     void moveMade(TTT::Move s);
 
+    /** Signals that user has clicked the message */
+    void messageAccepted();
+
 public slots:
 
     /** display a message */

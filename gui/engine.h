@@ -30,14 +30,17 @@ namespace TTT {
 class Search;
 }
 
-class Engine : public QObject
+static const int whatever = qRegisterMetaType<TTT::Move>("TTT::Move");
+
+class Engine : public QThread
 {
     Q_OBJECT
+
 public:
     explicit Engine(QObject *parent = 0);
     ~Engine();
 
-    bool thinking() const { return thinking_; }
+    bool thinking() const { return QThread::isRunning(); }
 
 signals:
 
@@ -49,17 +52,15 @@ public slots:
     /** Sets a position and starts search */
     void setBoard(const TTT::Board& b);
 
-private slots:
-
-    void slotStarted_();
+    virtual void run();
 
 private:
 
-    QThread thread_;
-
     TTT::Search * ai_;
-    bool thinking_;
     TTT::Board board_;
+
+    /** minimum move time for ai in ms */
+    int minWaitTime_;
 };
 
 #endif // ENGINE_H

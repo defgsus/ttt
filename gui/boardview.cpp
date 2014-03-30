@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "engine/board.h"
 
+#include <QDebug>
 #include <QResizeEvent>
 #include <QRect>
 #include <QColor>
@@ -47,7 +48,7 @@ BoardView::BoardView(QWidget *parent)
 
     // config
     background_ = QBrush(QColor(0,0,0));
-    bBrush_ = QBrush(QColor(30,30,30));
+    bBrush_ = QBrush(QColor(30,30,30,180));
     bBrushH_ = QBrush(QColor(40,50,40));
     xPen_ = QPen(QColor(220,255,220));
     oPen_ = QPen(QColor(220,220,255));
@@ -63,6 +64,8 @@ BoardView::~BoardView()
 
 void BoardView::setBoard(const TTT::Board& b)
 {
+    qDebug() << "BoardView::setBoard()";
+
     size_ = b.size();
     board_ = b;
 
@@ -176,17 +179,6 @@ void BoardView::paintEvent(QPaintEvent * )
         p.setBrush((int)i == hoverSquare_ ? bBrushH_ : bBrush_);
         p.drawRect(r0);
 
-        // draw text message
-        if (showMessage_>=0)
-        {
-            if ((int)i < showMessage_ && (int)i < message_.size())
-            {
-                p.setPen(mPen_);
-                p.drawText(r, Qt::AlignCenter | Qt::AlignHCenter, message_.at(i));
-            }
-            continue;
-        }
-
         // draw piece
         p.setBrush(Qt::NoBrush);
         switch (boardp_[i].what)
@@ -211,6 +203,20 @@ void BoardView::paintEvent(QPaintEvent * )
             p.drawEllipse(r1);
         break;
         }
+
+        // draw text message
+        if (showMessage_>=0)
+        {
+            if ((int)i < showMessage_ && (int)i < message_.size())
+            {
+                p.setPen(Qt::NoPen);
+                p.setBrush(bBrush_);
+                p.drawRect(r0);
+
+                p.setPen(mPen_);
+                p.drawText(r, Qt::AlignCenter | Qt::AlignHCenter, message_.at(i));
+            }
+        }
     }
 
     if (showMessage_>=0 && showMessage_ < message_.size())
@@ -221,6 +227,7 @@ void BoardView::paintEvent(QPaintEvent * )
 
     particles_->draw(p);
 //    QWidget::paintEvent(e);
+
 }
 
 void BoardView::leaveEvent(QEvent *)
@@ -269,6 +276,7 @@ void BoardView::mousePressEvent(QMouseEvent * e)
         {
             showMessage_ = -1;
             e->accept();
+            emit messageAccepted();
             return;
         }
 
