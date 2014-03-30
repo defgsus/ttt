@@ -130,11 +130,10 @@ bool Board::canMoveTo(Stm /*stm*/, Move m) const
     ;
 }
 
-
 void Board::makeMove(Move m)
 {
     TTT_ASSERT(canMoveTo(stm_, m),
-               "invalid move in Board::makeMove (" << m << ")");
+               "invalid move in Board::makeMove (" << m << " / " << toString(m) << ")");
 
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value
@@ -318,6 +317,11 @@ void Board::setEvalMap(Square s, int score)
     score_[s] = score;
 }
 
+void Board::copyEvalFrom(const Board& b)
+{
+    for (size_t i=0; i<sizesq_; ++i)
+        score_[i] = b.score_[i];
+}
 
 
 } // namespace TTT

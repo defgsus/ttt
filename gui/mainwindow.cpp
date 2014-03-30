@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow (parent),
     ui_         (new Ui::MainWindow),
-    board_      (5,3),
+    board_      (5,4),
     helper_     (board_),
     engine_     (new Engine),
     playerStm_  (TTT::X),

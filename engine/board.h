@@ -96,9 +96,9 @@ public:
     void getHash(Hash& h) const { return Hash::getHash(h, &board_[0], size_*size_, stm_); }
 #endif
 
-
     void clearEvalMap();
     void setEvalMap(Square s, int score);
+    void copyEvalFrom(const Board& b);
 
     /** print the board as ascii */
     void printBoard(bool witheval, std::ostream& out = std::cout) const;

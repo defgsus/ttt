@@ -39,21 +39,31 @@ struct Node
     static Score maxScore() { return MaxScore; }
 
     Node(const Board& b, BoardHelper * helper)
-        :   score(0), depth(0), board(b), helper(helper), bestChildMove(InvalidMove)
+        :   score(0), depth(0), board(b), helper(helper),
+            bestChildMove(InvalidMove), isEvaluated(false)
     { }
 
     Node()
-        :   score(0), depth(0), bestChildMove(InvalidMove)
+        :   score(0), depth(0), bestChildMove(InvalidMove), isEvaluated(false)
     { }
+
+    //Node(const Node&);
+
+    // ---- interface ----
 
     Score evaluate() const;
 
-    bool isTerminal() const;
+    bool isTerminal();
 
-    void createChilds();
+    bool createChilds();
     Index numChilds() const;
-    Node child(Index i) const;
-    void setBestChild(Node * c);
+    Node getChild(Index i);
+    void childEvaluated(const Node * c);
+    void setBestChild(const Node * c);
+
+    // ---- helper ----
+
+    Score eval();
 
     // ----- member -----
 
@@ -67,29 +77,54 @@ struct Node
     Move move,
         bestChildMove;
 
+    bool isEvaluated;
+    Score evaluation;
+
 };
+
+/*
+Node::Node(const Node &n)
+    :   score   (0),
+        depth   (n.depth),
+        board   (n.board),
+        helper  (n.helper),
+        bestChildMove(InvalidMove),
+        isEvaluated(false)
+{
+
+}
+*/
 
 Node::Score Node::evaluate() const
 {
-    const Score s = helper->eval(board);
-    return depth & 1 ? -s : s;
+    const Score s = isEvaluated? evaluation : helper->eval(board);
+    return std::max(-WinScore,std::min(WinScore, s ));//depth & 1 ? -s : s;
 }
 
-bool Node::isTerminal() const
+bool Node::isTerminal()
 {
-    return helper->isOver(board);
+    return (abs(eval()) >= WinScore);
 }
 
-void Node::createChilds()
+Node::Score Node::eval()
+{
+    evaluation = helper->eval(board);
+    isEvaluated = true;
+    return evaluation;
+}
+
+bool Node::createChilds()
 {
     helper->getMoves(board, moves);
+    return !moves.empty();
 }
 
 Node::Index Node::numChilds() const { return moves.size(); }
 
-Node Node::child(Index i) const
+Node Node::getChild(Index i)
 {
     Node n(*this);
+    n.isEvaluated = false;
     n.move = moves[i];
     n.board.makeMove(n.move);
     n.board.flipStm();
@@ -98,11 +133,15 @@ Node Node::child(Index i) const
     return n;
 }
 
-void Node::setBestChild(Node * c)
+void Node::childEvaluated(const Node * c)
+{
+    if (depth == 0)
+        board.setEvalMap(c->move, -c->score);
+}
+
+void Node::setBestChild(const Node * c)
 {
     //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
-    //if (depth == 1)
-        //board.setEvalMap(c->move, c->score);
     bestChildMove = c->move;
 }
 
@@ -115,12 +154,14 @@ class Search
     Search() : helper_(3,3) { }
 
     /** Return best move for current side-to-move */
-    Move bestMove(const Board& b, int maxdepth);
+    Move bestMove(Board& b, int maxdepth);
 
     // ---------- public member ------------
 
     /** last best score */
     int score;
+    /** reached depth */
+    int depth;
     /** evaluated nodes */
     int nodes;
     /** number of pruned nodes */
@@ -139,7 +180,7 @@ private:
 };
 
 
-Move Search::bestMove(const Board &b, int maxdepth)
+Move Search::bestMove(Board &b, int maxdepth)
 {
     // update helper size
     helper_.setSize(b);
@@ -165,14 +206,16 @@ Move Search::bestMove(const Board &b, int maxdepth)
     // stats
     time = ti.elapsed();
     score = n.score;
+    depth = search_.maxDepth();
     nodes = search_.numNodes();
     prunes = search_.numPrunes();
     nps = (int)( (double)nodes / std::max(1, time) * 1000 );
 
+    b.copyEvalFrom(n.board);
 #ifndef TTT_NO_PRINT
     std::cout << std::endl;
 
-    std::cout << " depth " << maxdepth
+    std::cout << " depth " << depth
               << " nodes " << nodes
 #ifdef TTT_ALPHA_BETA
               << " prunes " << prunes
