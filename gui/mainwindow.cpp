@@ -72,7 +72,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
         // means engine gives up (That's an error actually!)
         if (board_.stm() == engineStm_)
         {
-            ui_->boardView->message("I'm lost, you win!");
+            ui_->boardView->message("I'm lost!");
         }
         slotStart();
         return;
@@ -98,7 +98,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
     else
     if (helper_.isWin(board_, engineStm_))
     {
-        m = tr("I win, i'm a machine!");
+        m = tr("You lose!");
     }
 
     if (!m.isNull())

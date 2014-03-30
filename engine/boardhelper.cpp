@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "boardhelper.h"
 #include "board.h"
 
-#include <cmath>
-
+#include <math.h>
+#include <iomanip>
 
 #define TTT_BOARD_CHECK \
     TTT_ASSERT(b.size_ == size_ && b.cons_ == cons_, \

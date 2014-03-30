@@ -165,7 +165,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Node * n)
 
     Score maxv = -Node::maxScore();
 
-    // terminal (no successors) ?
+    // terminal or no successors?
     if (n->isTerminal() ||
        !n->createChilds() ||
        !n->numChilds())
@@ -203,7 +203,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
         return n->score = n->evaluate();
     }
 
-    // terminal (no successors)?
+    // terminal or no successors?
     if (n->isTerminal() ||
        !n->createChilds() ||
        !n->numChilds())
@@ -211,11 +211,14 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
         return n->score = n->evaluate();
     }
 
+    // evaluate childs
     for (Index i = 0; i < n->numChilds(); ++i)
     {
         Node c = n->getChild(i);
 
         const Score score = -negamax_(depth + 1, -beta, -alpha, &c);
+
+        n->childEvaluated(&c);
 
         if (score >= beta)
         {

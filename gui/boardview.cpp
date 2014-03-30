@@ -19,6 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include "boardview.h"
+#include "messagebox.h"
+
 #include "engine/board.h"
 
 #include <QResizeEvent>
@@ -31,9 +33,13 @@ BoardView::BoardView(QWidget *parent)
     : QWidget       (parent),
       board_        (),
       size_         (board_.size()),
-      hoverSquare_  (-1)
+      hoverSquare_  (-1),
+      showMessage_  (-1)
 {
     setMouseTracking(true);
+
+    updateTimer_.setSingleShot(true);
+    connect(&updateTimer_, SIGNAL(timeout()), SLOT(update()));
 
     // config
     background_ = QBrush(QColor(0,0,0));
@@ -42,7 +48,7 @@ BoardView::BoardView(QWidget *parent)
     xPen_ = QPen(QColor(220,255,220));
     oPen_ = QPen(QColor(220,220,255));
     cPen_ = QPen(QColor(100,100,100));
-
+    mPen_ = QPen(QColor(250,250,250));
     setBoard(board_);
 }
 
@@ -87,9 +93,20 @@ void BoardView::setBoard(const TTT::Board& b)
 
 void BoardView::message(const QString& m)
 {
+    message_ = m;
+    showMessage_ = 0;
+    //new MessageBox(m, this);
+    //update();
+    /*
     QMessageBox::information(this,
                              "X in a row in N²",
                              m);
+    */
+}
+
+void BoardView::updateIn(int ms)
+{
+    updateTimer_.start(ms);
 }
 
 
@@ -117,12 +134,17 @@ void BoardView::resizeEvent(QResizeEvent *e)
     xPen_.setWidth(sqs_ / 10);
     oPen_.setWidth(xPen_.width());
     cPen_.setWidth(xPen_.width());
+
+    mFont_.setPointSizeF(0.5 * sqs_);
 }
 
 void BoardView::paintEvent(QPaintEvent * )
 {
     // full background
     QPainter p(this);
+    p.setFont(mFont_);
+
+
     p.setPen(Qt::NoPen);
     p.setBrush(background_);
     p.drawRect(rect());
@@ -139,6 +161,17 @@ void BoardView::paintEvent(QPaintEvent * )
         p.setPen(Qt::NoPen);
         p.setBrush((int)i == hoverSquare_ ? bBrushH_ : bBrush_);
         p.drawRect(r0);
+
+        // draw text message
+        if (showMessage_>=0)
+        {
+            if ((int)i < showMessage_ && (int)i < message_.size())
+            {
+                p.setPen(mPen_);
+                p.drawText(r, Qt::AlignCenter | Qt::AlignHCenter, message_.at(i));
+            }
+            continue;
+        }
 
         // draw piece
         p.setBrush(Qt::NoBrush);
@@ -165,6 +198,14 @@ void BoardView::paintEvent(QPaintEvent * )
         break;
         }
     }
+
+    if (showMessage_>=0 && showMessage_ < message_.size())
+    {
+        showMessage_++;
+        updateIn(200);
+    }
+
+//    QWidget::paintEvent(e);
 }
 
 void BoardView::leaveEvent(QEvent *)

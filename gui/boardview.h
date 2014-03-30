@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QRect>
 #include <QBrush>
 #include <QPen>
+#include <QFont>
+#include <QTimer>
 
 #include "engine/board.h"
 
@@ -56,6 +58,9 @@ public slots:
 
     /** display a message */
     void message(const QString&);
+
+    /** update after @p ms millisecs */
+    void updateIn(int ms);
 
 protected:
     // ______ PROTECTED FUNCS _______
@@ -98,10 +103,16 @@ protected:
 
     int hoverSquare_;
 
+    QString message_;
+    int showMessage_;
+
+    QTimer updateTimer_;
+
     // --- pens and brushes ---
 
     QBrush background_, bBrush_, bBrushH_;
-    QPen xPen_, oPen_, cPen_;
+    QPen xPen_, oPen_, cPen_, mPen_;
+    QFont mFont_;
 };
 
 #endif // BOARDVIEW_H

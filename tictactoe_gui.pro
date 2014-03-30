@@ -21,7 +21,9 @@ SOURCES += \
     engine/boardhelper.cpp \
     gui/mainwindow.cpp \
     gui/boardview.cpp \
-    gui/engine.cpp
+    gui/engine.cpp \
+    gui/messagebox.cpp \
+    gui/particles.cpp
 
 HEADERS += \
     engine/board.h \
@@ -30,7 +32,9 @@ HEADERS += \
     engine/search.h \
     gui/mainwindow.h \
     gui/boardview.h \
-    gui/engine.h
+    gui/engine.h \
+    gui/messagebox.h \
+    gui/particles.h
 
 FORMS += \
     gui/mainwindow.ui
