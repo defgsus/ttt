@@ -27,7 +27,16 @@ class PopButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit PopButton(QWidget *parent = 0);
+
+    enum Dir
+    {
+        Left,
+        Right,
+        Up,
+        Down
+    };
+
+    explicit PopButton(Dir dir, QWidget *parent = 0);
 
 signals:
 

@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "engine.h"
 
 #include "popgroup.h"
+#include "popbutton.h"
 #include "boardview.h"
 
 
@@ -47,15 +48,25 @@ MainWidget::MainWidget(QWidget *parent) :
 
     // -- widgets --
 
-    QLayout * l = new QVBoxLayout(this);
+    QVBoxLayout * l = new QVBoxLayout(this);
     l->setMargin(0);
 
     //PopGroup * pg = new PopGroup(this);
     //l->addWidget(pg);
 
+        QLayout * l2 = new QHBoxLayout;
+        l->addLayout(l2);
 
-    boardView_ = new BoardView(this);
-    l->addWidget(boardView_);
+            b_back_ = new PopButton(PopButton::Left, this);
+            l2->addWidget(b_back_);
+            connect(b_back_, SIGNAL(clicked()), SLOT(back()));
+
+            boardView_ = new BoardView(this);
+            l2->addWidget(boardView_);
+
+            b_fwd_ = new PopButton(PopButton::Right, this);
+            l2->addWidget(b_fwd_);
+            connect(b_fwd_, SIGNAL(clicked()), SLOT(forward()));
 
     //pg->addWidget(boardView_);
     //pg->addWidget(new BoardView(this));
@@ -71,11 +82,13 @@ MainWidget::MainWidget(QWidget *parent) :
     slotStart();
 }
 
-
-
 void MainWidget::slotStart()
 {
+    stack_.clear();
+    stack_pos_ = 0;
+
     board_.init();
+
     if (board_.stm() != playerStm_)
         board_.flipStm();
 
@@ -93,6 +106,10 @@ void MainWidget::slotMoveMade(TTT::Move s)
         }
         return;
     }
+
+    // store in history
+    if (board_.stm() == playerStm_)
+        push();
 
     // apply move
     board_.makeMove(s);
@@ -131,3 +148,43 @@ void MainWidget::slotMoveMade(TTT::Move s)
     }
 }
 
+void MainWidget::updateStackButtons_()
+{
+    b_fwd_->setVisible(stack_pos_ < stack_.size());
+    b_back_->setVisible(stack_pos_ > 0);
+}
+
+void MainWidget::push()
+{
+    stack_.resize(stack_pos_+1);
+    stack_[stack_pos_] = board_;
+    stack_pos_++;
+
+    updateStackButtons_();
+}
+
+void MainWidget::back()
+{
+    if (stack_pos_ > 0)
+    {
+        stack_pos_--;
+
+        board_ = stack_[stack_pos_];
+        boardView_->setBoard(board_);
+    }
+
+    updateStackButtons_();
+}
+
+void MainWidget::forward()
+{
+    if (stack_pos_ < stack_.size())
+    {
+        board_ = stack_[stack_pos_];
+        boardView_->setBoard(board_);
+
+        stack_pos_++;
+    }
+
+    updateStackButtons_();
+}

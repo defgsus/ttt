@@ -18,18 +18,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include <QAnimationDriver>
+#include <QIcon>
 
 #include "popbutton.h"
 
 
-PopButton::PopButton(QWidget *parent)
+PopButton::PopButton(Dir dir, QWidget *parent)
     :   QPushButton(parent),
         w_    (32),
         h_    (32)
 
 {
-    setFixedSize(w_, h_);
+    setFlat(true);
+
+    setFixedSize(w_, h_);    
+
+    QString pic;
+    switch (dir)
+    {
+        case Left: pic = "left"; break;
+        case Right: pic = "right"; break;
+        case Up: pic = "up"; break;
+        case Down: pic = "down"; break;
+    }
+
+    setIcon(QIcon(":/img/b_" + pic + ".png"));
 }
 
 

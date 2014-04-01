@@ -78,7 +78,7 @@ void Engine::run()
     QTime t;
     t.start();
 
-    TTT::Move m = ai_->bestMove(board_, 8);
+    TTT::Move m = ai_->bestMove(board_, 4);
 
     int e = t.elapsed();
 

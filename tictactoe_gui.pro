@@ -74,3 +74,6 @@ OTHER_FILES += \
     android/res/values-id/strings.xml \
     android/res/values-zh-rTW/strings.xml \
     android/res/values-ro/strings.xml
+
+RESOURCES += \
+    resources_gui.qrc

@@ -40,7 +40,7 @@ BoardView::BoardView(QWidget *parent)
       particles_    (new Particles(this))
 {
     setMouseTracking(true);
-    //setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     updateTimer_.setSingleShot(true);
     connect(&updateTimer_, SIGNAL(timeout()), SLOT(update()));

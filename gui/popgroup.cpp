@@ -51,7 +51,7 @@ void PopGroup::addWidget(PopWidget * w)
     QLayout * l = new QHBoxLayout(w);
     ((QVBoxLayout*)layout_)->addLayout(l);
 
-        PopButton * b = new PopButton(this);
+        PopButton * b = new PopButton(PopButton::Left, this);
         l->addWidget(b);
 
         l->addWidget(w);

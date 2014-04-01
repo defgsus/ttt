@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
+#include <vector>
+
 #include <QWidget>
 
 #include "engine/board.h"
@@ -28,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 class Engine;
 class BoardView;
+class PopButton;
 
 class MainWidget : public QWidget
 {
@@ -45,11 +48,26 @@ public slots:
     /** Start new game */
     void slotStart();
 
+    /** Push Board on stack */
+    void push();
+
+    /** Pop Board from stack */
+    void back();
+    /** Pop Board from stack */
+    void forward();
+
 protected:
 
+    void updateStackButtons_();
+
+
     BoardView * boardView_;
+    PopButton * b_back_, * b_fwd_;
 
     TTT::Board board_;
+    std::vector <TTT::Board> stack_;
+    /** on insert pos, or pushed + 1 */
+    size_t stack_pos_;
     TTT::BoardHelper helper_;
     Engine * engine_;
 
