@@ -28,11 +28,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QFont>
 #include <QTimer>
 
+#include "popwidget.h"
+
 #include "engine/board.h"
 
 class Particles;
 
-class BoardView : public QWidget
+class BoardView : public PopWidget
 {
     Q_OBJECT
 public:

@@ -78,8 +78,10 @@ void Board::init(const std::string& str)
         Piece p = Empty;
         switch (str[i])
         {
-            case 'x': case 'X': p = X; pieces_++; break;
-            case 'o': case 'O': p = O; pieces_++; break;
+            case 'X': p = X; pieces_++; break;
+            case 'O': p = O; pieces_++; break;
+            case 'x': p = 4; break;
+            case 'o': p = 8; break;
         }
         board_[i].v = p;
     }

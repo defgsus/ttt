@@ -151,7 +151,7 @@ void NegaMax<Node>::search_ab(int maxDepth, Node * n)
 {
     init_();
     maxDepth_ = maxDepth;
-    negamax_(0, -Node::maxScore(), Node::maxScore(), n);
+    negamax_(0, -Node::maxScore() * 10, Node::maxScore() * 10, n);
 }
 
 

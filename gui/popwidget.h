@@ -18,40 +18,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef POPWIDGET_H
-#define POPWIDGET_H
+#ifndef GUI_POPWIDGET_H
+#define GUI_POPWIDGET_H
 
 #include <QWidget>
 
-class QLayout;
-class PopButton;
-
-/**  _____  widget
-    |     | layout
-    |__-__| layout
-
-
- */
 class PopWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PopWidget(QWidget * center, QWidget *parent = 0);
-
-    QLayout * layout() { return layout_; }
-
-    QWidget * getCentralWidget() { return widget_; }
-    const QWidget * getCentralWidget() const { return widget_; }
+    explicit PopWidget(QWidget *parent = 0);
 
 signals:
 
 public slots:
 
-protected:
-
-    QLayout * layout_, * layout0_;
-    QWidget * widget_;
-    PopButton * b_;
 };
 
-#endif // POPWIDGET_H
+#endif // GUI_POPWIDGET_H

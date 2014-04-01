@@ -113,13 +113,21 @@ int main(int , char **)
     bool print_eval = true;
     int autoplay = 0;
 
-    Board b(3,3);
+    Board b(5,4);
     BoardHelper bh(b);
     Search ai;
 
     b.init();
+    b.init("O.O.XO..XXXo..XXXxXOXXXOX");
+    b.init("X..XX.o.....o....OXXX..XX");
+    //b.init("O.O.XO..XXX...XXX.XOXXXOX");
     //std::cout << b.eval(X) << "\n"; return 0;
-
+/*     X . . X X     |        -7000 -7000
+     2 . 2 . . .     |  -7000  -196 -7000 -7000 -7000
+     3 . . 2 . .     |  -7000 -7000  -356 -7000 -7000
+     4 . . O X X     |  -7000 -7000
+     5 X . . X X
+*/
     std::vector<Board> stack;
 
     while (true)

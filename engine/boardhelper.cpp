@@ -181,12 +181,12 @@ void BoardHelper::createRowValues_()
         // store utility value
         rowValues_.push_back( u );
 
-#if 0
+#if 1
         // debug print
         if (k%4 != 3)
         {
             std::cout << std::setw(4) << k << " ";
-            for (i=0; i<cons_; ++i) std::cout << pieceChar(row[i]);
+            for (i=0; i<cons_; ++i) std::cout << Board::pieceChar(row[i]);
             if (u!=0) std::cout << " " << u;
             std::cout << std::endl;
         }

@@ -18,42 +18,42 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#ifndef GUI_POPGROUP_H
+#define GUI_POPGROUP_H
 
+#include <vector>
 #include <QWidget>
 
-#include "engine/board.h"
-#include "engine/boardhelper.h"
+class QLayout;
+class PopWidget;
 
-class Engine;
-class BoardView;
+/**  _____  widget
+    |     | layout
+    |__-__| layout
 
-class MainWidget : public QWidget
+
+ */
+class PopGroup : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit PopGroup(QWidget *parent = 0);
+
+    QLayout * layout() { return layout_; }
+
+    void addWidget(PopWidget * w);
+
+    PopWidget * getWidget(uint i) { return widgets_[i]; }
+    const PopWidget * getWidget(uint i) const { return widgets_[i]; }
 
 signals:
 
 public slots:
 
-    /** Move from user */
-    void slotMoveMade(TTT::Move s);
-
-    /** Start new game */
-    void slotStart();
-
 protected:
 
-    BoardView * boardView_;
-
-    TTT::Board board_;
-    TTT::BoardHelper helper_;
-    Engine * engine_;
-
-    TTT::Stm playerStm_, engineStm_;
+    QLayout * layout_;
+    std::vector<PopWidget *> widgets_;
 };
 
-#endif // MAINWIDGET_H
+#endif // GUI_POPGROUP_H

@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QMessageBox>
 
 BoardView::BoardView(QWidget *parent)
-    : QWidget       (parent),
+    : PopWidget     (parent),
       board_        (),
       size_         (board_.size()),
       hoverSquare_  (-1),
@@ -163,14 +163,13 @@ void BoardView::resizeEvent(QResizeEvent *e)
 
 void BoardView::paintEvent(QPaintEvent * )
 {
-    // full background
     QPainter p(this);
     p.setFont(mFont_);
 
-
-    p.setPen(Qt::NoPen);
-    p.setBrush(background_);
-    p.drawRect(rect());
+    // full background
+//    p.setPen(Qt::NoPen);
+//    p.setBrush(background_);
+//    p.drawRect(rect());
 
     for (size_t i = 0; i < boardp_.size(); ++i)
     {

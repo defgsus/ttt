@@ -18,28 +18,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include <QLayout>
-#include <QPalette>
-
 #include "popwidget.h"
-#include "popbutton.h"
 
-
-
-PopWidget::PopWidget(QWidget * center, QWidget *parent)
-    :   QWidget(parent),
-        widget_(center)
+PopWidget::PopWidget(QWidget *parent) :
+    QWidget(parent)
 {
-    layout_ = new QVBoxLayout(this);
-    layout_->setMargin(0);
-
-        widget_->setParent(this);
-        layout_->addWidget(widget_);
-
-        QLayout * layout0_ = new QHBoxLayout;
-        ((QVBoxLayout*)layout_)->addLayout(layout0_);
-
-            b_ = new PopButton(this);
-            layout0_->addWidget(b_);
-
 }

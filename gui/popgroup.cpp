@@ -18,42 +18,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#include <QLayout>
+#include <QPalette>
 
-#include <QWidget>
+#include "popgroup.h"
+#include "popwidget.h"
+#include "popbutton.h"
 
-#include "engine/board.h"
-#include "engine/boardhelper.h"
 
-class Engine;
-class BoardView;
-
-class MainWidget : public QWidget
+PopGroup::PopGroup(QWidget *parent)
+    :   QWidget(parent)
 {
-    Q_OBJECT
-public:
-    explicit MainWidget(QWidget *parent = 0);
+    layout_ = new QVBoxLayout(this);
+    layout_->setMargin(0);
 
-signals:
+    /*
+        widget_->setParent(this);
+        layout_->addWidget(widget_);
 
-public slots:
+        QLayout * layout0_ = new QHBoxLayout;
+        ((QVBoxLayout*)layout_)->addLayout(layout0_);
 
-    /** Move from user */
-    void slotMoveMade(TTT::Move s);
+            b_ = new PopButton(this);
+            layout0_->addWidget(b_);
+    */
+}
 
-    /** Start new game */
-    void slotStart();
+void PopGroup::addWidget(PopWidget * w)
+{
+    widgets_.push_back(w);
 
-protected:
+    QLayout * l = new QHBoxLayout(w);
+    ((QVBoxLayout*)layout_)->addLayout(l);
 
-    BoardView * boardView_;
+        PopButton * b = new PopButton(this);
+        l->addWidget(b);
 
-    TTT::Board board_;
-    TTT::BoardHelper helper_;
-    Engine * engine_;
-
-    TTT::Stm playerStm_, engineStm_;
-};
-
-#endif // MAINWIDGET_H
+        l->addWidget(w);
+}

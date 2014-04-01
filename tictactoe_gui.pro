@@ -23,9 +23,10 @@ SOURCES += \
     gui/engine.cpp \
     gui/messagebox.cpp \
     gui/particles.cpp \
-    gui/popwidget.cpp \
     gui/mainwidget.cpp \
-    gui/popbutton.cpp
+    gui/popbutton.cpp \
+    gui/popgroup.cpp \
+    gui/popwidget.cpp
 
 HEADERS += \
     engine/board.h \
@@ -37,9 +38,10 @@ HEADERS += \
     gui/engine.h \
     gui/messagebox.h \
     gui/particles.h \
-    gui/popwidget.h \
     gui/mainwidget.h \
-    gui/popbutton.h
+    gui/popbutton.h \
+    gui/popgroup.h \
+    gui/popwidget.h
 
 FORMS +=
 

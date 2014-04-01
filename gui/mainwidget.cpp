@@ -21,11 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QDebug>
 #include <QKeyEvent>
 #include <QLayout>
+#include <QDockWidget>
 
 #include "mainwidget.h"
 #include "engine.h"
 
-#include "popwidget.h"
+#include "popgroup.h"
 #include "boardview.h"
 
 
@@ -37,18 +38,37 @@ MainWidget::MainWidget(QWidget *parent) :
     playerStm_  (TTT::X),
     engineStm_  (TTT::O)
 {
+    // -- style --
+
     QPalette pal = palette();
     pal.setColor(QPalette::Window, QColor(0,0,0));
     setPalette(pal);
 
+
+    // -- widgets --
+
     QLayout * l = new QVBoxLayout(this);
     l->setMargin(0);
 
-        boardView_ = new BoardView(this);
+    //PopGroup * pg = new PopGroup(this);
+    //l->addWidget(pg);
 
-        PopWidget * p = new PopWidget(boardView_, this);
-        l->addWidget(p);
 
+    boardView_ = new BoardView(this);
+    l->addWidget(boardView_);
+
+    //pg->addWidget(boardView_);
+    //pg->addWidget(new BoardView(this));
+
+
+    // --- state logic ---
+
+    // connect move makers
+    connect(boardView_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+    connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+    connect(boardView_, SIGNAL(messageAccepted()), SLOT(slotStart()));
+
+    slotStart();
 }
 
 
