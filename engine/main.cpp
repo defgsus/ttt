@@ -139,7 +139,7 @@ int main(int , char **)
         std::string str;
         if (autoplay<=0)
         {
-            std::cout << pieceChar(b.stm()) << ">";
+            std::cout << Board::pieceChar(b.stm()) << ">";
             std::cin >> str;
         }
 

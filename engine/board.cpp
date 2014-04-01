@@ -41,7 +41,7 @@ Board::Board(uint size, uint cons)
 void Board::init()
 {
     for (auto &i : board_)
-        i = Empty;
+        i.v = Empty;
     clearEvalMap();
 
     stm_ = X;
@@ -81,7 +81,7 @@ void Board::init(const std::string& str)
             case 'x': case 'X': p = X; pieces_++; break;
             case 'o': case 'O': p = O; pieces_++; break;
         }
-        board_[i] = p;
+        board_[i].v = p;
     }
 }
 
@@ -138,7 +138,7 @@ void Board::makeMove(Move m)
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value
     for (auto &i : board_)
-        i = (i & pieceMask) | (((i & captureMask) >> 1) & captureMask);
+        i.v = (i.v & pieceMask) | (((i.v & captureLockedMask) >> 1) & captureLockedMask);
 #endif
 
     setPieceAt(m, stm_);
@@ -155,6 +155,7 @@ void Board::makeMove(Move m)
     exeCapture(m, 1,-1);
 #endif
 }
+
 
 bool Board::exeCapture(Square m, int xi, int yi)
 {
@@ -191,7 +192,7 @@ bool Board::exeCapture(Square m, int xi, int yi)
                 {
                     pos -= inc;
                     // set empty + flags
-                    board_[pos] = 8;
+                    board_[pos].v = 8;
                 }
                 pieces_ -= op;
                 return true;
@@ -264,10 +265,10 @@ void Board::printBoard(bool eval, std::ostream& out) const
             for (uint x=0; x<size_; ++x)
             {
                 if (!bigboard_)
-                    out << pieceChar(board_[y*size_+x]) << " ";
+                    out << pieceChar(board_[y*size_+x].v) << " ";
                 else
                 {
-                    switch (board_[y*size_+x])
+                    switch (board_[y*size_+x].v & pieceMask)
                     {
                     default: if (y1==0) out << "   ";  else out << ".  "; break;
                     case X:  if (y1==0) out << "\\/ "; else out << "/\\ "; break;
@@ -284,7 +285,7 @@ void Board::printBoard(bool eval, std::ostream& out) const
                 {
                     std::cout << " ";
                     for (int b=3; b>=0; --b)
-                        std::cout << (int)(board_[y*size_+x] & (1<<b));
+                        std::cout << (int)(board_[y*size_+x].v & (1<<b));
                 }
             }
 

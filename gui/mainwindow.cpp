@@ -19,15 +19,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QDebug>
+#include <QKeyEvent>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "engine.h"
+#include "settingsview.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow (parent),
     ui_         (new Ui::MainWindow),
-    board_      (5,4),
+    board_      (7,4),
     helper_     (board_),
     engine_     (new Engine),
     playerStm_  (TTT::X),
@@ -45,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // setup engine
     connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+
+//    SettingsView * s = new SettingsView(ui_->centralWidget);
+
 
     slotStart();
 }
@@ -115,3 +121,11 @@ void MainWindow::slotMoveMade(TTT::Move s)
     }
 }
 
+
+
+void MainWindow::keyPressEvent(QKeyEvent * e)
+{
+    qDebug() << e->key();
+
+    QWidget::keyPressEvent(e);
+}

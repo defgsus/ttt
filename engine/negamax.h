@@ -100,7 +100,8 @@ public:
     int numPrunes() const { return prunes_; }
     /** Returns maximum reached depth. */
     int maxDepth() const { return depth_; }
-
+    /** Returns number of called evaluations */
+    int numEvals() const { return evals_; }
 
 private: // ____ PRIVATE ________
 
@@ -119,7 +120,9 @@ private: // ____ PRIVATE ________
     /** reched depth */
         depth_,
     /** maximum allowed depth */
-        maxDepth_;
+        maxDepth_,
+    /** number of called evaluations */
+        evals_;
 };
 
 
@@ -132,6 +135,7 @@ void NegaMax<Node>::init_()
     nodes_ = 0;
     prunes_ = 0;
     depth_ = 0;
+    evals_ = 0;
 }
 
 template <class Node>
@@ -159,6 +163,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Node * n)
 
     if (depth >= maxDepth_)
     {
+        evals_++;
         n->score = n->evaluate();
         return n->score;
     }
@@ -170,6 +175,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Node * n)
        !n->createChilds() ||
        !n->numChilds())
     {
+        evals_++;
         return n->score = n->evaluate();
     }
 
@@ -200,6 +206,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
 
     if (depth >= maxDepth_)
     {
+        evals_++;
         return n->score = n->evaluate();
     }
 
@@ -208,6 +215,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
        !n->createChilds() ||
        !n->numChilds())
     {
+        evals_++;
         return n->score = n->evaluate();
     }
 

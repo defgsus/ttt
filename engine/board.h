@@ -33,7 +33,48 @@ class Board
     friend class BoardHelper;
 
 public:
+
+    enum DirectionFlags
+    {
+        D_Up        = 0x01,
+        D_Down      = 0x02,
+        D_Left      = 0x04,
+        D_Right     = 0x08
+    };
+
+    union BoardData
+    {
+        uint32_t v;
+
+        union
+        {
+            /** non-zero when can-capture */
+            unsigned char
+                captureLength,
+            /** DirectionFlags */
+                captureDir;
+        };
+    };
+
+    static const Piece pieceMask = 3;
+    static const Piece captureLockedMask = 4+8;
+
+
+#if 0
+    enum FlagMask
+    {
+        /** current max capture length ! */
+        M_CaptureLength = 0xff,
+        /** DirectionFlags */
+        M_CaptureDir = 0xff00
+
+    };
+#endif
+
+
+    /** Creates empty board with white-to-move */
     Board(uint size = 3, uint consecutives = 3);
+
 
     /** resize the board. */
     void setSize(uint size = 3, uint consecutives = 3);
@@ -59,17 +100,19 @@ public:
     /** Returns number of pieces on board. */
     uint pieces() const { return pieces_; }
 
+    static char pieceChar(Piece p);
+
     /** Return piece at given position */
-    Piece pieceAt(Square m) const { return board_[m] & pieceMask; }
-    char pieceCharAt(Square m) const { return pieceChar(board_[m]); }
+    Piece pieceAt(Square m) const { return board_[m].v & pieceMask; }
+    char pieceCharAt(Square m) const { return pieceChar(board_[m].v); }
     /** Sets piece flags, nothing else. @p p must be piece bits only! */
-    void setPieceAt(Square m, Piece p) { board_[m] &= ~pieceMask; board_[m] |= p; }
+    void setPieceAt(Square m, Piece p) { board_[m].v &= ~pieceMask; board_[m].v |= p; }
 
     /** Return whatever value is at position @p m */
-    Piece valueAt(Square m) const { return board_[m]; }
+    Piece valueAt(Square m) const { return board_[m].v; }
 
     /** Returns 1, 2 or 0 */
-    int capturedAt(Square m) const { return (board_[m] & captureMask) >> 2; }
+    int capturedAt(Square m) const { return (board_[m].v & captureLockedMask) >> 2; }
 
     /** Parses a string like 'a1' and return the move.
         InvalidMove on error. */
@@ -105,9 +148,11 @@ public:
 
 protected:
 
+    void getCaptures_();
+
     uint size_, sizesq_, cons_;
 
-    std::vector<Piece> board_;
+    std::vector<BoardData> board_;
 
     /** evaluation buffer */
     std::vector<int> score_;
@@ -117,6 +162,15 @@ protected:
     uint pieces_, ply_;
 
 };
+
+
+
+inline char Board::pieceChar(Piece p)
+{
+    return p == 0 ?
+        '.' : (p&pieceMask) != 0 ?
+                ((p&X) ? 'X' : 'O') : (((p&captureLockedMask)==8)? '2' : '1');
+}
 
 } // namespace TTT
 

@@ -40,6 +40,7 @@ BoardView::BoardView(QWidget *parent)
       particles_    (new Particles(this))
 {
     setMouseTracking(true);
+    //setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
     updateTimer_.setSingleShot(true);
     connect(&updateTimer_, SIGNAL(timeout()), SLOT(update()));
@@ -106,8 +107,10 @@ void BoardView::setBoard(const TTT::Board& b)
 
 void BoardView::message(const QString& m)
 {
+    qDebug() << "BoardView::message("<<m<<")";
     message_ = m;
     showMessage_ = 0;
+    update();
     //new MessageBox(m, this);
     //update();
     /*
@@ -152,7 +155,7 @@ void BoardView::resizeEvent(QResizeEvent *e)
     oPen_.setWidth(xPen_.width());
     cPen_.setWidth(xPen_.width());
 
-    mFont_.setPointSizeF(0.5 * sqs_);
+    mFont_.setPointSizeF(0.3 * sqs_);
 }
 
 void BoardView::paintEvent(QPaintEvent * )

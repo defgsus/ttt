@@ -43,6 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //#define TTT_KEEP_TREE
 
 #ifndef NDEBUG
+#   include <cstdlib>
 #   define TTT_DEBUG(stream_arg__) { std::cerr << stream_arg__ << std::endl; }
 #   define TTT_ASSERT(expr__, stream_arg__) { \
         if (!(expr__)) { std::cerr << stream_arg__ << "\n" << __FILE__ << " : " << __LINE__ << std::endl; exit(-1); } }
@@ -68,7 +69,8 @@ namespace TTT {
 
 typedef unsigned int        uint;
 
-typedef unsigned char       Piece;
+typedef uint32_t            Piece;
+//typedef unsigned char       Piece;
 typedef uint                Square;
 typedef Square              Move;
 typedef std::vector<Move>   Moves;
@@ -94,15 +96,7 @@ const Move InvalidMove = -1;
 const int MaxScore = 7000;
 const int WinScore = MaxScore / 2;
 const int InvalidScore = MaxScore*10;
-const Piece pieceMask = 3;
-const Piece captureMask = 4+8;
 
-inline char pieceChar(Piece p)
-{
-    return p == 0 ?
-        '.' : (p&pieceMask) != 0 ?
-                ((p&X) ? 'X' : 'O') : (((p&captureMask)==8)? '2' : '1');
-}
 
 #ifdef TTT_TRANSPOSITION_TABLE
 struct Hash

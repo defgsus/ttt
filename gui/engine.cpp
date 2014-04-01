@@ -78,11 +78,11 @@ void Engine::run()
     QTime t;
     t.start();
 
-    TTT::Move m = ai_->bestMove(board_, 6);
-
-    //while (t.elapsed() < minWaitTime_);
+    TTT::Move m = ai_->bestMove(board_, 4);
 
     int e = t.elapsed();
+
+    // wait minimum time
     if (e<minWaitTime_)
         msleep(minWaitTime_ - e);
 

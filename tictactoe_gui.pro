@@ -11,8 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = tictactoe_gui
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += --std=c++0x -DTTT_NO_PRINT
-QMAKE_CXXFLAGS_RELEASE += -O2 -DNDEBUG
+QMAKE_CXXFLAGS += --std=c++0x
+QMAKE_CXXFLAGS_RELEASE += -O2 -DNDEBUG -DTTT_NO_PRINT
 
 
 SOURCES += \
@@ -23,21 +23,25 @@ SOURCES += \
     gui/boardview.cpp \
     gui/engine.cpp \
     gui/messagebox.cpp \
-    gui/particles.cpp
+    gui/particles.cpp \
+    gui/settingsview.cpp
 
 HEADERS += \
     engine/board.h \
     engine/boardhelper.h \
+    engine/common.h \
     engine/negamax.h \
     engine/search.h \
     gui/mainwindow.h \
     gui/boardview.h \
     gui/engine.h \
     gui/messagebox.h \
-    gui/particles.h
+    gui/particles.h \
+    gui/settingsview.h
 
 FORMS += \
-    gui/mainwindow.ui
+    gui/mainwindow.ui \
+    gui/settingsview.ui
 
 OTHER_FILES += \
     android/src/org/qtproject/qt5/android/bindings/QtActivity.java \

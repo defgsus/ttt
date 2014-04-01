@@ -51,7 +51,7 @@ struct Node
 
     // ---- interface ----
 
-    Score evaluate() const;
+    Score evaluate();
 
     bool isTerminal();
 
@@ -95,10 +95,11 @@ Node::Node(const Node &n)
 }
 */
 
-Node::Score Node::evaluate() const
+Node::Score Node::evaluate()
 {
-    const Score s = isEvaluated? evaluation : helper->eval(board);
-    return std::max(-WinScore,std::min(WinScore, s ));//depth & 1 ? -s : s;
+    const Score s = isEvaluated? evaluation : eval();
+    //return std::max(-WinScore,std::min(WinScore, s ));
+    return s;
 }
 
 bool Node::isTerminal()
@@ -109,6 +110,10 @@ bool Node::isTerminal()
 Node::Score Node::eval()
 {
     evaluation = helper->eval(board);
+
+    // rate close wins higher
+    //evaluation /= (depth + 1);
+
     isEvaluated = true;
     return evaluation;
 }
@@ -164,6 +169,8 @@ class Search
     int depth;
     /** evaluated nodes */
     int nodes;
+    /** number of called evaluations */
+    int evals;
     /** number of pruned nodes */
     int prunes;
     /** time of last search in milliseconds */
@@ -209,6 +216,7 @@ Move Search::bestMove(Board &b, int maxdepth)
     depth = search_.maxDepth();
     nodes = search_.numNodes();
     prunes = search_.numPrunes();
+    evals = search_.numEvals();
     nps = (int)( (double)nodes / std::max(1, time) * 1000 );
 
     b.copyEvalFrom(n.board);
@@ -217,6 +225,7 @@ Move Search::bestMove(Board &b, int maxdepth)
 
     std::cout << " depth " << depth
               << " nodes " << nodes
+              << " evals " << evals
 #ifdef TTT_ALPHA_BETA
               << " prunes " << prunes
 #endif

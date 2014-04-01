@@ -18,47 +18,33 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "settingsview.h"
+#include "ui_settingsview.h"
 
-#include <QMainWindow>
-#include <QThread>
-
-#include "engine/board.h"
-#include "engine/boardhelper.h"
-
-namespace Ui { class MainWindow; }
-
-class Engine;
-
-class MainWindow : public QMainWindow
+SettingsView::SettingsView(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::SettingsView)
 {
-    Q_OBJECT
+    ui->setupUi(this);
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
-private slots:
-    /** Move from user */
-    void slotMoveMade(TTT::Move s);
+    connect(ui->butOk, SIGNAL(clicked()), SLOT(slotOk()));
+    connect(ui->butCancel, SIGNAL(clicked()), SLOT(slotCancel()));
+}
 
-    /** Start new game */
-    void slotStart();
+SettingsView::~SettingsView()
+{
+    delete ui;
+}
 
-protected:
-    virtual void keyPressEvent(QKeyEvent *);
+void SettingsView::slotOk()
+{
+    close();
+    deleteLater();
+}
 
-private:
-    Ui::MainWindow * ui_;
-
-    TTT::Board board_;
-    TTT::BoardHelper helper_;
-    Engine * engine_;
-
-    QThread * engineThread_;
-
-    TTT::Stm playerStm_, engineStm_;
-};
-
-#endif // MAINWINDOW_H
+void SettingsView::slotCancel()
+{
+    close();
+    deleteLater();
+}

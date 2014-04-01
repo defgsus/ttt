@@ -37,27 +37,29 @@ BoardHelper::BoardHelper(uint size, uint consecutives)
     :   size_(size),
         cons_(consecutives)
 {
-    createRowValues_();
-    createMoveOrder_();
-    createScanOrder_();
+    setSize(size_, cons_);
 }
 
 BoardHelper::BoardHelper(const Board& b)
     :   size_(b.size_),
         cons_(b.cons_)
 {
-    createRowValues_();
-    createMoveOrder_();
-    createScanOrder_();
+    setSize(size_, cons_);
 }
 
 void BoardHelper::setSize(uint size, uint consecutives)
 {
     size_ = size;
     cons_ = consecutives;
+    sizesq_ = size_ * size_;
+
     createRowValues_();
     createMoveOrder_();
     createScanOrder_();
+
+    flags_.resize(sizesq_);
+    for (auto &i : flags_)
+        i = 0;
 }
 
 void BoardHelper::setSize(const Board &b)
@@ -68,12 +70,12 @@ void BoardHelper::setSize(const Board &b)
 
 void BoardHelper::createMoveOrder_()
 {
-    moveOrder_.resize(size_ * size_);
+    moveOrder_.resize(sizesq_);
 
     for (auto &i : moveOrder_)
         i = 0;
 
-    // use an ulam spiral to create indexes
+    // use an ulam spiral to create indices
     // that start in the middle and expand towards edges
     const int sh = (size_ >> 1) - !(size_&1);
     for (int y = 0; y<(int)size_; ++y)
@@ -85,6 +87,8 @@ void BoardHelper::createMoveOrder_()
             moveOrder_[u] = (y * size_ + x);
     }
 
+    // revert (to verify that above is a good basic ordering,
+    // at least for current evaluation function ;)
     //for (auto i : moveOrder_)
     //    std::cout << " " << i;
 }
@@ -123,12 +127,21 @@ int BoardHelper::getRowValue_(int * row, const int X, const int O) const
         // generally less points when opponent breaks row
         for (uint i = 0; i<cons_; ++i)
             if (row[i] == O) { u /= 3; break; }
-#if 1
+#if (1)
         // no points for full-row-emptyness
         if (full == 0) u = 0;
 #endif
 
+        // make relative to length (not working right)
+        //u = (u) / std::max(1u, sizesq_ / 5);
     }
+
+#if (0)
+    // limit score to draw/win
+    // (disable tactics)
+    if (u<WinScore) u = 0;
+    u = std::min(WinScore, u);
+#endif
 
     return std::max(0,u);
 }
@@ -150,7 +163,7 @@ void BoardHelper::createRowValues_()
         std::vector<int> row;
         for (i=0; i<cons_; ++i)
         {
-            kk = (k>>(i*2)) & pieceMask;
+            kk = (k>>(i*2)) & Board::pieceMask;
             if ((kk)==Empty) row.push_back(Empty); else
             if ((kk)==X)     row.push_back(X); else
             if ((kk)>=O)     row.push_back(O);

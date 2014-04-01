@@ -63,7 +63,6 @@ public:
         m will be cleared before. */
     void getMoves(const Board& b, Moves& m) const;
 
-
 private:
     /** return the evaluation value of one row */
     int getRowValue_(int * row, int x, int o) const;
@@ -72,6 +71,7 @@ private:
     void createScanOrder_();
 
     uint size_,
+         sizesq_,
          cons_;
 
     /** evaluation of all row combinations */
@@ -80,6 +80,8 @@ private:
     std::vector<uint> moveOrder_;
     /** indices to all possible rows. */
     std::vector<uint> scanOrder_;
+
+    std::vector<uint> flags_;
 };
 
 
