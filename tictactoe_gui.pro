@@ -26,7 +26,10 @@ SOURCES += \
     gui/mainwidget.cpp \
     gui/popbutton.cpp \
     gui/popgroup.cpp \
-    gui/popwidget.cpp
+    gui/popwidget.cpp \
+    gui/numberwidget.cpp \
+    gui/squarewidget.cpp \
+    gui/settingswidget.cpp
 
 HEADERS += \
     engine/board.h \
@@ -41,7 +44,10 @@ HEADERS += \
     gui/mainwidget.h \
     gui/popbutton.h \
     gui/popgroup.h \
-    gui/popwidget.h
+    gui/popwidget.h \
+    gui/numberwidget.h \
+    gui/squarewidget.h \
+    gui/settingswidget.h
 
 FORMS +=
 

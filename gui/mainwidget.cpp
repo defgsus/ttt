@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "popgroup.h"
 #include "popbutton.h"
 #include "boardview.h"
-
+#include "settingswidget.h"
 
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent),
@@ -54,19 +54,26 @@ MainWidget::MainWidget(QWidget *parent) :
     //PopGroup * pg = new PopGroup(this);
     //l->addWidget(pg);
 
-        QLayout * l2 = new QHBoxLayout;
-        l->addLayout(l2);
+        QWidget * boardDock = new QWidget();
+        l->addWidget(boardDock);
 
-            b_back_ = new PopButton(PopButton::Left, this);
+        QLayout * l2 = new QHBoxLayout(boardDock);
+        l2->setMargin(0);
+
+            b_back_ = new PopButton(PopButton::Left, boardDock);
             l2->addWidget(b_back_);
             connect(b_back_, SIGNAL(clicked()), SLOT(back()));
 
-            boardView_ = new BoardView(this);
+            boardView_ = new BoardView(boardDock);
             l2->addWidget(boardView_);
 
-            b_fwd_ = new PopButton(PopButton::Right, this);
+            b_fwd_ = new PopButton(PopButton::Right, boardDock);
             l2->addWidget(b_fwd_);
             connect(b_fwd_, SIGNAL(clicked()), SLOT(forward()));
+
+
+        SettingsWidget * settings_ = new SettingsWidget(this);
+        l->addWidget(settings_);
 
     //pg->addWidget(boardView_);
     //pg->addWidget(new BoardView(this));
