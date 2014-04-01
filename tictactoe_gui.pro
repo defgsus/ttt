@@ -19,12 +19,13 @@ SOURCES += \
     main.cpp \
     engine/board.cpp \
     engine/boardhelper.cpp \
-    gui/mainwindow.cpp \
     gui/boardview.cpp \
     gui/engine.cpp \
     gui/messagebox.cpp \
     gui/particles.cpp \
-    gui/settingsview.cpp
+    gui/popwidget.cpp \
+    gui/mainwidget.cpp \
+    gui/popbutton.cpp
 
 HEADERS += \
     engine/board.h \
@@ -32,16 +33,15 @@ HEADERS += \
     engine/common.h \
     engine/negamax.h \
     engine/search.h \
-    gui/mainwindow.h \
     gui/boardview.h \
     gui/engine.h \
     gui/messagebox.h \
     gui/particles.h \
-    gui/settingsview.h
+    gui/popwidget.h \
+    gui/mainwidget.h \
+    gui/popbutton.h
 
-FORMS += \
-    gui/mainwindow.ui \
-    gui/settingsview.ui
+FORMS +=
 
 OTHER_FILES += \
     android/src/org/qtproject/qt5/android/bindings/QtActivity.java \

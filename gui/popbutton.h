@@ -18,47 +18,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef POPBUTTON_H
+#define POPBUTTON_H
 
-#include <QMainWindow>
-#include <QThread>
+#include <QPushButton>
 
-#include "engine/board.h"
-#include "engine/boardhelper.h"
-
-namespace Ui { class MainWindow; }
-
-class Engine;
-
-class MainWindow : public QMainWindow
+class PopButton : public QPushButton
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit PopButton(QWidget *parent = 0);
 
-private slots:
-    /** Move from user */
-    void slotMoveMade(TTT::Move s);
+signals:
 
-    /** Start new game */
-    void slotStart();
+public slots:
 
 protected:
-    virtual void keyPressEvent(QKeyEvent *);
 
-private:
-    Ui::MainWindow * ui_;
-
-    TTT::Board board_;
-    TTT::BoardHelper helper_;
-    Engine * engine_;
-
-    QThread * engineThread_;
-
-    TTT::Stm playerStm_, engineStm_;
+    int w_, h_;
 };
 
-#endif // MAINWINDOW_H
+#endif // POPBUTTON_H

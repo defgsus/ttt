@@ -35,6 +35,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Use a greedyness value to cut-off nodes
     NOT USED RIGHT NOW */
 //#define TTT_GREEDY
+/** randomize moves a little */
+#define TTT_RANDOMNESS
 /** Use a hash table (worse performance in threading mode
     NOT USED RIGHT NOW */
 //#define TTT_TRANSPOSITION_TABLE

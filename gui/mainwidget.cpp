@@ -20,66 +20,56 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QDebug>
 #include <QKeyEvent>
+#include <QLayout>
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "mainwidget.h"
 #include "engine.h"
-#include "settingsview.h"
+
+#include "popwidget.h"
+#include "boardview.h"
 
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow (parent),
-    ui_         (new Ui::MainWindow),
-    board_      (7,4),
+MainWidget::MainWidget(QWidget *parent) :
+    QWidget(parent),
+    board_      (5,4),
     helper_     (board_),
     engine_     (new Engine),
     playerStm_  (TTT::X),
     engineStm_  (TTT::O)
 {
-    // setup ui
-    ui_->setupUi(this);
+    QPalette pal = palette();
+    pal.setColor(QPalette::Window, QColor(0,0,0));
+    setPalette(pal);
 
-    // init boardview with correct size
-    ui_->boardView->setBoard(board_);
+    QLayout * l = new QVBoxLayout(this);
+    l->setMargin(0);
 
-    // connect boardview
-    connect(ui_->boardView, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
-    connect(ui_->boardView, SIGNAL(messageAccepted()), SLOT(slotStart()));
+        boardView_ = new BoardView(this);
 
-    // setup engine
-    connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
+        PopWidget * p = new PopWidget(boardView_, this);
+        l->addWidget(p);
 
-//    SettingsView * s = new SettingsView(ui_->centralWidget);
-
-
-    slotStart();
-}
-
-
-MainWindow::~MainWindow()
-{
-    delete ui_;
 }
 
 
 
-void MainWindow::slotStart()
+void MainWidget::slotStart()
 {
     board_.init();
     if (board_.stm() != playerStm_)
         board_.flipStm();
 
-    ui_->boardView->setBoard(board_);
+    boardView_->setBoard(board_);
 }
 
-void MainWindow::slotMoveMade(TTT::Move s)
+void MainWidget::slotMoveMade(TTT::Move s)
 {
     if (s == TTT::InvalidMove)
     {
         // means engine gives up (That's an error actually!)
         if (board_.stm() == engineStm_)
         {
-            ui_->boardView->message("I'm lost!");
+            boardView_->message("I'm lost!");
         }
         return;
     }
@@ -88,7 +78,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
     board_.makeMove(s);
     board_.flipStm();
 
-    ui_->boardView->setBoard(board_);
+    boardView_->setBoard(board_);
 
     // check result
     QString m;
@@ -109,7 +99,7 @@ void MainWindow::slotMoveMade(TTT::Move s)
 
     if (!m.isNull())
     {
-        ui_->boardView->message(m);
+        boardView_->message(m);
         //slotStart();
         return;
     }
@@ -121,11 +111,3 @@ void MainWindow::slotMoveMade(TTT::Move s)
     }
 }
 
-
-
-void MainWindow::keyPressEvent(QKeyEvent * e)
-{
-    qDebug() << e->key();
-
-    QWidget::keyPressEvent(e);
-}

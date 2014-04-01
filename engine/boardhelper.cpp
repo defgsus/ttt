@@ -57,9 +57,15 @@ void BoardHelper::setSize(uint size, uint consecutives)
     createMoveOrder_();
     createScanOrder_();
 
+    randpointer_ = rand() & (randsize_-1);
+    for (uint i=0; i<randsize_; ++i)
+        randomness_[i] = rand();
+
+    /*
     flags_.resize(sizesq_);
     for (auto &i : flags_)
         i = 0;
+    */
 }
 
 void BoardHelper::setSize(const Board &b)
@@ -290,6 +296,17 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
         if (b.canMoveTo(b.stm_, k))
             m.push_back(k);
     }
+
+#ifdef TTT_RANDOMNESS
+    for (size_t i=0; i<size_; ++i)
+    {
+        const uint
+            f = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size(),
+            t = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size();
+        std::swap(m[f], m[t]);
+    }
+#endif
+
 }
 
 

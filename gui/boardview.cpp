@@ -137,6 +137,9 @@ void BoardView::resizeEvent(QResizeEvent *e)
     const int
         mi = std::min(e->size().width(), e->size().height());
 
+    if (mi <= 0)
+        return;
+
     // edge margin
     margin_ = mi / 20;
 

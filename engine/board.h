@@ -45,7 +45,7 @@ public:
     union BoardData
     {
         uint32_t v;
-
+#if 0
         union
         {
             /** non-zero when can-capture */
@@ -54,6 +54,7 @@ public:
             /** DirectionFlags */
                 captureDir;
         };
+#endif
     };
 
     static const Piece pieceMask = 3;

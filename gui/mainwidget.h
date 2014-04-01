@@ -18,29 +18,45 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include "gui/mainwidget.h"
-#include <QApplication>
+#ifndef MAINWIDGET_H
+#define MAINWIDGET_H
 
-#include <QDesktopWidget>
 #include <QWidget>
+#include <QThread>
 
-int main(int argc, char *argv[])
+#include "engine/board.h"
+#include "engine/boardhelper.h"
+
+class Engine;
+class BoardView;
+
+class MainWidget : public QWidget
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+public:
+    explicit MainWidget(QWidget *parent = 0);
 
-    MainWidget w;
+signals:
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    // set some size
-    w.setGeometry(0,0, 500, 500);
+public slots:
 
-    // center
-    QRect r = QApplication::desktop()->rect();
-    w.setGeometry((r.width() - w.width())/2, (r.height() - w.height()) / 2,
-                  w.width(), w.height());
-#endif
+    /** Move from user */
+    void slotMoveMade(TTT::Move s);
 
-    w.show();
+    /** Start new game */
+    void slotStart();
 
-    return a.exec();
-}
+protected:
+
+    BoardView * boardView_;
+
+    TTT::Board board_;
+    TTT::BoardHelper helper_;
+    Engine * engine_;
+
+    QThread * engineThread_;
+
+    TTT::Stm playerStm_, engineStm_;
+};
+
+#endif // MAINWIDGET_H

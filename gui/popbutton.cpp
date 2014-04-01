@@ -18,33 +18,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include "settingsview.h"
-#include "ui_settingsview.h"
+#include <QAnimationDriver>
 
-SettingsView::SettingsView(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::SettingsView)
+#include "popbutton.h"
+
+
+PopButton::PopButton(QWidget *parent)
+    :   QPushButton(parent),
+        w_    (32),
+        h_    (32)
+
 {
-    ui->setupUi(this);
-
-
-    connect(ui->butOk, SIGNAL(clicked()), SLOT(slotOk()));
-    connect(ui->butCancel, SIGNAL(clicked()), SLOT(slotCancel()));
+    setFixedSize(w_, h_);
 }
 
-SettingsView::~SettingsView()
-{
-    delete ui;
-}
 
-void SettingsView::slotOk()
-{
-    close();
-    deleteLater();
-}
-
-void SettingsView::slotCancel()
-{
-    close();
-    deleteLater();
-}

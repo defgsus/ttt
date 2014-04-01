@@ -18,30 +18,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef SETTINGSVIEW_H
-#define SETTINGSVIEW_H
+#include <QLayout>
+#include <QPalette>
 
-#include <QWidget>
+#include "popwidget.h"
+#include "popbutton.h"
 
-namespace Ui {
-class SettingsView;
-}
 
-class SettingsView : public QWidget
+
+PopWidget::PopWidget(QWidget * center, QWidget *parent)
+    :   QWidget(parent),
+        widget_(center)
 {
-    Q_OBJECT
+    layout_ = new QVBoxLayout(this);
+    layout_->setMargin(0);
 
-public:
-    explicit SettingsView(QWidget *parent = 0);
-    ~SettingsView();
+        widget_->setParent(this);
+        layout_->addWidget(widget_);
 
-protected slots:
+        QLayout * layout0_ = new QHBoxLayout;
+        ((QVBoxLayout*)layout_)->addLayout(layout0_);
 
-    void slotOk();
-    void slotCancel();
+            b_ = new PopButton(this);
+            layout0_->addWidget(b_);
 
-private:
-    Ui::SettingsView *ui;
-};
-
-#endif // SETTINGSVIEW_H
+}

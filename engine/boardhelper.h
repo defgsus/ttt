@@ -63,6 +63,9 @@ public:
         m will be cleared before. */
     void getMoves(const Board& b, Moves& m) const;
 
+    /* pushes all capture moves onto @p m */
+//    void getCaptures(Board& b, Moves& m) const;
+
 private:
     /** return the evaluation value of one row */
     int getRowValue_(int * row, int x, int o) const;
@@ -81,7 +84,11 @@ private:
     /** indices to all possible rows. */
     std::vector<uint> scanOrder_;
 
-    std::vector<uint> flags_;
+    uint randomness_[0x200];
+    mutable uint randpointer_;
+    static const uint randsize_ = sizeof(randomness_) / sizeof(uint);
+
+    //std::vector<uint> flags_;
 };
 
 

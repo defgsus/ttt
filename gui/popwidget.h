@@ -18,29 +18,40 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include "gui/mainwidget.h"
-#include <QApplication>
+#ifndef POPWIDGET_H
+#define POPWIDGET_H
 
-#include <QDesktopWidget>
 #include <QWidget>
 
-int main(int argc, char *argv[])
+class QLayout;
+class PopButton;
+
+/**  _____  widget
+    |     | layout
+    |__-__| layout
+
+
+ */
+class PopWidget : public QWidget
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+public:
+    explicit PopWidget(QWidget * center, QWidget *parent = 0);
 
-    MainWidget w;
+    QLayout * layout() { return layout_; }
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    // set some size
-    w.setGeometry(0,0, 500, 500);
+    QWidget * getCentralWidget() { return widget_; }
+    const QWidget * getCentralWidget() const { return widget_; }
 
-    // center
-    QRect r = QApplication::desktop()->rect();
-    w.setGeometry((r.width() - w.width())/2, (r.height() - w.height()) / 2,
-                  w.width(), w.height());
-#endif
+signals:
 
-    w.show();
+public slots:
 
-    return a.exec();
-}
+protected:
+
+    QLayout * layout_, * layout0_;
+    QWidget * widget_;
+    PopButton * b_;
+};
+
+#endif // POPWIDGET_H
