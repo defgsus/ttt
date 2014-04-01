@@ -86,6 +86,7 @@ void MainWidget::slotStart()
 {
     stack_.clear();
     stack_pos_ = 0;
+    updateStackButtons_();
 
     board_.init();
 
@@ -113,8 +114,11 @@ void MainWidget::slotMoveMade(TTT::Move s)
 
     // apply move
     board_.makeMove(s);
+
+    // flip side-to-move
     board_.flipStm();
 
+    // update view
     boardView_->setBoard(board_);
 
     // check result
@@ -137,7 +141,6 @@ void MainWidget::slotMoveMade(TTT::Move s)
     if (!m.isNull())
     {
         boardView_->message(m);
-        //slotStart();
         return;
     }
 
@@ -148,10 +151,12 @@ void MainWidget::slotMoveMade(TTT::Move s)
     }
 }
 
+
+
 void MainWidget::updateStackButtons_()
 {
-    b_fwd_->setVisible(stack_pos_ < stack_.size());
-    b_back_->setVisible(stack_pos_ > 0);
+    b_fwd_->setEnabled(stack_pos_ + 1 < stack_.size());
+    b_back_->setEnabled(stack_pos_ > 0);
 }
 
 void MainWidget::push()
@@ -160,11 +165,22 @@ void MainWidget::push()
     stack_[stack_pos_] = board_;
     stack_pos_++;
 
+    //qDebug() << "push " << stack_.size() << "p" << stack_pos_;
+
     updateStackButtons_();
 }
 
 void MainWidget::back()
 {
+    // save current board if it hasn't been done
+    if (board_.stm() == playerStm_
+        && stack_pos_ == stack_.size())
+    {
+        push();
+        stack_pos_--;
+    }
+
+    // go back in time
     if (stack_pos_ > 0)
     {
         stack_pos_--;
@@ -173,18 +189,24 @@ void MainWidget::back()
         boardView_->setBoard(board_);
     }
 
+    //qDebug() << "back " << stack_.size() << "p" << stack_pos_;
+
     updateStackButtons_();
 }
 
 void MainWidget::forward()
 {
-    if (stack_pos_ < stack_.size())
+    // go forward in time
+    if (stack_pos_ + 1 < stack_.size())
     {
+        stack_pos_++;
+
         board_ = stack_[stack_pos_];
         boardView_->setBoard(board_);
 
-        stack_pos_++;
     }
+
+    //qDebug() << "fwd " << stack_.size() << "p" << stack_pos_;
 
     updateStackButtons_();
 }

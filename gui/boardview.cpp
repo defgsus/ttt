@@ -65,7 +65,7 @@ BoardView::~BoardView()
 
 void BoardView::setBoard(const TTT::Board& b)
 {
-    qDebug() << "BoardView::setBoard()";
+//    qDebug() << "BoardView::setBoard()";
 
     size_ = b.size();
     board_ = b;

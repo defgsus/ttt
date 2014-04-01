@@ -181,7 +181,7 @@ void BoardHelper::createRowValues_()
         // store utility value
         rowValues_.push_back( u );
 
-#if 1
+#if 0
         // debug print
         if (k%4 != 3)
         {

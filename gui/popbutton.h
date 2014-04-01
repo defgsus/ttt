@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QPushButton>
 
+/** A QPushButton with specialized look */
 class PopButton : public QPushButton
 {
     Q_OBJECT
@@ -44,7 +45,11 @@ public slots:
 
 protected:
 
+    void changeEvent(QEvent * e);
+
     int w_, h_;
+
+    QIcon icon_;
 };
 
 #endif // POPBUTTON_H

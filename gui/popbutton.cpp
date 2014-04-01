@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QIcon>
+#include <QEvent>
 
 #include "popbutton.h"
 
@@ -27,7 +28,6 @@ PopButton::PopButton(Dir dir, QWidget *parent)
     :   QPushButton(parent),
         w_    (32),
         h_    (32)
-
 {
     setFlat(true);
 
@@ -42,7 +42,19 @@ PopButton::PopButton(Dir dir, QWidget *parent)
         case Down: pic = "down"; break;
     }
 
-    setIcon(QIcon(":/img/b_" + pic + ".png"));
+    icon_ = QIcon(":/img/b_" + pic + ".png");
+    setIcon(icon_);
 }
 
+void PopButton::changeEvent(QEvent * e)
+{
+    if (e->type() == QEvent::EnabledChange)
+    {
+        // need to check the other way around
+        // because change signal is not
+        // propagated to QPushButton yet
+        setIcon(isEnabled()? icon_ : QIcon());
+    }
 
+    QPushButton::changeEvent(e);
+}
