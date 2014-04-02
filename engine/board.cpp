@@ -145,96 +145,7 @@ bool Board::canMoveTo(Stm /*stm*/, Move m) const
     ;
 }
 
-void Board::getCaptures_()
-{
-    num_captures_ = 0;
-    uint32_t cap = 0;
 
-#define TTT_EXE_CAPTURE(bp__, xi__, yi__, shift__)   \
-    if (pieceAt(bp__) == Empty)                      \
-    {                                                \
-        const int c = getCapture_(bp__, xi__, yi__); \
-        num_captures_ += c;                          \
-        cap |= c << (shift__);                       \
-    }
-
-    for (uint i=0; i<sizesq_; ++i)
-    {
-        TTT_EXE_CAPTURE(i, -1, -1, S_LeftUp);
-        TTT_EXE_CAPTURE(i,  0, -1, S_Up);
-        TTT_EXE_CAPTURE(i,  1, -1, S_RightUp);
-        TTT_EXE_CAPTURE(i, -1,  0, S_Left);
-        TTT_EXE_CAPTURE(i,  1,  0, S_Right);
-        TTT_EXE_CAPTURE(i, -1,  1, S_LeftDown);
-        TTT_EXE_CAPTURE(i,  0,  1, S_Down);
-        TTT_EXE_CAPTURE(i,  1,  1, S_RightDown);
-
-        board_[i].cap = cap;
-    }
-#undef TTT_EXE_CAPTURE
-}
-
-int Board::getCapture_(Square m, int xi, int yi) const
-{
-    int pos = m, px = m%size_;
-    const int inc = xi + yi * size_;
-
-    // opponent count
-    int op = 0;
-
-    for (int i=0; i<(int)size_; ++i)
-    {
-        pos += inc;
-        px += xi;
-
-        // outside board
-        if (px < 0 || px >= (int)size_ ||
-            pos < 0 || pos >= (int)sizesq_)
-            return 0;
-
-        const Piece piece = pieceAt(pos);
-        if (piece == Empty)
-            return 0;
-        else
-        if (piece == nstm_)
-            ++op;
-        else
-        if (piece == stm_)
-        {
-            return op;
-        }
-    }
-    return 0;
-}
-
-void Board::exeCapture_(Square m)
-{
-    const int cap = board_[m].cap;
-
-#define TTT_EXE_CAPTURE(bp__, xi__, yi__, shift__)   \
-    {                                                \
-        const int inc = (xi__) + (int)size_ * (yi__);\
-        const int cnt = (cap >> (shift__)) & 15;     \
-        int pos = bp__;                              \
-        for (int i=0; i<cnt; ++i)                    \
-        {                                            \
-            pos += inc;                              \
-            /* set empty + flags */                  \
-            board_[pos].v = 8;                       \
-        }                                            \
-    }
-
-    TTT_EXE_CAPTURE(m, -1, -1, S_LeftUp);
-    TTT_EXE_CAPTURE(m,  0, -1, S_Up);
-    TTT_EXE_CAPTURE(m,  1, -1, S_RightUp);
-    TTT_EXE_CAPTURE(m, -1,  0, S_Left);
-    TTT_EXE_CAPTURE(m,  1,  0, S_Right);
-    TTT_EXE_CAPTURE(m, -1,  1, S_LeftDown);
-    TTT_EXE_CAPTURE(m,  0,  1, S_Down);
-    TTT_EXE_CAPTURE(m,  1,  1, S_RightDown);
-
-#undef TTT_EXE_CAPTURE
-}
 
 void Board::makeMove(Move m)
 {
@@ -250,75 +161,20 @@ void Board::makeMove(Move m)
 #ifdef TTT_CAPTURE
     // XXX Todo: only need m square here
     if (num_captures_ < 0)
-        getCaptures_();
+        getCapture_(m);
 #endif
 
     setPieceAt(m, stm_);
     pieces_++;
 
 #ifdef TTT_CAPTURE
-    //exeCapture_(m);
-    getCaptures_();
+    exeCapture_(m);
     // invalidate previous captures
     num_captures_ = -1;
-
-/*    exeCapture(m, 1, 0);
-    exeCapture(m, 1, 1);
-    exeCapture(m, 0, 1);
-    exeCapture(m,-1, 1);
-    exeCapture(m,-1, 0);
-    exeCapture(m,-1,-1);
-    exeCapture(m, 0,-1);
-    exeCapture(m, 1,-1);*/
 #endif
 }
 
 
-bool Board::exeCapture(Square m, int xi, int yi)
-{
-    if (pieceAt(m) != stm_) return false;
-
-    int pos = m, px = m%size_;
-    const int inc = xi + yi * size_;
-
-    // opponent count
-    int op = 0;
-
-    for (int i=0; i<(int)size_; ++i)
-    {
-        pos += inc;
-        px += xi;
-
-        if (px < 0 || px >= (int)size_ ||
-            pos < 0 || pos >= (int)sizesq_)
-            return false;
-
-        const Piece piece = pieceAt(pos);
-        if (piece == Empty)
-            return false;
-        else
-        if (piece == nstm_)
-            ++op;
-        else
-        if (piece == stm_)
-        {
-            if (op>0)
-            {
-                // remove pieces
-                for (int j=0; j<op; ++j)
-                {
-                    pos -= inc;
-                    // set empty + flags
-                    board_[pos].v = 8;
-                }
-                pieces_ -= op;
-                return true;
-            }
-            return false;
-        }
-    }
-    return false;
-}
 
 
 
@@ -344,7 +200,7 @@ std::string Board::toString(Move m) const
 void Board::printBoard(bool eval, std::ostream& out) const
 {
     const bool bigboard_ = false;
-    const bool bitboard = true;//false;
+    const bool bitboard = false;
 
     // -- header --
 
@@ -403,8 +259,9 @@ void Board::printBoard(bool eval, std::ostream& out) const
                     std::cout << " ";
                     //for (int b=3; b>=0; --b)
                     //    std::cout << (int)(board_[y*size_+x].v & (1<<b));
-                    for (int b=32; b>=0; --b)
-                        std::cout << (int)((board_[y*size_+x].cap & (1<<b)) != 0);
+                    for (int b=31; b>=0; --b)
+                        std::cout << (int)((board_[y*size_+x].cap & (1<<b)) != 0)
+                                << ((b&3)==0? " " : "");
                 }
             }
 

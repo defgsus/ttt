@@ -51,7 +51,7 @@ public:
         uint32_t v;
 
         /** 4 bits of length for each direction, left-up, up, up-right, right ... */
-        uint32_t cap;
+        mutable uint32_t cap;
     };
 
     static const Piece pieceMask = 3;
@@ -127,10 +127,12 @@ public:
 
     /** Check for capture possibility from position m along direction xi,yi
         and execute */
-    bool exeCapture(Move m, int xi, int yi);
+    //bool exeCapture(Move m, int xi, int yi);
 
     /** Number of possible captures for stm */
-    int numCaptures() { if (num_captures_<0) getCaptures_(); return num_captures_; }
+    int numCaptures() const { if (num_captures_<0) getCaptures_(); return num_captures_; }
+
+    int numCapturablePieces() const;
 
     //int canBeCaptured()
 
@@ -151,7 +153,10 @@ public:
 
 protected:
 
-    void getCaptures_();
+    /** Updates one field: board_[m].cap */
+    void getCapture_(Square m) const;
+
+    void getCaptures_() const;
     int getCapture_(Square m, int xi, int yi) const;
     void exeCapture_(Square m);
 
@@ -168,7 +173,7 @@ protected:
 
     uint pieces_, ply_;
     /** if -1, not initialized */
-    int  num_captures_;
+    mutable int  num_captures_;
 
 };
 

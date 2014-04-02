@@ -19,7 +19,8 @@ QMAKE_CXXFLAGS += --std=c++0x
 SOURCES += \
     main.cpp \
     board.cpp \
-    boardhelper.cpp
+    boardhelper.cpp \
+    board_captures.cpp
 
 HEADERS += \
     board.h \

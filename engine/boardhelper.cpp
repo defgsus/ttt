@@ -247,7 +247,10 @@ int BoardHelper::eval(const Board& b) const
 {
     TTT_BOARD_CHECK;
 
-    return (b.stm_==X)? evalX(b) : -evalX(b);
+    int e = //evalX(b)
+            + b.numCapturablePieces();
+
+    return (b.stm_==X)? e : -e;
 }
 
 int BoardHelper::evalX(const Board& b) const

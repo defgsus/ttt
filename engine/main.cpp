@@ -135,10 +135,13 @@ int main(int , char **)
     reprint_:
 
         std::cout << std::endl;
+        int caps = b.numCaptures();
         b.printBoard(print_eval);
 
         int eval = bh.eval(b);
-        std::cout << std::setw(b.size()*8+10) << "eval " << eval
+        std::cout << std::setw(b.size()*8+10) << ""
+                  << " eval " << eval
+                  << " caps " << caps << " (" << b.numCapturablePieces() << ")"
                   << std::endl;
 
     ask_:
