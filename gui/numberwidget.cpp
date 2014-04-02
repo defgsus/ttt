@@ -41,8 +41,8 @@ NumberWidget::NumberWidget(const QString& label, int num, int num_min, int num_m
         QPalette p(palette());
         p.setColor(QPalette::Text, QColor(255,255,255));
         text->setPalette(p);
-        QFont f(text->font());
-        f.setPointSize(21);
+        QFont f;
+        f.setPixelSize(physicalDpiX()/4);
         text->setFont(f);
 
         // individual boxes

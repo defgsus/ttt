@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "board.h"
 
 #include <math.h>
+#include <stdlib.h>
 #include <iomanip>
 
 #define TTT_BOARD_CHECK \

@@ -20,18 +20,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <QIcon>
 #include <QEvent>
+#include <QPaintEngine>
 
 #include "popbutton.h"
 
 
 PopButton::PopButton(Dir dir, QWidget *parent)
     :   QPushButton(parent),
-        w_    (32),
-        h_    (32)
+        w_    (physicalDpiX() / 3),
+        h_    (w_)
 {
     setFlat(true);
 
     setFixedSize(w_, h_);    
+    setIconSize(QSize(w_, h_));
 
     setDir(dir);
 }
@@ -55,9 +57,6 @@ void PopButton::changeEvent(QEvent * e)
 {
     if (e->type() == QEvent::EnabledChange)
     {
-        // need to check the other way around
-        // because change signal is not
-        // propagated to QPushButton yet
         setIcon(isEnabled()? icon_ : QIcon());
     }
 
