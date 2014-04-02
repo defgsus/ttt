@@ -74,7 +74,7 @@ MainWidget::MainWidget(QWidget *parent) :
             connect(b_fwd_, SIGNAL(clicked()), SLOT(forward()));
 
 
-        SettingsWidget * settings_ = new SettingsWidget(this);
+        settings_ = new SettingsWidget(this);
         //l->addWidget(settings_);
 
     pg->addWidget(boardDock);
@@ -88,6 +88,11 @@ MainWidget::MainWidget(QWidget *parent) :
     connect(engine_, SIGNAL(moveMade(TTT::Move)), SLOT(slotMoveMade(TTT::Move)));
     connect(boardView_, SIGNAL(messageAccepted()), SLOT(slotStart()));
 
+    // settings
+    connect(settings_, SIGNAL(changed()), SLOT(slotReconfigure()));
+
+
+    slotReconfigure();
     slotStart();
 }
 
@@ -107,16 +112,17 @@ void MainWidget::slotStart()
 
 void MainWidget::slotReconfigure()
 {
-    uint x = AppSettings->getValue("consecutives").toInt(),
-        n = AppSettings->getValue("boardSize").toInt();
+    uint x = AppSettings->getValue("cons").toInt(),
+         n = AppSettings->getValue("size").toInt();
     if (board_.size() != n || board_.consecutives() != x)
     {
         ignoreEngine();
         board_.setSize(n, x);
-        boardView_->setBoard(board_);
+        helper_.setSize(board_);
+        slotStart();
     }
 
-    engine_->setMaxDepth(AppSettings->getValue("maxDepth").toInt());
+    engine_->setMaxDepth(AppSettings->getValue("depth").toInt());
 }
 
 void MainWidget::ignoreEngine()

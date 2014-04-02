@@ -32,9 +32,9 @@ const QMap<QString, QVariant>& Settings::defaultValues() const
 {
     if (map_.empty())
     {
-        map_.insert("boardSize",     QVariant(5));
-        map_.insert("consecutives",  QVariant(4));
-        map_.insert("maxDepth",      QVariant(4));
+        map_.insert("size",     QVariant(5));
+        map_.insert("cons",     QVariant(4));
+        map_.insert("depth",    QVariant(4));
     }
     return map_;
 }

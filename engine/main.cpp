@@ -118,8 +118,8 @@ int main(int , char **)
     Search ai;
 
     b.init();
-    b.init("O.O.XO..XXXo..XXXxXOXXXOX");
-    b.init("X..XX.o.....o....OXXX..XX");
+    //b.init("O.O.XO..XXXo..XXXxXOXXXOX");
+    //b.init("X..XX.o.....o....OXXX..XX");
     //b.init("O.O.XO..XXX...XXX.XOXXXOX");
     //std::cout << b.eval(X) << "\n"; return 0;
 /*     X . . X X     |        -7000 -7000

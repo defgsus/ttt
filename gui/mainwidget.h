@@ -31,6 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 class Engine;
 class BoardView;
 class PopButton;
+class SettingsWidget;
+
 
 class MainWidget : public QWidget
 {
@@ -68,6 +70,7 @@ protected:
 
     BoardView * boardView_;
     PopButton * b_back_, * b_fwd_;
+    SettingsWidget * settings_;
 
     TTT::Board board_;
     std::vector <TTT::Board> stack_;

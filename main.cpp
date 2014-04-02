@@ -18,15 +18,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#include "gui/mainwidget.h"
 #include <QApplication>
 
 #include <QDesktopWidget>
 #include <QWidget>
 
+#include "gui/settings.h"
+#include "gui/mainwidget.h"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    AppSettings = new Settings;
 
     MainWidget w;
 
@@ -43,4 +47,6 @@ int main(int argc, char *argv[])
     w.show();
 
     return a.exec();
+
+    delete AppSettings;
 }

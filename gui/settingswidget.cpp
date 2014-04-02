@@ -22,19 +22,35 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "settingswidget.h"
 #include "numberwidget.h"
+#include "settings.h"
 
 SettingsWidget::SettingsWidget(QWidget *parent)
     :   PopWidget(parent)
 {
     QVBoxLayout * l = new QVBoxLayout(this);
 
-    auto n = new NumberWidget("search depth", 4, 1, 8, this);
-    l->addWidget(n);
+#define TTT_GUI_ADD_NUM(widget__, key__, label__, min__, max__)      \
+    widget__ = new NumberWidget(label__, min__, min__, max__, this); \
+    l->addWidget(widget__);                                          \
+    connect(widget__, &NumberWidget::numberChanged, [this]()         \
+    {                                                                \
+        AppSettings->setValue(key__, widget__->getNumber());         \
+        emit changed();                                              \
+    });
 
-    n = new NumberWidget("board size (N)", 5, 3, 10, this);
-    l->addWidget(n);
+    TTT_GUI_ADD_NUM(n_size_,    "size",     "board size (N)", 3, 10);
+    TTT_GUI_ADD_NUM(n_rows_,    "cons",     "row length (X)", 3, 10);
+    TTT_GUI_ADD_NUM(n_depth_,   "depth",    "search depth",   1, 8);
 
-    n = new NumberWidget("row lenth (X)", 4, 3, 10, this);
-    l->addWidget(n);
+#undef TTT_GUI_ADD_NUM
 
+    slotReconfigure();
+}
+
+
+void SettingsWidget::slotReconfigure()
+{
+    n_size_->setNumber(AppSettings->getValue("size").toInt());
+    n_rows_->setNumber(AppSettings->getValue("cons").toInt());
+    n_depth_->setNumber(AppSettings->getValue("depth").toInt());
 }

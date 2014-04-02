@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "popwidget.h"
 
+class NumberWidget;
+
 class SettingsWidget : public PopWidget
 {
     Q_OBJECT
@@ -31,8 +33,19 @@ public:
 
 signals:
 
+    void changed();
+
 public slots:
 
+    /** Set widgets to Settings */
+    void slotReconfigure();
+
+protected:
+
+    NumberWidget
+        * n_size_,
+        * n_rows_,
+        * n_depth_;
 };
 
 #endif // GUI_SETTINGSWIDGET_H

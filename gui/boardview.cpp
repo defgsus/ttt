@@ -134,6 +134,13 @@ void BoardView::addParticles(TTT::Square s)
 
 // ----------------- events ---------------------
 
+void BoardView::showEvent(QShowEvent *)
+{
+    // need to force this
+    QResizeEvent r(size(), size());
+    resizeEvent(&r);
+}
+
 void BoardView::resizeEvent(QResizeEvent *e)
 {
     const int

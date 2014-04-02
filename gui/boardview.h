@@ -44,8 +44,12 @@ public:
     /** Sets a new position */
     void setBoard(const TTT::Board& b);
 
+
+protected:
+
     // ------- event ------------
-    
+
+    virtual void showEvent(QShowEvent *);
     virtual void resizeEvent(QResizeEvent *);
     virtual void paintEvent(QPaintEvent *);
     
@@ -71,7 +75,8 @@ public slots:
 
     void addParticles(TTT::Square s);
 
-protected:
+protected:    
+
     // ______ PROTECTED FUNCS _______
 
     QRect squareRect(TTT::Square s) const;
