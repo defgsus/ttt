@@ -33,6 +33,11 @@ PopButton::PopButton(Dir dir, QWidget *parent)
 
     setFixedSize(w_, h_);    
 
+    setDir(dir);
+}
+
+void PopButton::setDir(Dir dir)
+{
     QString pic;
     switch (dir)
     {

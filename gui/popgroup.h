@@ -26,13 +26,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 class QLayout;
 class PopWidget;
+class PopButton;
 
-/**  _____  widget
-    |     | layout
-    |__-__| layout
-
-
- */
+/** Multipe widget container */
 class PopGroup : public QWidget
 {
     Q_OBJECT
@@ -50,10 +46,15 @@ signals:
 
 public slots:
 
+    void setActive(int i);
+
 protected:
 
     QLayout * layout_;
     std::vector<PopWidget *> widgets_;
+    std::vector<PopButton *> buttons_;
+
+    int sel_;
 };
 
 #endif // GUI_POPGROUP_H

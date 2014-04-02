@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include "numberwidget.h"
 
 SettingsWidget::SettingsWidget(QWidget *parent)
-    :   QWidget(parent)
+    :   PopWidget(parent)
 {
     QVBoxLayout * l = new QVBoxLayout(this);
 

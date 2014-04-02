@@ -51,11 +51,11 @@ MainWidget::MainWidget(QWidget *parent) :
     QVBoxLayout * l = new QVBoxLayout(this);
     l->setMargin(0);
 
-    //PopGroup * pg = new PopGroup(this);
-    //l->addWidget(pg);
+    PopGroup * pg = new PopGroup(this);
+    l->addWidget(pg);
 
-        QWidget * boardDock = new QWidget();
-        l->addWidget(boardDock);
+        PopWidget * boardDock = new PopWidget(this);
+        //l->addWidget(boardDock);
 
         QLayout * l2 = new QHBoxLayout(boardDock);
         l2->setMargin(0);
@@ -73,10 +73,10 @@ MainWidget::MainWidget(QWidget *parent) :
 
 
         SettingsWidget * settings_ = new SettingsWidget(this);
-        l->addWidget(settings_);
+        //l->addWidget(settings_);
 
-    //pg->addWidget(boardView_);
-    //pg->addWidget(new BoardView(this));
+    pg->addWidget(boardDock);
+    pg->addWidget(settings_);
 
 
     // --- state logic ---

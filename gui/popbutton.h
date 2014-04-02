@@ -39,6 +39,8 @@ public:
 
     explicit PopButton(Dir dir, QWidget *parent = 0);
 
+    void setDir(Dir dir);
+
 signals:
 
 public slots:

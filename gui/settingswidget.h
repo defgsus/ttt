@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef GUI_SETTINGSWIDGET_H
 #define GUI_SETTINGSWIDGET_H
 
-#include <QWidget>
+#include "popwidget.h"
 
-class SettingsWidget : public QWidget
+class SettingsWidget : public PopWidget
 {
     Q_OBJECT
 public:

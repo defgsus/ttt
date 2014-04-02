@@ -27,32 +27,63 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
 PopGroup::PopGroup(QWidget *parent)
-    :   QWidget(parent)
+    :   QWidget (parent),
+        sel_    (0)
 {
     layout_ = new QVBoxLayout(this);
     layout_->setMargin(0);
 
-    /*
-        widget_->setParent(this);
-        layout_->addWidget(widget_);
-
-        QLayout * layout0_ = new QHBoxLayout;
-        ((QVBoxLayout*)layout_)->addLayout(layout0_);
-
-            b_ = new PopButton(this);
-            layout0_->addWidget(b_);
-    */
 }
 
 void PopGroup::addWidget(PopWidget * w)
 {
     widgets_.push_back(w);
 
-    QLayout * l = new QHBoxLayout(w);
-    ((QVBoxLayout*)layout_)->addLayout(l);
+    const int i = widgets_.size() - 1;
 
-        PopButton * b = new PopButton(PopButton::Left, this);
+    if (i>0)
+    {
+        QLayout * l = new QHBoxLayout();
+        ((QVBoxLayout*)layout_)->addLayout(l);
+
+        PopButton * b = new PopButton(PopButton::Up, this);
         l->addWidget(b);
+        buttons_.push_back(b);
 
-        l->addWidget(w);
+        connect(b, &PopButton::clicked, [i,this]()
+        {
+            if (sel_ == i && i>0)
+                setActive(i-1);
+            else
+                setActive(i);
+        });
+    }
+
+    layout_->addWidget(w);
+
+    if (i != sel_)
+        w->setVisible(false);
+}
+
+
+void PopGroup::setActive(int sel)
+{
+    if (sel_ == sel) return;
+
+    widgets_[sel_]->setVisible(false);
+
+    if (sel_ < (int)buttons_.size())
+    {
+        buttons_[sel_]->setDir(PopButton::Down);
+    }
+
+    sel_ = sel;
+
+    widgets_[sel_]->setVisible(true);
+
+    if (sel_ < (int)buttons_.size())
+    {
+        buttons_[sel_]->setDir(PopButton::Up);
+    }
+
 }
