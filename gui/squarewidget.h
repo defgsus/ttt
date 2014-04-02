@@ -34,6 +34,10 @@ public:
     void setSelected(bool sel) { bool u = sel != selected_; selected_ = sel; if (u) update(); }
     bool selected() const { return selected_; }
 
+    /** Default = true */
+    void setClickable(bool clickable) { clickable_ = clickable; if (!clickable_) setSelected(false); }
+    bool isClickable() const { return clickable_; }
+
 signals:
 
     void clicked();
@@ -51,7 +55,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *);
 
     bool hover_;
-    bool selected_;
+    bool selected_,
+         clickable_;
 
     QBrush br_back_, br_hover_;
     QPen pen_select_;

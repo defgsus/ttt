@@ -19,12 +19,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <QPainter>
+#include <QMouseEvent>
 
 #include "squarewidget.h"
 
 SquareWidget::SquareWidget(QWidget *parent)
     :   QWidget (parent),
-        hover_  (0)
+        hover_  (0),
+        selected_(0),
+        clickable_(0)
 {
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -75,8 +78,13 @@ void SquareWidget::leaveEvent(QEvent *)
     update();
 }
 
-void SquareWidget::mousePressEvent(QMouseEvent * )
+void SquareWidget::mousePressEvent(QMouseEvent * e)
 {
+    if (!clickable_)
+        return;
+
+    e->accept();
+
     selected_ = !selected_;
     update();
 

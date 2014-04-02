@@ -44,7 +44,8 @@ signals:
 
 public slots:
 
-    void setNumber(int num);
+    void setNumber(int num, bool sendEvent = false);
+    bool setMaxNumber(int max_num, bool sendEvent = false);
 
 protected:
 

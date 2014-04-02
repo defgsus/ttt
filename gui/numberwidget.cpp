@@ -65,10 +65,11 @@ NumberWidget::NumberWidget(const QString& label, int num, int num_min, int num_m
         }
 
     setNumber(num_);
+    setMaxNumber(max_);
 }
 
 
-void NumberWidget::setNumber(int n)
+void NumberWidget::setNumber(int n, bool sendEvent)
 {
     if (n < min_ || n > max_)
         return;
@@ -83,4 +84,23 @@ void NumberWidget::setNumber(int n)
         if (squares_[i]->selected())
             squares_[i]->setSelected(false);
     }
+
+    if (sendEvent)
+        emit numberChanged(num_);
+}
+
+bool NumberWidget::setMaxNumber(int max_num, bool sendEvent)
+{
+    max_ = max_num;
+
+    for (int i=0; i<len_; ++i)
+        squares_[i]->setClickable(i+min_ <= max_);
+
+    if (num_ > max_)
+    {
+        setNumber(max_, sendEvent);
+        return true;
+    }
+
+    return false;
 }

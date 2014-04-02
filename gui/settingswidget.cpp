@@ -29,6 +29,7 @@ SettingsWidget::SettingsWidget(QWidget *parent)
 {
     QVBoxLayout * l = new QVBoxLayout(this);
 
+
 #define TTT_GUI_ADD_NUM(widget__, key__, label__, min__, max__)      \
     widget__ = new NumberWidget(label__, min__, min__, max__, this); \
     l->addWidget(widget__);                                          \
@@ -38,11 +39,35 @@ SettingsWidget::SettingsWidget(QWidget *parent)
         emit changed();                                              \
     });
 
-    TTT_GUI_ADD_NUM(n_size_,    "size",     "board size (N)", 3, 10);
-    TTT_GUI_ADD_NUM(n_rows_,    "cons",     "row length (X)", 3, 10);
+    n_size_ = new NumberWidget("board size (N)", 3, 3, 9, this);
+    l->addWidget(n_size_);
+    n_rows_ = new NumberWidget("row length (X)", 3, 3, 9, this);
+    l->addWidget(n_rows_);
     TTT_GUI_ADD_NUM(n_depth_,   "depth",    "search depth",   1, 8);
 
 #undef TTT_GUI_ADD_NUM
+
+    connect(n_size_, &NumberWidget::numberChanged, [this](int n)
+    {
+        if (n_rows_->getNumber() > n)
+            n_rows_->setNumber(n, true);
+        AppSettings->setValue("size", n);
+        emit changed();
+        /*
+        if (n_rows_->setMaxNumber(n_size_->getNumber()))
+            AppSettings->setValue("cons", n_rows_->getNumber());
+        AppSettings->setValue("size", n_size_->getNumber());
+        emit changed();
+        */
+    });
+
+    connect(n_rows_, &NumberWidget::numberChanged, [this](int n)
+    {
+        AppSettings->setValue("cons", n);
+        if (n_size_->getNumber() < n)
+            n_size_->setNumber(n, true);
+        emit changed();
+    });
 
     slotReconfigure();
 }
@@ -53,4 +78,5 @@ void SettingsWidget::slotReconfigure()
     n_size_->setNumber(AppSettings->getValue("size").toInt());
     n_rows_->setNumber(AppSettings->getValue("cons").toInt());
     n_depth_->setNumber(AppSettings->getValue("depth").toInt());
+    n_rows_->setMaxNumber(n_size_->getNumber());
 }

@@ -52,9 +52,9 @@ void Board::init()
 
 void Board::setSize(uint size, uint cons)
 {
-    size_ = size;
-    sizesq_ = size*size;
-    cons_ = cons;
+    size_ = std::max(2u, size);
+    sizesq_ = size_ * size_;
+    cons_ = std::min(cons, size_);
     board_.resize(sizesq_);
     score_.resize(sizesq_);
 
