@@ -192,6 +192,26 @@ Move Search::bestMove(Board &b, int maxdepth)
     // update helper size
     helper_.setSize(b);
 
+#ifdef TTT_LIMIT_DEPTH
+
+    // adjust level to number of root nodes
+    Moves moves;
+    helper_.getMoves(b, moves);
+    int numMoves = moves.size();
+
+    if (numMoves > 35)
+        maxdepth = std::min(maxdepth, 4);
+    else
+    if (numMoves > 25)
+        maxdepth = std::min(maxdepth, 6);
+    else
+    if (numMoves > 15)
+        maxdepth = std::min(maxdepth, 8);
+    else
+    if (numMoves > 10)
+        maxdepth = std::min(maxdepth, 10);
+#endif
+
     // setup root node
     Node n(b, &helper_);
 
