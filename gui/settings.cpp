@@ -18,56 +18,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef ENGINE_H
-#define ENGINE_H
+#include "settings.h"
 
-#include <QObject>
-#include <QThread>
+Settings * AppSettings;
 
-#include "engine/board.h"
+Settings::Settings(QObject *parent) :
+    QSettings("com.modular-audio-graphics", "XInARowInNSquare", parent)
+{
 
-namespace TTT {
-class Search;
 }
 
-static const int whatever = qRegisterMetaType<TTT::Move>("TTT::Move");
-
-class Engine : public QThread
+const QMap<QString, QVariant>& Settings::defaultValues() const
 {
-    Q_OBJECT
+    if (map_.empty())
+    {
+        map_.insert("boardSize",     QVariant(5));
+        map_.insert("consecutives",  QVariant(4));
+        map_.insert("maxDepth",      QVariant(4));
+    }
+    return map_;
+}
 
-public:
-    explicit Engine(QObject *parent = 0);
-    ~Engine();
+QVariant Settings::getValue(const QString& key) const
+{
+    const auto i = defaultValues().find(key);
+    Q_ASSERT_X(i != map_.end(), "Settings", "key unkown");
 
-    bool thinking() const { return QThread::isRunning(); }
-
-    /** Stop execution (async) */
-    void stop();
-
-    void setMaxDepth(int d) { maxDepth_ = d; }
-
-signals:
-
-    /** Engine has a move */
-    void moveMade(TTT::Move);
-
-public slots:
-
-    /** Sets a position and starts search */
-    void setBoard(const TTT::Board& b);
-
-    virtual void run();
-
-private:
-
-    TTT::Search * ai_;
-    TTT::Board board_;
-
-    /** minimum move time for ai in ms */
-    int minWaitTime_,
-    /** max search depth in half-moves */
-        maxDepth_;
-};
-
-#endif // ENGINE_H
+    return value(key, i.value());
+}

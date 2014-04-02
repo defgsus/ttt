@@ -42,6 +42,9 @@ signals:
 
 public slots:
 
+    /** Read and apply settings */
+    void slotReconfigure();
+
     /** Move from user */
     void slotMoveMade(TTT::Move s);
 
@@ -58,6 +61,8 @@ public slots:
 
 protected:
 
+    void ignoreEngine();
+
     void updateStackButtons_();
 
 
@@ -70,6 +75,7 @@ protected:
     size_t stack_pos_;
     TTT::BoardHelper helper_;
     Engine * engine_;
+    bool ignoreEngine_;
 
     TTT::Stm playerStm_, engineStm_;
 };

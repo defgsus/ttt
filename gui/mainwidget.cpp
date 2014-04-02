@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QDockWidget>
 
 #include "mainwidget.h"
+#include "settings.h"
 #include "engine.h"
 
 #include "popgroup.h"
@@ -36,6 +37,7 @@ MainWidget::MainWidget(QWidget *parent) :
     board_      (5,4),
     helper_     (board_),
     engine_     (new Engine),
+    ignoreEngine_(false),
     playerStm_  (TTT::X),
     engineStm_  (TTT::O)
 {
@@ -103,8 +105,36 @@ void MainWidget::slotStart()
     boardView_->setBoard(board_);
 }
 
+void MainWidget::slotReconfigure()
+{
+    uint x = AppSettings->getValue("consecutives").toInt(),
+        n = AppSettings->getValue("boardSize").toInt();
+    if (board_.size() != n || board_.consecutives() != x)
+    {
+        ignoreEngine();
+        board_.setSize(n, x);
+        boardView_->setBoard(board_);
+    }
+
+    engine_->setMaxDepth(AppSettings->getValue("maxDepth").toInt());
+}
+
+void MainWidget::ignoreEngine()
+{
+    if (!engine_->thinking()) return;
+
+    ignoreEngine_ = true;
+    engine_->stop();
+}
+
 void MainWidget::slotMoveMade(TTT::Move s)
 {
+    if (ignoreEngine_ && board_.stm() == engineStm_)
+    {
+        ignoreEngine_ = false;
+        return;
+    }
+
     if (s == TTT::InvalidMove)
     {
         // means engine gives up (That's an error actually!)

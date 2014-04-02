@@ -18,56 +18,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ****************************************************************************/
 
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-#include <QObject>
-#include <QThread>
+#include <QSettings>
 
-#include "engine/board.h"
-
-namespace TTT {
-class Search;
-}
-
-static const int whatever = qRegisterMetaType<TTT::Move>("TTT::Move");
-
-class Engine : public QThread
+class Settings : public QSettings
 {
     Q_OBJECT
-
 public:
-    explicit Engine(QObject *parent = 0);
-    ~Engine();
+    explicit Settings(QObject *parent = 0);
 
-    bool thinking() const { return QThread::isRunning(); }
+    QVariant getValue(const QString& key) const;
 
-    /** Stop execution (async) */
-    void stop();
-
-    void setMaxDepth(int d) { maxDepth_ = d; }
+    const QMap<QString, QVariant>& defaultValues() const;
 
 signals:
 
-    /** Engine has a move */
-    void moveMade(TTT::Move);
-
 public slots:
 
-    /** Sets a position and starts search */
-    void setBoard(const TTT::Board& b);
+protected:
 
-    virtual void run();
-
-private:
-
-    TTT::Search * ai_;
-    TTT::Board board_;
-
-    /** minimum move time for ai in ms */
-    int minWaitTime_,
-    /** max search depth in half-moves */
-        maxDepth_;
+    mutable QMap<QString, QVariant> map_;
 };
 
-#endif // ENGINE_H
+extern Settings * AppSettings;
+
+#endif // SETTINGS_H

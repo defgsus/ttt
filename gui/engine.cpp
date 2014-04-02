@@ -60,7 +60,8 @@ signals:
 Engine::Engine(QObject *parent)
     :   QThread (parent),
         ai_     (new TTT::Search),
-        minWaitTime_    (350)
+        minWaitTime_    (350),
+        maxDepth_   (4)
 {
 
 }
@@ -78,7 +79,7 @@ void Engine::run()
     QTime t;
     t.start();
 
-    TTT::Move m = ai_->bestMove(board_, 4);
+    TTT::Move m = ai_->bestMove(board_, maxDepth_);
 
     int e = t.elapsed();
 
@@ -87,6 +88,11 @@ void Engine::run()
         msleep(minWaitTime_ - e);
 
     emit moveMade(m);
+}
+
+void Engine::stop()
+{
+    // XXX TODO
 }
 
 

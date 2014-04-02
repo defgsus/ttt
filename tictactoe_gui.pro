@@ -29,7 +29,8 @@ SOURCES += \
     gui/popwidget.cpp \
     gui/numberwidget.cpp \
     gui/squarewidget.cpp \
-    gui/settingswidget.cpp
+    gui/settingswidget.cpp \
+    gui/settings.cpp
 
 HEADERS += \
     engine/board.h \
@@ -47,7 +48,8 @@ HEADERS += \
     gui/popwidget.h \
     gui/numberwidget.h \
     gui/squarewidget.h \
-    gui/settingswidget.h
+    gui/settingswidget.h \
+    gui/settings.h
 
 FORMS +=
 
