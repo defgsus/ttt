@@ -28,7 +28,13 @@ SettingsWidget::SettingsWidget(QWidget *parent)
 {
     QVBoxLayout * l = new QVBoxLayout(this);
 
-    auto n = new NumberWidget("hello", 1, 0, 5, this);
+    auto n = new NumberWidget("search depth", 4, 1, 8, this);
+    l->addWidget(n);
+
+    n = new NumberWidget("board size (N)", 5, 3, 10, this);
+    l->addWidget(n);
+
+    n = new NumberWidget("row lenth (X)", 4, 3, 10, this);
     l->addWidget(n);
 
 }

@@ -32,13 +32,55 @@ NumberWidget::NumberWidget(const QString& label, int num, int num_min, int num_m
       max_    (num_max),
       len_    (num_max - num_min)
 {
-    QHBoxLayout * l = new QHBoxLayout(this);
+    auto l0 = new QVBoxLayout(this);
+    l0->setMargin(1);
 
-    for (int i = 0; i < len_; ++i)
+        // label
+        auto text = new QLabel(label, this);
+        l0->addWidget(text);
+        QPalette p(palette());
+        p.setColor(QPalette::Text, QColor(255,255,255));
+        text->setPalette(p);
+        QFont f(text->font());
+        f.setPointSize(21);
+        text->setFont(f);
+
+        // individual boxes
+        auto l = new QHBoxLayout();
+        l0->addLayout(l);
+        l->setMargin(1);
+
+        for (int i = 0; i < len_; ++i)
+        {
+            SquareWidget * s = new SquareWidget(this);
+
+            l->addWidget(s);
+            squares_.push_back(s);
+
+            connect(s, &SquareWidget::clicked, [i,this]()
+            {
+                setNumber(i + min_);
+                emit numberChanged(num_);
+            });
+        }
+
+    setNumber(num_);
+}
+
+
+void NumberWidget::setNumber(int n)
+{
+    if (n < min_ || n > max_)
+        return;
+
+    num_ = n;
+
+    for (size_t i=0; i<squares_.size(); ++i)
     {
-        SquareWidget * s = new SquareWidget(this);
-
-        l->addWidget(s);
-        squares_.push_back(s);
+        if ((int)i == num_ - min_)
+            squares_[i]->setSelected(true);
+        else
+        if (squares_[i]->selected())
+            squares_[i]->setSelected(false);
     }
 }

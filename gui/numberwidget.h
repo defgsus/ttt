@@ -36,9 +36,15 @@ public:
     explicit NumberWidget(const QString& label, int num, int num_min, int num_max,
                           QWidget *parent = 0);
 
+    int  getNumber() const { return num_; }
+
 signals:
 
+    void numberChanged(int num);
+
 public slots:
+
+    void setNumber(int num);
 
 protected:
 

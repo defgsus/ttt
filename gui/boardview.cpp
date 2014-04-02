@@ -67,6 +67,8 @@ void BoardView::setBoard(const TTT::Board& b)
 {
 //    qDebug() << "BoardView::setBoard()";
 
+    showMessage_ = -1;
+
     size_ = b.size();
     board_ = b;
 
@@ -158,12 +160,13 @@ void BoardView::resizeEvent(QResizeEvent *e)
     oPen_.setWidth(xPen_.width());
     cPen_.setWidth(xPen_.width());
 
-    mFont_.setPointSizeF(0.3 * sqs_);
+    mFont_.setPixelSize(0.7 * sqs_);
 }
 
 void BoardView::paintEvent(QPaintEvent * )
 {
     QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
     p.setFont(mFont_);
 
     // full background

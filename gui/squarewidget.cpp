@@ -39,11 +39,14 @@ SquareWidget::SquareWidget(QWidget *parent)
 void SquareWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
 
+    // draw square
     p.setPen(Qt::NoPen);
     p.setBrush(hover_? br_hover_ : br_back_);
     p.drawRect(rect());
 
+    // draw cross
     if (selected_)
     {
         const int wi = width() / 10;
@@ -84,8 +87,7 @@ void SquareWidget::resizeEvent(QResizeEvent * )
 {
     if (height() != width())
     {
-        QRect r = geometry();
-        r.setHeight(width());
-        setGeometry(r);
+        setFixedHeight(width());
     }
+
 }

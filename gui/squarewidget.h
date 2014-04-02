@@ -31,7 +31,9 @@ class SquareWidget : public QWidget
 public:
     explicit SquareWidget(QWidget *parent = 0);
 
-//    virtual QSize sizeHint() const { return QSize(width(), width()); }
+    void setSelected(bool sel) { bool u = sel != selected_; selected_ = sel; if (u) update(); }
+    bool selected() const { return selected_; }
+
 signals:
 
     void clicked();
@@ -39,7 +41,6 @@ signals:
 public slots:
 
 protected:
-//    virtual int heightForWidth(int w) const { return w; }
 
     virtual void resizeEvent(QResizeEvent *);
 
