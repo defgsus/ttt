@@ -79,7 +79,7 @@ void BoardView::setBoard(const TTT::Board& b)
     for (size_t i=0; i<size_*size_; ++i)
     {
         PaintWhat w = Nothing;
-        int c = board_.capturedAt(i);
+        int c = board_.blockedAt(i);
         if (c>1)
         {
             w = Locked2;
@@ -150,7 +150,7 @@ void BoardView::resizeEvent(QResizeEvent *e)
         return;
 
     // edge margin
-    margin_ = mi / 20;
+    margin_ = mi / 30;
 
     const int mi2 = mi - margin_*2;
 

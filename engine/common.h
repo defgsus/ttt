@@ -96,6 +96,7 @@ enum PieceType
     Empty, X = 1, O = 2
 };
 
+const uint maxBoardSize = 15; /* for capture bits */
 const Move InvalidMove = -1;
 const int MaxScore = 7000;
 const int WinScore = MaxScore / 2;

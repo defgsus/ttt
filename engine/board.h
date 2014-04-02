@@ -34,27 +34,24 @@ class Board
 
 public:
 
-    enum DirectionFlags
+    enum DirectionShifts
     {
-        D_Up        = 0x01,
-        D_Down      = 0x02,
-        D_Left      = 0x04,
-        D_Right     = 0x08
+        S_LeftUp    =  0,
+        S_Up        =  4,
+        S_RightUp   =  8,
+        S_Left      = 12,
+        S_Right     = 16,
+        S_RightDown = 20,
+        S_Down      = 24,
+        S_LeftDown  = 28
     };
 
-    union BoardData
+    struct BoardData
     {
         uint32_t v;
-#if 0
-        union
-        {
-            /** non-zero when can-capture */
-            unsigned char
-                captureLength,
-            /** DirectionFlags */
-                captureDir;
-        };
-#endif
+
+        /** 4 bits of length for each direction, left-up, up, up-right, right ... */
+        uint32_t cap;
     };
 
     static const Piece pieceMask = 3;
@@ -103,6 +100,13 @@ public:
 
     static char pieceChar(Piece p);
 
+    /** Parses a string like 'a1' and return the move.
+        InvalidMove on error. */
+    Move parseMove(const std::string& str) const;
+
+    /** Returns the alphanum rep */
+    std::string toString(Move m) const;
+
     /** Return piece at given position */
     Piece pieceAt(Square m) const { return board_[m].v & pieceMask; }
     char pieceCharAt(Square m) const { return pieceChar(board_[m].v); }
@@ -113,14 +117,7 @@ public:
     Piece valueAt(Square m) const { return board_[m].v; }
 
     /** Returns 1, 2 or 0 */
-    int capturedAt(Square m) const { return (board_[m].v & captureLockedMask) >> 2; }
-
-    /** Parses a string like 'a1' and return the move.
-        InvalidMove on error. */
-    Move parseMove(const std::string& str) const;
-
-    /** Returns the alphanum rep */
-    std::string toString(Move m) const;
+    int blockedAt(Square m) const { return (board_[m].v & captureLockedMask) >> 2; }
 
     /** Is this a valid move? */
     bool canMoveTo(Stm stm, Move m) const;
@@ -131,6 +128,11 @@ public:
     /** Check for capture possibility from position m along direction xi,yi
         and execute */
     bool exeCapture(Move m, int xi, int yi);
+
+    /** Number of possible captures for stm */
+    int numCaptures() { if (num_captures_<0) getCaptures_(); return num_captures_; }
+
+    //int canBeCaptured()
 
     /** Number of pieces >= size*size ? */
     bool isDraw() const;
@@ -150,6 +152,8 @@ public:
 protected:
 
     void getCaptures_();
+    int getCapture_(Square m, int xi, int yi) const;
+    void exeCapture_(Square m);
 
     uint size_, sizesq_, cons_;
 
@@ -158,9 +162,13 @@ protected:
     /** evaluation buffer */
     std::vector<int> score_;
 
+    // ----- running variables -----
+
     Stm stm_, nstm_;
 
     uint pieces_, ply_;
+    /** if -1, not initialized */
+    int  num_captures_;
 
 };
 
