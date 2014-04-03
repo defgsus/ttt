@@ -185,7 +185,13 @@ void Board::makeMove(Move m)
 
 bool Board::isDraw() const
 {
-    return (pieces() >= size() * size());
+    int u = 0;
+    for (size_t i = 0; i < board_.size(); ++i)
+    {
+        u += (pieceAt(i) == Empty) && (!blockedAt(i));
+    }
+    return u == 0;
+    //return (pieces() >= size() * size());
 }
 
 std::string Board::toString(Move m) const

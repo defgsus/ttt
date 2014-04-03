@@ -300,11 +300,21 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
     TTT_BOARD_CHECK;
 
     m.clear();
+
+    // check captures first
     for (size_t i=0; i<moveOrder_.size(); ++i)
     {
         const Square k = moveOrder_[i];
 
-        if (b.canMoveTo(b.stm_, k))
+        if (b.canMoveTo(b.stm_, k) && b.canCapture(k))
+            m.push_back(k);
+    }
+
+    for (size_t i=0; i<moveOrder_.size(); ++i)
+    {
+        const Square k = moveOrder_[i];
+
+        if (b.canMoveTo(b.stm_, k) && !b.canCapture(k))
             m.push_back(k);
     }
 

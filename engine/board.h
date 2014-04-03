@@ -122,6 +122,9 @@ public:
     /** Is this a valid move? */
     bool canMoveTo(Stm stm, Move m) const;
 
+    /** Can this square capture? */
+    bool canCapture(Square m) const;
+
     /** execute move for stm */
     void makeMove(Move m);
 

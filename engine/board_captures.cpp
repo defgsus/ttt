@@ -38,6 +38,13 @@ int Board::numCapturablePieces() const
     return n;
 }
 
+bool Board::canCapture(Square m) const
+{
+    if (num_captures_ < 0)
+        getCaptures_();
+
+    return board_[m].cap != 0;
+}
 
 
 void Board::getCaptures_() const
