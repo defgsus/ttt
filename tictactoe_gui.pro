@@ -18,6 +18,7 @@ QMAKE_CXXFLAGS_RELEASE += -O2 -DNDEBUG -DTTT_NO_PRINT
 SOURCES += \
     main.cpp \
     engine/board.cpp \
+    engine/board_captures.cpp \
     engine/boardhelper.cpp \
     gui/boardview.cpp \
     gui/engine.cpp \

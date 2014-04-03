@@ -132,6 +132,7 @@ Node Node::getChild(Index i)
     n.isEvaluated = false;
     n.move = moves[i];
     n.board.makeMove(n.move);
+    //TTT_DEBUG(n.board.numAllCaptured());
     n.board.flipStm();
     n.depth++;
 //        TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(n.move));
@@ -214,6 +215,8 @@ Move Search::bestMove(Board &b, int maxdepth)
 
     // setup root node
     Node n(b, &helper_);
+
+    n.board.resetNumAllCaptured();
 
 #ifndef TTT_NO_PRINT
     std::cout << "!";

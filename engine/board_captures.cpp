@@ -131,9 +131,11 @@ int Board::getCapture_(Square m, int xi, int yi) const
 
 
 
-void Board::exeCapture_(Square m)
+int Board::exeCapture_(Square m)
 {
     const int cap = board_[m].cap;
+
+    int count = 0;
 
 #define TTT_EXE_CAPTURE(bp__, xi__, yi__, shift__)   \
     {                                                \
@@ -145,7 +147,9 @@ void Board::exeCapture_(Square m)
             pos += inc;                              \
             /* set empty + flags */                  \
             board_[pos].v = 8;                       \
+            pieces_--;                               \
         }                                            \
+        count += cnt;                                \
     }
 
     TTT_EXE_CAPTURE(m, -1, -1, S_LeftUp);
@@ -158,6 +162,8 @@ void Board::exeCapture_(Square m)
     TTT_EXE_CAPTURE(m, -1,  1, S_LeftDown);
 
 #undef TTT_EXE_CAPTURE
+
+    return count;
 }
 
 

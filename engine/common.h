@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Force one move pause for captured squares */
 #define TTT_CAPTURE_WAIT
 /** Use Alpha-Beta-Pruning */
-#define TTT_ALPHA_BETA
+//#define TTT_ALPHA_BETA
 /** Auto-limit level proportional to number of root nodes */
 #define TTT_LIMIT_DEPTH
 /** Use a greedyness value to cut-off nodes

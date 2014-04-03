@@ -61,6 +61,8 @@ void Board::init()
     ply_ = 0;
 
     num_captures_ = -1;
+    num_last_captured_ = 0;
+    num_all_captured_[X] = num_all_captured_[O] = 0;
 }
 
 void Board::setSize(uint size, uint cons)
@@ -168,7 +170,8 @@ void Board::makeMove(Move m)
     pieces_++;
 
 #ifdef TTT_CAPTURE
-    exeCapture_(m);
+    num_last_captured_ = exeCapture_(m);
+    num_all_captured_[stm_] += num_last_captured_;
     // invalidate previous captures
     num_captures_ = -1;
 #endif

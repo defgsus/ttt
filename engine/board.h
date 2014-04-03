@@ -134,6 +134,12 @@ public:
 
     int numCapturablePieces() const;
 
+    /** Returns number of last captured Pieces (makeMove()) */
+    int numLastCaptured() const { return num_last_captured_; }
+
+    /** Returns number of captured Pieces since start. */
+    int numAllCaptured(Stm stm) const { return num_all_captured_[stm]; }
+    void resetNumAllCaptured() { num_all_captured_[X] = num_all_captured_[O] = 0; }
     //int canBeCaptured()
 
     /** Number of pieces >= size*size ? */
@@ -156,11 +162,20 @@ protected:
     /** Updates one field: board_[m].cap */
     void getCapture_(Square m) const;
 
+    /** Calculates all capture and stores in board_[].cap */
     void getCaptures_() const;
+    /** Count the number of captured pieces along direction.
+        No check for Empty first square! */
     int getCapture_(Square m, int xi, int yi) const;
-    void exeCapture_(Square m);
+    /** Executes all captures for that square as stated by capture bits.
+        Returns number of captured pieces. */
+    int exeCapture_(Square m);
+
+    // ---- config ----
 
     uint size_, sizesq_, cons_;
+
+    // ---- data -----
 
     std::vector<BoardData> board_;
 
@@ -172,8 +187,11 @@ protected:
     Stm stm_, nstm_;
 
     uint pieces_, ply_;
+    mutable int
     /** if -1, not initialized */
-    mutable int  num_captures_;
+        num_captures_,
+        num_all_captured_[4],
+        num_last_captured_;
 
 };
 
