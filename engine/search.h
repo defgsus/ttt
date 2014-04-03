@@ -217,6 +217,7 @@ Move Search::bestMove(Board &b, int maxdepth)
     Node n(b, &helper_);
 
     n.board.resetNumAllCaptured();
+    n.board.clearEvalMap();
 
 #ifndef TTT_NO_PRINT
     std::cout << "!";

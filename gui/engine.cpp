@@ -81,9 +81,9 @@ void Engine::run()
 
     TTT::Move m = ai_->bestMove(board_, maxDepth_);
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
     board_.printBoard(true);
-#endif
+//#endif
 
     int e = t.elapsed();
 

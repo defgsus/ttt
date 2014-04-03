@@ -172,6 +172,7 @@ void Board::makeMove(Move m)
 #ifdef TTT_CAPTURE
     num_last_captured_ = exeCapture_(m);
     num_all_captured_[stm_] += num_last_captured_;
+
     // invalidate previous captures
     num_captures_ = -1;
 #endif

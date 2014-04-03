@@ -96,8 +96,8 @@ void BoardHelper::createMoveOrder_()
 
     // revert (to verify that above is a good basic ordering,
     // at least for current evaluation function ;)
-    //for (auto i : moveOrder_)
-    //    std::cout << " " << i;
+    //for (size_t i = 0; i < moveOrder_.size()/2; ++i)
+    //    std::swap(moveOrder_[i], moveOrder_[moveOrder_.size()-1-i]);
 }
 
 int BoardHelper::getRowValue_(int * row, const int X, const int O) const
@@ -247,8 +247,9 @@ int BoardHelper::eval(const Board& b) const
 {
     TTT_BOARD_CHECK;
 
-    int e = //evalX(b)
-            + 100 * b.numAllCaptured(b.stm())
+    int e = evalX(b)
+            + 40 * (  b.numAllCaptured(X)
+                    - b.numAllCaptured(O) )
             ;
 
     return (b.stm_==X)? e : -e;
@@ -303,6 +304,7 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
     }
 
 #ifdef TTT_RANDOMNESS
+    if (!m.empty())
     for (size_t i=0; i<size_; ++i)
     {
         const uint
