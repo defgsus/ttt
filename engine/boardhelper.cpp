@@ -36,14 +36,16 @@ namespace TTT {
 
 BoardHelper::BoardHelper(uint size, uint consecutives)
     :   size_(size),
-        cons_(consecutives)
+        cons_(consecutives),
+        captureWeight_(0)
 {
     setSize(size_, cons_);
 }
 
 BoardHelper::BoardHelper(const Board& b)
     :   size_(b.size_),
-        cons_(b.cons_)
+        cons_(b.cons_),
+        captureWeight_(0)
 {
     setSize(size_, cons_);
 }
@@ -247,10 +249,7 @@ int BoardHelper::eval(const Board& b) const
 {
     TTT_BOARD_CHECK;
 
-    int e = evalX(b)
-            + 40 * (  b.numAllCaptured(X)
-                    - b.numAllCaptured(O) )
-            ;
+    int e = evalX(b);
 
     return (b.stm_==X)? e : -e;
 }
@@ -276,6 +275,12 @@ int BoardHelper::evalX(const Board& b) const
         // add evaluation value
         u += rowValues_[cnt];
     }
+
+#ifdef TTT_CAPTURE_EVALUATE
+    u += captureWeight_
+            * (  b.numAllCaptured(X)
+               - b.numAllCaptured(O) );
+#endif
 
     return u;
 }

@@ -44,6 +44,8 @@ SettingsWidget::SettingsWidget(QWidget *parent)
     n_rows_ = new NumberWidget("row length (X)", 3, 3, 9, this);
     l->addWidget(n_rows_);
     TTT_GUI_ADD_NUM(n_depth_,   "depth",    "search depth",   1, 8);
+    n_capw_ = new NumberWidget("capture importance", 1, 0, 9, this);
+    l->addWidget(n_capw_);
 
 #undef TTT_GUI_ADD_NUM
 
@@ -69,6 +71,12 @@ SettingsWidget::SettingsWidget(QWidget *parent)
         emit changed();
     });
 
+    connect(n_capw_, &NumberWidget::numberChanged, [this](int n)
+    {
+        AppSettings->setValue("capweight", n * 10);
+        emit changed();
+    });
+
     slotReconfigure();
 }
 
@@ -79,4 +87,5 @@ void SettingsWidget::slotReconfigure()
     n_rows_->setNumber(AppSettings->getValue("cons").toInt());
     n_depth_->setNumber(AppSettings->getValue("depth").toInt());
     n_rows_->setMaxNumber(n_size_->getNumber());
+    n_capw_->setNumber(AppSettings->getValue("capweight").toInt() / 10);
 }

@@ -47,6 +47,8 @@ public:
 
     void setMaxDepth(int d) { maxDepth_ = d; }
 
+    TTT::Search& ai() { return *ai_; }
+
 signals:
 
     /** Engine has a move */

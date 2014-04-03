@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_CAPTURE
 /** Force one move pause for captured squares */
 #define TTT_CAPTURE_WAIT
+/** weight captured pieces in in evaluation */
+#define TTT_CAPTURE_EVALUATE
 /** Use Alpha-Beta-Pruning */
 #define TTT_ALPHA_BETA
 /** Auto-limit level proportional to number of root nodes */

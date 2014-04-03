@@ -95,19 +95,19 @@ Node::Node(const Node &n)
 }
 */
 
-Node::Score Node::evaluate()
+inline Node::Score Node::evaluate()
 {
     const Score s = isEvaluated? evaluation : eval();
     //return std::max(-WinScore,std::min(WinScore, s ));
     return s;
 }
 
-bool Node::isTerminal()
+inline bool Node::isTerminal()
 {
     return (abs(eval()) >= WinScore);
 }
 
-Node::Score Node::eval()
+inline Node::Score Node::eval()
 {
     evaluation = helper->eval(board);
 
@@ -118,15 +118,15 @@ Node::Score Node::eval()
     return evaluation;
 }
 
-bool Node::createChilds()
+inline bool Node::createChilds()
 {
     helper->getMoves(board, moves);
     return !moves.empty();
 }
 
-Node::Index Node::numChilds() const { return moves.size(); }
+inline Node::Index Node::numChilds() const { return moves.size(); }
 
-Node Node::getChild(Index i)
+inline Node Node::getChild(Index i)
 {
     Node n(*this);
     n.isEvaluated = false;
@@ -139,13 +139,13 @@ Node Node::getChild(Index i)
     return n;
 }
 
-void Node::childEvaluated(const Node * c)
+inline void Node::childEvaluated(const Node * c)
 {
     if (depth == 0)
         board.setEvalMap(c->move, -c->score);
 }
 
-void Node::setBestChild(const Node * c)
+inline void Node::setBestChild(const Node * c)
 {
     //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
     bestChildMove = c->move;
@@ -157,12 +157,22 @@ class Search
 {
     public:
 
-    Search() : helper_(3,3) { }
+    Search()
+        :   captureWeight(10),
+            helper_(3,3)
+    { }
 
     /** Return best move for current side-to-move */
     Move bestMove(Board& b, int maxdepth);
 
     // ---------- public member ------------
+
+    // ----- settings --
+
+    int captureWeight;
+
+
+    // ----- stats -----
 
     /** last best score */
     int score;
@@ -188,10 +198,11 @@ private:
 };
 
 
-Move Search::bestMove(Board &b, int maxdepth)
+inline Move Search::bestMove(Board &b, int maxdepth)
 {
     // update helper size
     helper_.setSize(b);
+    helper_.setCaptureWeight(captureWeight);
 
 #ifdef TTT_LIMIT_DEPTH
 

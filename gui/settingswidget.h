@@ -45,7 +45,8 @@ protected:
     NumberWidget
         * n_size_,
         * n_rows_,
-        * n_depth_;
+        * n_depth_,
+        * n_capw_;
 };
 
 #endif // GUI_SETTINGSWIDGET_H

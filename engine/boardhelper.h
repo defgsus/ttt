@@ -44,6 +44,12 @@ public:
     /** Resizes the board accel. structure (if necessary). */
     void setSize(const Board& b);
 
+    // ----- settings ----
+
+    /** Sets the multiplier for evaluation of captured pieces */
+    void setCaptureWeight(int w) { captureWeight_ = w; }
+
+
     // ----- querry ------
 
     /** Returns board value */
@@ -88,7 +94,9 @@ private:
     mutable uint randpointer_;
     static const uint randsize_ = sizeof(randomness_) / sizeof(uint);
 
-    //std::vector<uint> flags_;
+    // ---- settings ---
+
+    int captureWeight_;
 };
 
 

@@ -23,9 +23,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #include <QLayout>
 #include <QDockWidget>
 
+#include "engine.h"
+#include "engine/search.h"
 #include "mainwidget.h"
 #include "settings.h"
-#include "engine.h"
 
 #include "popgroup.h"
 #include "popbutton.h"
@@ -123,6 +124,7 @@ void MainWidget::slotReconfigure()
     }
 
     engine_->setMaxDepth(AppSettings->getValue("depth").toInt());
+    engine_->ai().captureWeight = AppSettings->getValue("capweight").toInt();
 }
 
 void MainWidget::ignoreEngine()
