@@ -102,10 +102,11 @@ void test()
     delete b3;
 }
 
+void test_engines();
+
 int main(int , char **)
 {
-    //return TEST::testNegaMax();
-    //test(); return 0;
+    test_engines(); return 0;
 
     printHelp(true);
 

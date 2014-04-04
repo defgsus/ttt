@@ -132,6 +132,9 @@ public:
         and execute */
     //bool exeCapture(Move m, int xi, int yi);
 
+    /** number of made ply */
+    int numPly() const { return ply_; }
+
     /** Number of possible captures for stm */
     int numCaptures() const { if (num_captures_<0) getCaptures_(); return num_captures_; }
 

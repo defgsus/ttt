@@ -15,12 +15,14 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += --std=c++0x
+QMAKE_CXXFLAGS_RELEASE += -DTTT_NO_PRINT
 
 SOURCES += \
     main.cpp \
     board.cpp \
     boardhelper.cpp \
-    board_captures.cpp
+    board_captures.cpp \
+    test_engines.cpp
 
 HEADERS += \
     board.h \
