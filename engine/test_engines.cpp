@@ -52,7 +52,8 @@ public:
         :   b(5,4),
             bh(b)
     {
-        maxDepth[0] = maxDepth[1] = 2;
+        maxDepth[0] = maxDepth[1] = 4;
+        captureWeight[0] = captureWeight[1] = 0;
 
         do_50_start = false;
         do_fixed_first_move = true;
@@ -61,6 +62,9 @@ public:
 
     void play_game()
     {
+        ai[0].captureWeight = captureWeight[0];
+        ai[1].captureWeight = captureWeight[1];
+
         b.init();
 
         // 50/50 start turn
@@ -150,8 +154,9 @@ public:
 
         // settings
         out << "board " << b.size() << " " << b.consecutives()
-            << "  depth " << maxDepth[0] << ":" << maxDepth[1] << "\n"
-            << "start-side " << (do_50_start? "X/O" : "X")
+            << "  depth " << maxDepth[0] << ":" << maxDepth[1]
+            << "  capture weight " << captureWeight[0] << ":" << captureWeight[1]
+            << "\nstart-side " << (do_50_start? "X/O" : "X")
             << "  fixed-first-move " << (do_fixed_first_move? "yes" : "no")
             << "\n";
         // stats
@@ -202,14 +207,16 @@ public:
         }
 
         printStats();
+        printStats(std::cerr);
     }
 
     void run()
     {
-        for (int i=2; i<=10; ++i)
+        for (int i=0; i<=10; ++i)
         {
-            maxDepth[0] = i;
-            maxDepth[1] = 4;
+            //maxDepth[0] = 4;
+            //maxDepth[1] = 4;
+            captureWeight[0] = i * 10;
             run_test();
         }
     }
@@ -222,7 +229,7 @@ public:
 
     // --- config ---
 
-    int maxDepth[2];
+    int maxDepth[2], captureWeight[2];
     bool
         do_50_start,
         do_fixed_first_move;

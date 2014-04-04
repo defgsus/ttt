@@ -1,0 +1,134 @@
+depth 4:4  start side X  random first move yes
+games 3000 wins 1075:1925 (35.8333%) draws 0
+moves 95601 average 31.867 invalid 0
+wins per start square:
+  110:0       0:123   130:0       0:132   132:0
+    0:120     0:110     0:122     0:117     0:118
+  114:0       0:111   118:0       0:115   117:0
+    0:125     0:129     0:124     0:124     0:113
+  109:0       0:141   126:0       0:101   119:0
+
+depth 5:5  start side X  random first move yes
+games 2380 wins 1725:655 (72.479%) draws 0
+moves 69137 average 29.0492 invalid 0
+wins per start square:
+   96:0      96:0      96:0     107:0     106:0
+   96:0       0:83      0:100   103:0      85:0
+   83:0       0:86     95:0       0:89      0:98
+   99:0       0:106     0:93     91:0      96:0
+   87:0     116:0     104:0      75:0      94:0
+
+
+
+board 5 4  depth 2:2
+start-side X  fixed-first-move yes
+games 25  wins 25:0 (100%)  draws 0
+moves 507  average 20.28  invalid 0
+wins per start square:
+    1:0       1:0       1:0       1:0       1:0
+    1:0       1:0       1:0       1:0       1:0
+    1:0       1:0       1:0       1:0       1:0
+    1:0       1:0       1:0       1:0       1:0
+    1:0       1:0       1:0       1:0       1:0
+
+board 5 4  depth 3:3
+start-side X  fixed-first-move yes
+games 25  wins 7:18 (28%)  draws 0
+moves 519  average 20.76  invalid 0
+wins per start square:
+    0:1       0:1       1:0       0:1       1:0
+    0:1       0:1       0:1       0:1       0:1
+    1:0       0:1       1:0       0:1       1:0
+    0:1       0:1       0:1       0:1       0:1
+    0:1       0:1       1:0       0:1       1:0
+
+board 5 4  depth 4:4
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 795  average 31.8  invalid 0
+wins per start square:
+    1:0       0:1       1:0       0:1       1:0
+    0:1       0:1       0:1       0:1       0:1
+    1:0       0:1       1:0       0:1       1:0
+    0:1       0:1       0:1       0:1       0:1
+    1:0       0:1       1:0       0:1       1:0
+
+board 5 4  depth 5:5
+start-side X  fixed-first-move yes
+games 25  wins 18:7 (72%)  draws 0
+moves 728  average 29.12  invalid 0
+wins per start square:
+    1:0       1:0       1:0       1:0       1:0
+    1:0       0:1       0:1       1:0       1:0
+    1:0       0:1       1:0       0:1       0:1
+    1:0       0:1       0:1       1:0       1:0
+    1:0       1:0       1:0       1:0       1:0
+
+board 5 4  depth 6:6
+start-side X  fixed-first-move yes
+games 25  wins 3:16 (15.7895%)  draws 0
+moves 3719  average 148.76  invalid 0
+wins per start square:
+    1:0       0:1       0:1       0:1       0:1
+    0:1       0:1       0:0       0:1       0:0
+    0:1       0:0       1:0       0:0       0:1
+    0:1       0:1       0:0       0:1       0:0
+    1:0       0:1       0:1       0:1       0:1
+
+
+
+
+board 5 4  depth 2:4
+start-side X  fixed-first-move yes
+games 25  wins 6:16 (27.2727%)  draws 3
+moves 732  average 29.28  invalid 0
+wins per start square:
+     :         :1       1:         :1        :1
+     :1        :1        :1        :1        :1
+    1:         :1       1:         :1       1:
+     :1        :1        :1        :1       1:
+     :         :1       1:         :1        :
+
+board 5 4  depth 3:4
+start-side X  fixed-first-move yes
+games 25  wins 3:22 (12%)  draws 0
+moves 617  average 24.68  invalid 0
+wins per start square:
+     :1        :1       1:         :1        :1
+     :1        :1        :1        :1        :1
+    1:         :1       1:         :1        :1
+     :1        :1        :1        :1        :1
+     :1        :1        :1        :1        :1
+
+board 5 4  depth 4:4
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 795  average 31.8  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:
+     :1        :1        :1        :1        :1
+    1:         :1       1:         :1       1:
+     :1        :1        :1        :1        :1
+    1:         :1       1:         :1       1:
+
+board 5 4  depth 5:4
+start-side X  fixed-first-move yes
+games 25  wins 21:4 (84%)  draws 0
+moves 645  average 25.8  invalid 0
+wins per start square:
+    1:        1:        1:        1:        1:
+    1:        1:         :1       1:        1:
+    1:         :1       1:         :1       1:
+    1:        1:         :1       1:        1:
+    1:        1:        1:        1:        1:
+
+board 5 4  depth 6:4
+start-side X  fixed-first-move yes
+games 25  wins 17:8 (68%)  draws 0
+moves 751  average 30.04  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:
+     :1       1:        1:        1:         :1
+    1:        1:        1:        1:        1:
+     :1       1:        1:        1:         :1
+    1:         :1       1:         :1       1:
