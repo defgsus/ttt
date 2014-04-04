@@ -1,0 +1,121 @@
+board 5 4  depth 6:6  capture weight 0:0
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 827  average 33.08  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:         :1        :1   
+     :1       1:         :1       1:         :1   
+     :1        :1       1:         :1        :1   
+    1:         :1        :1        :1       1:    
+
+board 5 4  depth 6:6  capture weight 10:0
+start-side X  fixed-first-move yes
+games 25  wins 10:15 (40%)  draws 0
+moves 800  average 32  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1        :1       1:    
+     :1        :1       1:         :1       1:    
+     :1        :1        :1        :1       1:    
+    1:         :1       1:         :1       1:    
+
+board 5 4  depth 6:6  capture weight 20:0
+start-side X  fixed-first-move yes
+games 25  wins 19:6 (76%)  draws 0
+moves 753  average 30.12  invalid 0
+wins per start square:
+    1:        1:        1:        1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:        1:        1:        1:    
+
+board 5 4  depth 6:6  capture weight 30:0
+start-side X  fixed-first-move yes
+games 25  wins 16:9 (64%)  draws 0
+moves 686  average 27.44  invalid 0
+wins per start square:
+     :1       1:        1:        1:         :1   
+    1:         :1       1:         :1       1:    
+    1:        1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:        1:        1:         :1   
+
+board 5 4  depth 6:6  capture weight 40:0
+start-side X  fixed-first-move yes
+games 25  wins 17:8 (68%)  draws 0
+moves 665  average 26.6  invalid 0
+wins per start square:
+     :1       1:        1:        1:         :1   
+    1:         :1       1:         :1       1:    
+    1:        1:        1:        1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:        1:        1:         :1   
+
+board 5 4  depth 6:6  capture weight 50:0
+start-side X  fixed-first-move yes
+games 25  wins 16:8 (66.6667%)  draws 1
+moves 675  average 27  invalid 0
+wins per start square:
+     :1       1:        1:        1:         :1   
+    1:         :1       1:         :1       1:    
+    1:        1:         :        1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:        1:        1:         :1   
+
+board 5 4  depth 6:6  capture weight 60:0
+start-side X  fixed-first-move yes
+games 25  wins 16:9 (64%)  draws 0
+moves 674  average 26.96  invalid 0
+wins per start square:
+     :1       1:        1:        1:         :1   
+    1:         :1       1:         :1       1:    
+    1:        1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:        1:        1:         :1   
+
+board 5 4  depth 6:6  capture weight 70:0
+start-side X  fixed-first-move yes
+games 25  wins 16:9 (64%)  draws 0
+moves 776  average 31.04  invalid 0
+wins per start square:
+     :1       1:        1:        1:         :1   
+    1:         :1       1:         :1       1:    
+    1:        1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+     :1       1:        1:        1:         :1   
+
+board 5 4  depth 6:6  capture weight 80:0
+start-side X  fixed-first-move yes
+games 25  wins 20:5 (80%)  draws 0
+moves 802  average 32.08  invalid 0
+wins per start square:
+    1:        1:        1:        1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:        1:        1:        1:    
+
+board 5 4  depth 6:6  capture weight 90:0
+start-side X  fixed-first-move yes
+games 25  wins 20:5 (80%)  draws 0
+moves 802  average 32.08  invalid 0
+wins per start square:
+    1:        1:        1:        1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:         :1       1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:        1:        1:        1:    
+
+board 5 4  depth 6:6  capture weight 100:0
+start-side X  fixed-first-move yes
+games 25  wins 20:4 (83.3333%)  draws 1
+moves 817  average 32.68  invalid 0
+wins per start square:
+    1:        1:        1:        1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:         :        1:        1:    
+    1:         :1       1:         :1       1:    
+    1:        1:        1:        1:        1:    
+
