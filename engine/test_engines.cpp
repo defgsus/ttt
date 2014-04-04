@@ -36,6 +36,7 @@ public:
         int num_games,
             num_draws,
             num_wins[2],
+            num_moves,
             num_invalid_moves,
             num_max_moves_reached,
             num_moves_histogram[MAX_MOVES+1];
@@ -44,15 +45,34 @@ public:
 
 
     TestEngines()
-        :   bh(b)
+        :   b(5,4),
+            bh(b)
     {
         maxDepth[0] = maxDepth[1] = 4;
+
+        do_50_start = false;
+        do_random_first_move = true;
     }
 
 
     void play_game()
     {
         b.init();
+
+        // 50/50 start turn
+        if (do_50_start)
+        {
+            if (stat.num_games & 1)
+                b.flipStm();
+        }
+
+        // start with random move
+        if (do_random_first_move)
+        {
+            b.makeMove(rand()%(b.size()*b.size()));
+            b.flipStm();
+            stat.num_moves++;
+        }
 
 #define TTT_STOP { playing = false; continue; }
 
@@ -74,6 +94,7 @@ public:
             // -- make move --
 
             b.makeMove(m);
+            stat.num_moves++;
 
             if (b.numPly() > MAX_MOVES-1)
             {
@@ -107,7 +128,10 @@ public:
     {
         out << "games " << stat.num_games
             << " X=" << stat.num_wins[0] << " O=" << stat.num_wins[1]
-            << " (" << stat.num_draws << ")"
+            << " (" << stat.num_draws << " draws)\n"
+            << "moves " << stat.num_moves
+            << " average " << ((float)stat.num_moves / stat.num_games)
+            << " invalid " << (stat.num_invalid_moves) << "\n"
             << std::endl;
     }
 
@@ -117,7 +141,16 @@ public:
         bh.setSize(b);
         memset(&stat, 0, sizeof(stat));
 
-        play_game();
+        for (int i=0; i<500; ++i)
+        {
+            if (i!=0 && i%10==0)
+                printStats();
+
+            play_game();
+
+        }
+
+        printStats();
     }
 
     // ----------- public member ------------
@@ -129,7 +162,10 @@ public:
     // --- config ---
 
     int maxDepth[2];
-
+    bool
+        do_50_start,
+        do_random_first_move
+    ;
     // --- stats ----
 
 };
