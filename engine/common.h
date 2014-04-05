@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_LIMIT_DEPTH
 /** Use a greedyness value to cut-off nodes
     EXPERIMENTAL */
-#define TTT_GREEDY
+//#define TTT_GREEDY
 /** randomize moves a little
     CURRENTLY CRAP */
 //#define TTT_RANDOMNESS

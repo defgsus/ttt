@@ -1,0 +1,231 @@
+board 5 4  depth 4:4  capture-weight 0:0  greed -200:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 807  average 32.28  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -195:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 807  average 32.28  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -190:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 807  average 32.28  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -185:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 823  average 32.92  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -180:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 823  average 32.92  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -175:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 867  average 34.68  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -170:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 867  average 34.68  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -165:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 865  average 34.6  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -160:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 875  average 35  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -155:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 875  average 35  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -150:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 11:14 (44%)  draws 0
+moves 857  average 34.28  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -145:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 13:12 (52%)  draws 0
+moves 865  average 34.6  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:        1:        1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -140:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 12:13 (48%)  draws 0
+moves 952  average 38.08  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1       1:        1:         :1   
+     :1       1:         :1       1:        1:    
+     :1       1:        1:         :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -135:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 8:17 (32%)  draws 0
+moves 794  average 31.76  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1        :1        :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -130:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 8:17 (32%)  draws 0
+moves 818  average 32.72  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1        :1        :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -125:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 8:17 (32%)  draws 0
+moves 820  average 32.8  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1        :1        :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -120:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 785  average 31.4  invalid 0
+wins per start square:
+    1:         :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1        :1        :1       1:    
+     :1       1:         :1        :1        :1   
+     :1       1:        1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -115:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 715  average 28.6  invalid 0
+wins per start square:
+     :1        :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1       1:        1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -110:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 9:16 (36%)  draws 0
+moves 693  average 27.72  invalid 0
+wins per start square:
+     :1        :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+    1:         :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -105:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 8:17 (32%)  draws 0
+moves 666  average 26.64  invalid 0
+wins per start square:
+     :1        :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+
+board 5 4  depth 4:4  capture-weight 0:0  greed -100:-  evalDepthMult -:-
+start-side X  fixed-first-move yes
+games 25  wins 8:17 (32%)  draws 0
+moves 726  average 29.04  invalid 0
+wins per start square:
+     :1        :1       1:         :1       1:    
+     :1        :1        :1       1:         :1   
+     :1        :1       1:         :1       1:    
+     :1       1:         :1        :1        :1   
+     :1        :1       1:         :1       1:    
+

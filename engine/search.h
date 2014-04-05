@@ -39,7 +39,11 @@ struct Node
     static Score maxScore() { return MaxScore; }
 
     Node(const Board& b, BoardHelper * helper, Node * parent = 0)
-        :   greed(-TTT::MaxScore),
+        :
+#ifdef TTT_GREEDY
+            greed(-TTT::MaxScore),
+#endif
+            evalDepthMult(0.f),
             parent(parent), score(0), depth(0), board(b), helper(helper),
             bestChildMove(InvalidMove), isEvaluated(false)
     { }
@@ -60,7 +64,7 @@ struct Node
     Index numChilds() const;
     Node getChild(Index i);
     void childEvaluated(const Node * c);
-    void setBestChild(const Node * c);
+    bool setBestChild(const Node * c);
 
     // ---- helper ----
 
@@ -70,7 +74,10 @@ struct Node
 
     // -- config --
 
+#ifdef TTT_GREEDY
     int greed;
+#endif
+    float evalDepthMult;
 
     // -- during search --
 
@@ -87,7 +94,7 @@ struct Node
         bestChildMove;
 
     bool isEvaluated;
-    Score evaluation;
+    Score evaluation_;
 
 };
 
@@ -106,25 +113,31 @@ Node::Node(const Node &n)
 
 inline Node::Score Node::evaluate()
 {
-    const Score s = isEvaluated? evaluation : forceEval();
+    const Score s = isEvaluated? evaluation_ : forceEval();
     //return std::max(-WinScore,std::min(WinScore, s ));
     return s;
 }
 
 inline bool Node::isTerminal()
 {
-    return (abs(evaluate()) >= WinScore);
+    const Score e = evaluate();
+    return (abs(e) >= WinScore)
+#ifdef TTT_GREEDY
+    // prune when too little progress
+       || (depth>=2 && evaluate() < parent->parent->evaluate() + greed)
+#endif
+    ;
 }
 
 inline Node::Score Node::forceEval()
 {
-    evaluation = helper->eval(board);
+    evaluation_ = helper->eval(board);
 
     // rate close wins higher
-    //evaluation /= (depth + 1);
+    evaluation_ *= (1.f + evalDepthMult * depth);
 
     isEvaluated = true;
-    return evaluation;
+    return evaluation_;
 }
 
 inline bool Node::createChilds()
@@ -138,6 +151,7 @@ inline Node::Index Node::numChilds() const { return moves.size(); }
 inline Node Node::getChild(Index i)
 {
     Node n(*this);
+    n.parent = this;
     n.isEvaluated = false;
     n.move = moves[i];
     n.board.makeMove(n.move);
@@ -154,10 +168,12 @@ inline void Node::childEvaluated(const Node * c)
         board.setEvalMap(c->move, -c->score);
 }
 
-inline void Node::setBestChild(const Node * c)
+inline bool Node::setBestChild(const Node * c)
 {
     //TTT_DEBUG(std::setw(depth) << "" << (depth&1? "min " : "max ") << board.toString(c->move) << " " << c->score);
     bestChildMove = c->move;
+
+    return false;
 }
 
 
@@ -171,6 +187,7 @@ class Search
 #ifdef TTT_GREEDY
             greed(-MaxScore),
 #endif
+            evalDepthMult(0.f),
             helper_(3,3)
     { }
 
@@ -185,6 +202,7 @@ class Search
 #ifdef TTT_GREEDY
     int greed;
 #endif
+    float evalDepthMult;
 
     // ----- stats -----
 
@@ -238,7 +256,8 @@ inline Move Search::bestMove(Board &b, int maxdepth)
         maxdepth = std::min(maxdepth, 10);
 #endif
 
-    // setup root node
+    // --- setup root node ---
+
     Node n(b, &helper_);
 
     n.board.resetNumAllCaptured();
@@ -246,6 +265,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
 #ifdef TTT_GREEDY
     n.greed = greed;
 #endif
+    n.evalDepthMult = evalDepthMult;
 
 #ifndef TTT_NO_PRINT
     std::cout << "!";

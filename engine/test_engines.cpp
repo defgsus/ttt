@@ -66,8 +66,10 @@ public:
     {
         maxDepth[0] = maxDepth[1] = 4;
         captureWeight[0] = captureWeight[1] = 0;
+        evalDepthMult[0] = evalDepthMult[1] = 0.f;
+#ifdef TTT_GREEDY
         greed[0] = greed[1] = -MaxScore;
-
+#endif
         do_50_start = false;
         do_fixed_first_move = true;
     }
@@ -77,6 +79,8 @@ public:
     {
         ai[0].captureWeight = captureWeight[0];
         ai[1].captureWeight = captureWeight[1];
+        ai[0].evalDepthMult = evalDepthMult[0];
+        ai[1].evalDepthMult = evalDepthMult[1];
 #ifdef TTT_GREEDY
         ai[0].greed = greed[0];
         ai[1].greed = greed[1];
@@ -172,8 +176,12 @@ public:
         out << "board " << b.size() << " " << b.consecutives()
             << "  depth " << maxDepth[0] << ":" << maxDepth[1]
             << "  capture-weight " << captureWeight[0] << ":" << captureWeight[1]
+#ifdef TTT_GREEDY
             << "  greed " << str_if(greed[0], greed[0] > -MaxScore, "-") << ":"
                           << str_if(greed[1], greed[1] > -MaxScore, "-")
+#endif
+            << "  evalDepthMult " << str_if(evalDepthMult[0], evalDepthMult[0] != 0.f, "-") << ":"
+                                  << str_if(evalDepthMult[1], evalDepthMult[1] != 0.f, "-")
             << "\nstart-side " << (do_50_start? "X/O" : "X")
             << "  fixed-first-move " << (do_fixed_first_move? "yes" : "no")
             << "\n";
@@ -227,9 +235,10 @@ public:
         for (int i=0; i<=20; ++i)
         {
             maxDepth[0] =
-            maxDepth[1] = 5;
+            maxDepth[1] = 4;
             //captureWeight[0] = i * 10;
-            //greed[0] = -1000 + i * 100;
+            //greed[1] = -200 + i * 5;
+            evalDepthMult[0] = -0.1 - (float)i / 200;
             run_test();
         }
     }
@@ -243,6 +252,7 @@ public:
     // --- config ---
 
     int maxDepth[2], captureWeight[2];
+    float evalDepthMult[2];
 #ifdef TTT_GREEDY
     int greed[2];
 #endif

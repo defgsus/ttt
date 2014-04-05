@@ -62,7 +62,8 @@ namespace TTT {
 
         void childEvaluated(Node * c);  // will be called for every evaluated child
 
-        void setBestChild(Node * c);    // will be called frequently, whenever a child node is found current best
+        bool setBestChild(Node * c);    // will be called frequently, whenever a child node is found current best
+                                        // returning TRUE will prune the right side of the tree
     };
     @endcode
 
@@ -239,6 +240,8 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
         if (score > alpha)
         {
             n->score = alpha = score;
+            if (n->setBestChild(&c))
+                return alpha;
         }
 
     }
