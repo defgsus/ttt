@@ -1,0 +1,23 @@
+board 5 4  depth 6:6  capture-weight 0:0  greed -:-  evalDepthMult -:-
+start-side X/O  fixed-first-move yes
+games 50  wins 25:25 (50%)  draws 0
+moves 1788  average 35.76  invalid 0
+wins per start square:
+    1:1       1:1       2:        1:1       1:1   
+     :2       2:        1:1       2:         :2   
+    1:1        :2        :2       2:        2:    
+     :2       1:1       2:        2:         :2   
+    1:1        :2       2:         :2       1:1   
+
+   a b c d e     |      a     b     c     d     e   ply: 0 (X)
+ 1 . . . . .     |      8     8     8     8     8
+ 2 . . . . .     |      8     8     8     8     8
+ 3 . . . . .     |      8     8     8     8     8
+ 4 . . . . .     |      8     8     8     8     8
+ 5 . . . . .     |      8     8     8     8     8
+   a b c d e     |      a     b     c     d     e   ply: 0 (X)
+ 1 . . . . .     |     -2    -2    -2    -2    -2
+ 2 . . . . .     |     -2    -2    -2    -2    -2
+ 3 . . . . .     |     -2    -2    -2    -2    -2
+ 4 . . . . .     |     -2    -2    -2    -2    -2
+ 5 . . . . .     |     -2    -2    -2    -2    -2

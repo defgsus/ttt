@@ -35,7 +35,7 @@ const QMap<QString, QVariant>& Settings::defaultValues() const
         map_.insert("size",     QVariant(5));
         map_.insert("cons",     QVariant(4));
         map_.insert("depth",    QVariant(4));
-        map_.insert("capweight",QVariant(20));
+        map_.insert("capweight",QVariant(70));
     }
     return map_;
 }

@@ -37,7 +37,8 @@ namespace TTT {
 BoardHelper::BoardHelper(uint size, uint consecutives)
     :   size_(size),
         cons_(consecutives),
-        captureWeight_(0)
+        captureWeight_(0),
+        rowMethod_(0)
 {
     setSize(size_, cons_);
 }
@@ -59,6 +60,9 @@ void BoardHelper::setSize(uint size, uint consecutives)
     createRowValues_();
     createMoveOrder_();
     createScanOrder_();
+#ifdef TTT_CAPTURE_EVALUATE
+    createNeighbourOrder_();
+#endif
 
     randpointer_ = rand() & (randsize_-1);
     for (uint i=0; i<randsize_; ++i)
@@ -75,6 +79,15 @@ void BoardHelper::setSize(const Board &b)
 {
     if (b.size_ != size_ || b.cons_ != cons_)
         setSize(b.size_, b.cons_);
+}
+
+void BoardHelper::setRowMethod(int m)
+{
+    if (rowMethod_ == m)
+        return;
+
+    rowMethod_ = m;
+    createRowValues_();
 }
 
 void BoardHelper::createMoveOrder_()
@@ -104,7 +117,17 @@ void BoardHelper::createMoveOrder_()
 
 int BoardHelper::getRowValue_(int * row, const int X, const int O) const
 {
-    // get utility value
+    switch (rowMethod_)
+    {
+        default: return getRowValue0_(row, X, O);
+        case 1: return getRowValue1_(row, X, O);
+    }
+}
+
+int BoardHelper::getRowValue0_(int * row, const int X, const int O) const
+{
+    // -- get probable utility value --
+
     int u = 0, full = 0;
 
     // start by scoring
@@ -151,6 +174,44 @@ int BoardHelper::getRowValue_(int * row, const int X, const int O) const
     if (u<WinScore) u = 0;
     u = std::min(WinScore, u);
 #endif
+
+    return std::max(0,u);
+}
+
+int BoardHelper::getRowValue1_(int * row, const int X, const int O) const
+{
+    // -- get probable utility value --
+
+    int u = 0, own = 0, other = 0;
+
+    // count each
+    for (uint i = 0; i<cons_; ++i)
+    {
+        if (row[i] == X)
+            own++;
+        else
+        if (row[i] == O)
+            other++;
+    }
+
+    // full row?
+    if (own == (int)cons_)
+    {
+        return MaxScore; // win
+    }
+
+    u = own;
+
+    // additional points for consecutiveness
+    for (uint i=0; i<cons_-1; ++i)
+        if (row[i] == X && row[i+1] == X)
+            u *= 2;
+
+    if (own == (int)cons_-1)
+        u *= 10;
+
+    // generally less points when opponent breaks row
+    u /= (1 + 2*other);
 
     return std::max(0,u);
 }
@@ -285,6 +346,56 @@ int BoardHelper::evalX(const Board& b) const
     return u;
 }
 
+#ifdef TTT_CAPTURE_EVALUATE
+
+void BoardHelper::createNeighbourOrder_()
+{
+    neighbours_.resize(sizesq_+1);
+
+    neighbourOrder_.clear();
+
+#define TTT_ADD_N(y, x)                                          \
+    if ((x)>=0 && (x)<(int)size_ && (y)>=0 && (y)<(int)size_)   \
+        neighbourOrder_.push_back((y)*size_+(x));               \
+    else                                                        \
+        neighbourOrder_.push_back(size_);
+
+    for (int j=0; j<(int)size_; ++j)
+    for (int i=0; i<(int)size_; ++i)
+    {
+        TTT_ADD_N(j-1, i-1)
+        TTT_ADD_N(j-1, i  )
+        TTT_ADD_N(j-1, i+1)
+        TTT_ADD_N(j  , i-1)
+        TTT_ADD_N(j  , i+1)
+        TTT_ADD_N(j+1, i-1)
+        TTT_ADD_N(j+1, i  )
+        TTT_ADD_N(j+1, i+1)
+    }
+
+#undef TTT_ADD_N
+}
+
+void BoardHelper::countNeighbours_(const Board& b) const
+{
+    for (auto &i : neighbours_)
+        i = 0;
+
+    auto n = neighbourOrder_.begin();
+    for (size_t i=0; i<sizesq_; ++i)
+    {
+        if (b.pieceAt(i) == Empty)
+        {
+            n+=8;
+            continue;
+        }
+
+        for (size_t j=0; j<8; ++j)
+            neighbours_[*n++]++;
+    }
+}
+#endif
+
 bool BoardHelper::isWin(const Board& b, Stm p) const
 {
     TTT_BOARD_CHECK;
@@ -301,20 +412,35 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
 
     m.clear();
 
+#ifdef TTT_ONLY_CLOSE_VACANT
+    countNeighbours_(b);
+#endif
+
     // check captures first
     for (size_t i=0; i<moveOrder_.size(); ++i)
     {
         const Square k = moveOrder_[i];
 
-        if (b.canMoveTo(b.stm_, k) && b.canCapture(k))
+        if (
+#ifdef TTT_ONLY_CLOSE_VACANT
+                neighbours_[k] &&
+#endif
+                b.canMoveTo(b.stm_, k) && b.canCapture(k)
+            )
             m.push_back(k);
     }
 
+    // non-captures
     for (size_t i=0; i<moveOrder_.size(); ++i)
     {
         const Square k = moveOrder_[i];
 
-        if (b.canMoveTo(b.stm_, k) && !b.canCapture(k))
+        if (
+#ifdef TTT_ONLY_CLOSE_VACANT
+                neighbours_[k] &&
+#endif
+                b.canMoveTo(b.stm_, k) && !b.canCapture(k)
+            )
             m.push_back(k);
     }
 

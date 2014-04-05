@@ -1,0 +1,11 @@
+board 5 4  depth 4:4  capture-weight 0:0  greed -:-  evalDepthMult -:-
+start-side X/O  fixed-first-move yes
+games 50  wins 26:24 (52%)  draws 0
+moves 1627  average 32.54  invalid 0
+wins per start square:
+    2:        1:1       1:1       1:1       1:1   
+     :2       1:1       1:1       1:1       1:1   
+     :2       2:        2:        1:1       1:1   
+    1:1        :2       1:1       1:1       1:1   
+     :2       2:        2:        1:1       1:1   
+

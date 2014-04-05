@@ -35,7 +35,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Use Alpha-Beta-Pruning */
 #define TTT_ALPHA_BETA
 /** Auto-limit level proportional to number of root nodes */
-#define TTT_LIMIT_DEPTH
+//#define TTT_LIMIT_DEPTH
+/** Only search close vacant cells */
+#define TTT_ONLY_CLOSE_VACANT
 /** Use a greedyness value to cut-off nodes
     EXPERIMENTAL */
 #define TTT_GREEDY

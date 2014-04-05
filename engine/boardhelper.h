@@ -49,6 +49,8 @@ public:
     /** Sets the multiplier for evaluation of captured pieces */
     void setCaptureWeight(int w) { captureWeight_ = w; }
 
+    /** Sets the row evaluation scoring method, currently 0 or 1 */
+    void setRowMethod(int m);
 
     // ----- querry ------
 
@@ -75,9 +77,16 @@ public:
 private:
     /** return the evaluation value of one row */
     int getRowValue_(int * row, int x, int o) const;
+    int getRowValue0_(int * row, int x, int o) const;
+    int getRowValue1_(int * row, int x, int o) const;
     void createRowValues_();
     void createMoveOrder_();
     void createScanOrder_();
+
+#ifdef TTT_ONLY_CLOSE_VACANT
+    void createNeighbourOrder_();
+    void countNeighbours_(const Board& b) const;
+#endif
 
     uint size_,
          sizesq_,
@@ -90,6 +99,11 @@ private:
     /** indices to all possible rows. */
     std::vector<uint> scanOrder_;
 
+#ifdef TTT_ONLY_CLOSE_VACANT
+    mutable std::vector<int> neighbours_;
+    std::vector<uint> neighbourOrder_;
+#endif
+
     uint randomness_[0x200];
     mutable uint randpointer_;
     static const uint randsize_ = sizeof(randomness_) / sizeof(uint);
@@ -97,6 +111,7 @@ private:
     // ---- settings ---
 
     int captureWeight_;
+    int rowMethod_;
 };
 
 

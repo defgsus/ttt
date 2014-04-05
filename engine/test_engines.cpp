@@ -85,6 +85,7 @@ public:
         ai[0].greed = greed[0];
         ai[1].greed = greed[1];
 #endif
+        ai[0].rowMethod = 1;
         b.init();
 
         // 50/50 start turn
@@ -234,7 +235,7 @@ public:
 
     void run()
     {
-        for (int i=0; i<=100; ++i)
+        for (int i=0; i<=0; ++i)
         {
             maxDepth[0] =
             maxDepth[1] = 4;
@@ -276,6 +277,15 @@ void test_engines()
     TestEngines test;
 
     test.run();
+
+    Board b(5,4);
+    Search s;
+    s.rowMethod = 0;
+    s.bestMove(b,6);
+    b.printBoard(true);
+    s.rowMethod = 1;
+    s.bestMove(b,6);
+    b.printBoard(true);
 
 }
 

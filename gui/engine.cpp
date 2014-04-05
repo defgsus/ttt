@@ -63,8 +63,9 @@ Engine::Engine(QObject *parent)
         minWaitTime_    (350),
         maxDepth_   (4)
 {
-    ai_->greed = -160;
-    ai_->evalDepthMult = -0.215;
+    //ai_->rowMethod = 1;
+    //ai_->greed = -160;
+    //ai_->evalDepthMult = -0.215;
 }
 
 Engine::~Engine()

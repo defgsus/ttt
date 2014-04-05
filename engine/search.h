@@ -184,6 +184,7 @@ class Search
 
     Search()
         :   captureWeight(10),
+            rowMethod(0),
 #ifdef TTT_GREEDY
             greed(-MaxScore),
 #endif
@@ -199,6 +200,7 @@ class Search
     // ----- settings --
 
     int captureWeight;
+    int rowMethod;
 #ifdef TTT_GREEDY
     int greed;
 #endif
@@ -235,6 +237,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
     // update helper size
     helper_.setSize(b);
     helper_.setCaptureWeight(captureWeight);
+    helper_.setRowMethod(rowMethod);
 
 #ifdef TTT_LIMIT_DEPTH
 
@@ -292,7 +295,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
     nps = (int)( (double)nodes / std::max(1, time) * 1000 );
 
     b.copyEvalFrom(n.board);
-#ifndef TTT_NO_PRINT
+//#ifndef TTT_NO_PRINT
     std::cout << std::endl;
 
     std::cout << " depth " << depth
@@ -304,7 +307,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
               << " nps " << nps
               << " took " << ((double)time/1000) << "s"
               << std::endl;
-#endif
+//#endif
 
     return n.bestChildMove;
 }
