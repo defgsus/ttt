@@ -38,8 +38,9 @@ struct Node
 
     static Score maxScore() { return MaxScore; }
 
-    Node(const Board& b, BoardHelper * helper)
-        :   score(0), depth(0), board(b), helper(helper),
+    Node(const Board& b, BoardHelper * helper, Node * parent = 0)
+        :   greed(-TTT::MaxScore),
+            parent(parent), score(0), depth(0), board(b), helper(helper),
             bestChildMove(InvalidMove), isEvaluated(false)
     { }
 
@@ -63,9 +64,17 @@ struct Node
 
     // ---- helper ----
 
-    Score eval();
+    Score forceEval();
 
     // ----- member -----
+
+    // -- config --
+
+    int greed;
+
+    // -- during search --
+
+    Node * parent;
 
     Score score;
     Moves moves;
@@ -97,17 +106,17 @@ Node::Node(const Node &n)
 
 inline Node::Score Node::evaluate()
 {
-    const Score s = isEvaluated? evaluation : eval();
+    const Score s = isEvaluated? evaluation : forceEval();
     //return std::max(-WinScore,std::min(WinScore, s ));
     return s;
 }
 
 inline bool Node::isTerminal()
 {
-    return (abs(eval()) >= WinScore);
+    return (abs(evaluate()) >= WinScore);
 }
 
-inline Node::Score Node::eval()
+inline Node::Score Node::forceEval()
 {
     evaluation = helper->eval(board);
 
@@ -159,6 +168,9 @@ class Search
 
     Search()
         :   captureWeight(10),
+#ifdef TTT_GREEDY
+            greed(-MaxScore),
+#endif
             helper_(3,3)
     { }
 
@@ -170,7 +182,9 @@ class Search
     // ----- settings --
 
     int captureWeight;
-
+#ifdef TTT_GREEDY
+    int greed;
+#endif
 
     // ----- stats -----
 
@@ -229,6 +243,9 @@ inline Move Search::bestMove(Board &b, int maxdepth)
 
     n.board.resetNumAllCaptured();
     n.board.clearEvalMap();
+#ifdef TTT_GREEDY
+    n.greed = greed;
+#endif
 
 #ifndef TTT_NO_PRINT
     std::cout << "!";

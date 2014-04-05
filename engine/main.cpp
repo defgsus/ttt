@@ -191,13 +191,15 @@ int main(int , char **)
             stack.clear();
             goto reprint_;
         }
+#ifdef TTT_GREEDY
         else if (str.find("greed")==0)
         {
             int g;
             std::cin >> g;
-            //ai.greed(g);
+            ai.greed = g;
             goto ask_;
         }
+#endif
         else if (str == "X" || str == "x")
         {
             if (b.stm() == O)

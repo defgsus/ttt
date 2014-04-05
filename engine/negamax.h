@@ -239,8 +239,8 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
         if (score > alpha)
         {
             n->score = alpha = score;
-            n->setBestChild(&c);
         }
+
     }
 
     n->score = alpha;

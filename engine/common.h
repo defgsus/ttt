@@ -37,8 +37,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Auto-limit level proportional to number of root nodes */
 #define TTT_LIMIT_DEPTH
 /** Use a greedyness value to cut-off nodes
-    NOT USED RIGHT NOW */
-//#define TTT_GREEDY
+    EXPERIMENTAL */
+#define TTT_GREEDY
 /** randomize moves a little
     CURRENTLY CRAP */
 //#define TTT_RANDOMNESS
@@ -86,11 +86,10 @@ typedef Piece               Stm;
 
 /** That's what goes onto a board square.
  *
- * always assumed: first bit is you, second bit is other
  *
  * Current Square/Piece layout:
- * bit 0   : X
- * bit 1   : O
+ * bit 0   : X    \ matches
+ * bit 1   : O    /   PieceType
  * bit 2-3 : capture wait counter
  *
  */

@@ -19,12 +19,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ****************************************************************************/
 
 #include <iomanip>
+#include <sstream>
 
 #include "board.h"
 #include "boardhelper.h"
 #include "search.h"
 
 using namespace TTT;
+
+template <class Streamable>
+std::string str_if(const Streamable& s, bool cond, const std::string& alternative = "")
+{
+    if (!cond) return alternative;
+
+    std::stringstream str;
+    str << s;
+    return str.str();
+}
+
 
 
 class TestEngines
@@ -54,6 +66,7 @@ public:
     {
         maxDepth[0] = maxDepth[1] = 4;
         captureWeight[0] = captureWeight[1] = 0;
+        greed[0] = greed[1] = -MaxScore;
 
         do_50_start = false;
         do_fixed_first_move = true;
@@ -64,7 +77,10 @@ public:
     {
         ai[0].captureWeight = captureWeight[0];
         ai[1].captureWeight = captureWeight[1];
-
+#ifdef TTT_GREEDY
+        ai[0].greed = greed[0];
+        ai[1].greed = greed[1];
+#endif
         b.init();
 
         // 50/50 start turn
@@ -155,7 +171,9 @@ public:
         // settings
         out << "board " << b.size() << " " << b.consecutives()
             << "  depth " << maxDepth[0] << ":" << maxDepth[1]
-            << "  capture weight " << captureWeight[0] << ":" << captureWeight[1]
+            << "  capture-weight " << captureWeight[0] << ":" << captureWeight[1]
+            << "  greed " << str_if(greed[0], greed[0] > -MaxScore, "-") << ":"
+                          << str_if(greed[1], greed[1] > -MaxScore, "-")
             << "\nstart-side " << (do_50_start? "X/O" : "X")
             << "  fixed-first-move " << (do_fixed_first_move? "yes" : "no")
             << "\n";
@@ -175,14 +193,8 @@ public:
             {
                 const int winx = stat.num_wins_per_square[(j*b.size()+i)*2],
                           wino = stat.num_wins_per_square[(j*b.size()+i)*2+1];
-                if (winx)
-                    out << std::right << std::setw(5) << winx << ":";
-                else
-                    out << std::right << std::setw(5) << " " << ":";
-                if (wino)
-                    out << std::left << std::setw(4) << wino << std::right;
-                else
-                    out << std::left << std::setw(4) << " " << std::right;
+                out << std::right << std::setw(5) << str_if(winx, winx!=0) << ":";
+                out << std::left << std::setw(4) << str_if(wino, wino!=0) << std::right;
             }
             out << "\n";
         }
@@ -212,11 +224,12 @@ public:
 
     void run()
     {
-        for (int i=0; i<=10; ++i)
+        for (int i=0; i<=20; ++i)
         {
             maxDepth[0] =
-            maxDepth[1] = 6;
-            captureWeight[0] = i * 10;
+            maxDepth[1] = 5;
+            //captureWeight[0] = i * 10;
+            //greed[0] = -1000 + i * 100;
             run_test();
         }
     }
@@ -230,6 +243,9 @@ public:
     // --- config ---
 
     int maxDepth[2], captureWeight[2];
+#ifdef TTT_GREEDY
+    int greed[2];
+#endif
     bool
         do_50_start,
         do_fixed_first_move;
