@@ -70,7 +70,7 @@ public:
 #ifdef TTT_GREEDY
         greed[0] = greed[1] = -MaxScore;
 #endif
-        do_50_start = false;
+        do_50_start = true;
         do_fixed_first_move = true;
     }
 
@@ -99,7 +99,9 @@ public:
         // start with fixed move
         if (do_fixed_first_move)
         {
-            b.makeMove(start_square = stat.num_games % (b.size()*b.size()));
+            start_square = (stat.num_games / (do_50_start? 2 : 1))
+                                % (b.size()*b.size());
+            b.makeMove(start_square);
             stat.num_moves++;
             b.flipStm();
         }
@@ -216,7 +218,7 @@ public:
         memset(&stat, 0, sizeof(stat));
 
         //const int num = 3000;
-        const int num = b.size() * b.size();
+        const int num = b.size() * b.size() * (do_50_start * 2);
         for (int i=0; i<num; ++i)
         {
             //if (i!=0 && i%10==0)
@@ -232,13 +234,13 @@ public:
 
     void run()
     {
-        for (int i=0; i<=20; ++i)
+        for (int i=0; i<=100; ++i)
         {
             maxDepth[0] =
             maxDepth[1] = 4;
-            //captureWeight[0] = i * 10;
-            //greed[1] = -200 + i * 5;
-            evalDepthMult[0] = -0.1 - (float)i / 200;
+            captureWeight[0] = i * 5;
+            //greed[0] = -200 + i * 5;
+            //evalDepthMult[0] = -0.1 - (float)i / 200;
             run_test();
         }
     }
