@@ -60,7 +60,7 @@ void BoardHelper::setSize(uint size, uint consecutives)
     createRowValues_();
     createMoveOrder_();
     createScanOrder_();
-#ifdef TTT_CAPTURE_EVALUATE
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
     createNeighbourOrder_();
 #endif
 
@@ -337,7 +337,7 @@ int BoardHelper::evalX(const Board& b) const
         u += rowValues_[cnt];
     }
 
-#ifdef TTT_CAPTURE_EVALUATE
+#if defined(TTT_CAPTURE) && defined(TTT_CAPTURE_EVALUATE)
     u += captureWeight_
             * (  b.numAllCaptured(X)
                - b.numAllCaptured(O) );
@@ -346,7 +346,7 @@ int BoardHelper::evalX(const Board& b) const
     return u;
 }
 
-#ifdef TTT_CAPTURE_EVALUATE
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
 
 void BoardHelper::createNeighbourOrder_()
 {
@@ -394,7 +394,7 @@ void BoardHelper::countNeighbours_(const Board& b) const
             neighbours_[*n++]++;
     }
 }
-#endif
+#endif // TTT_ONLY_CLOSE_OCCUPIED
 
 bool BoardHelper::isWin(const Board& b, Stm p) const
 {
@@ -412,23 +412,25 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
 
     m.clear();
 
-#ifdef TTT_ONLY_CLOSE_VACANT
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
     countNeighbours_(b);
 #endif
 
+#ifdef TTT_CAPTURE
     // check captures first
     for (size_t i=0; i<moveOrder_.size(); ++i)
     {
         const Square k = moveOrder_[i];
 
         if (
-#ifdef TTT_ONLY_CLOSE_VACANT
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
                 neighbours_[k] &&
 #endif
                 b.canMoveTo(b.stm_, k) && b.canCapture(k)
             )
             m.push_back(k);
     }
+#endif // TTT_CAPTURE
 
     // non-captures
     for (size_t i=0; i<moveOrder_.size(); ++i)
@@ -436,13 +438,24 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
         const Square k = moveOrder_[i];
 
         if (
-#ifdef TTT_ONLY_CLOSE_VACANT
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
                 neighbours_[k] &&
 #endif
-                b.canMoveTo(b.stm_, k) && !b.canCapture(k)
+                b.canMoveTo(b.stm_, k)
+#ifdef TTT_CAPTURE
+                && !b.canCapture(k)
+#endif
             )
             m.push_back(k);
     }
+
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
+    // first move?
+    if (m.empty())
+    {
+        m.push_back(moveOrder_[0]);
+    }
+#endif
 
 #ifdef TTT_RANDOMNESS
     if (!m.empty())

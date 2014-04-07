@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <iomanip>
 
-
+/*
 #define BOARD_INC_UP         ((int)(-size_))
 #define BOARD_INC_LEFT_UP    ((int)(-size_ - 1))
 #define BOARD_INC_RIGHT_UP   ((int)(-size_ + 1))
@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define BOARD_INC_LEFT_DOWN  ((int)(size_-1))
 #define BOARD_INC_DOWN       ((int)(size_))
 #define BOARD_INC_RIGHT_DOWN ((int)(size_+1))
-
+*/
 
 namespace TTT {
 
@@ -43,6 +43,7 @@ Board::Board(uint size, uint cons)
         sizesq_ (size_ * size_),
         cons_   (cons),
         board_  (sizesq_),
+        cap_    (sizesq_),
         score_  (sizesq_)
 {
     TTT_DEBUG("Board::Board(" << size << ", " << cons << ")");
@@ -52,7 +53,9 @@ Board::Board(uint size, uint cons)
 void Board::init()
 {
     for (auto &i : board_)
-        i.v = Empty;
+        i = Empty;
+    for (auto &i : cap_)
+        i = 0;
     clearEvalMap();
 
     stm_ = X;
@@ -60,9 +63,11 @@ void Board::init()
     pieces_ = 0;
     ply_ = 0;
 
+#ifdef TTT_CAPTURE
     num_captures_ = -1;
     num_last_captured_ = 0;
     num_all_captured_[X] = num_all_captured_[O] = 0;
+#endif
 }
 
 void Board::setSize(uint size, uint cons)
@@ -71,6 +76,7 @@ void Board::setSize(uint size, uint cons)
     sizesq_ = size_ * size_;
     cons_ = std::min(cons, size_);
     board_.resize(sizesq_);
+    cap_.resize(sizesq_);
     score_.resize(sizesq_);
 
     init();
@@ -98,7 +104,7 @@ void Board::init(const std::string& str)
             case 'x': p = 4; break;
             case 'o': p = 8; break;
         }
-        board_[i].v = p;
+        board_[i] = p;
     }
 }
 
@@ -157,7 +163,7 @@ void Board::makeMove(Move m)
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value
     for (auto &i : board_)
-        i.v = (i.v & pieceMask) | (((i.v & captureLockedMask) >> 1) & captureLockedMask);
+        i = (i & pieceMask) | (((i & captureLockedMask) >> 1) & captureLockedMask);
 #endif
 
 #ifdef TTT_CAPTURE
@@ -248,10 +254,10 @@ void Board::printBoard(bool eval, std::ostream& out) const
             for (uint x=0; x<size_; ++x)
             {
                 if (!bigboard_)
-                    out << pieceChar(board_[y*size_+x].v) << " ";
+                    out << pieceChar(board_[y*size_+x]) << " ";
                 else
                 {
-                    switch (board_[y*size_+x].v & pieceMask)
+                    switch (board_[y*size_+x] & pieceMask)
                     {
                     default: if (y1==0) out << "   ";  else out << ".  "; break;
                     case X:  if (y1==0) out << "\\/ "; else out << "/\\ "; break;
@@ -268,9 +274,9 @@ void Board::printBoard(bool eval, std::ostream& out) const
                 {
                     std::cout << " ";
                     //for (int b=3; b>=0; --b)
-                    //    std::cout << (int)(board_[y*size_+x].v & (1<<b));
+                    //    std::cout << (int)(board_[y*size_+x] & (1<<b));
                     for (int b=31; b>=0; --b)
-                        std::cout << (int)((board_[y*size_+x].cap & (1<<b)) != 0)
+                        std::cout << (int)((cap_[y*size_+x] & (1<<b)) != 0)
                                 << ((b&3)==0? " " : "");
                 }
             }

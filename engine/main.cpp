@@ -42,9 +42,9 @@ void printRules(Board b)
 
     std::cout << "\n - X in a row in N^2 - \n"
               << "---------------------------\n"
-              << "try to connect " << b.consecutives() << " of your pieces (X).\n"
+              << "try to connect " << b.consecutives() << " of your pieces (X).\n";
 #ifdef TTT_CAPTURE
-              << "surround the other player to capture/exchange.\n"
+    std::out  << "surround the other player to capture/exchange.\n"
               << "e.g. placing an X at the empty square\n";
     for (size_t i=0; i<b.size(); ++i)
         std::cout << " " << b.pieceCharAt(i);
@@ -106,7 +106,7 @@ void test_engines();
 
 int main(int , char **)
 {
-    test_engines(); return 0;
+    //test_engines(); return 0;
 
     printHelp(true);
 
@@ -136,13 +136,14 @@ int main(int , char **)
     reprint_:
 
         std::cout << std::endl;
-        int caps = b.numCaptures();
         b.printBoard(print_eval);
 
         int eval = bh.eval(b);
         std::cout << std::setw(b.size()*8+10) << ""
                   << " eval " << eval
-                  << " caps " << caps << " (" << b.numCapturablePieces() << ")"
+#ifdef TTT_CAPTURE
+                  << " caps " << b.numCaptures() << " (" << b.numCapturablePieces() << ")"
+#endif
                   << std::endl;
 
     ask_:

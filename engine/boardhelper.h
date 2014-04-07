@@ -83,7 +83,7 @@ private:
     void createMoveOrder_();
     void createScanOrder_();
 
-#ifdef TTT_ONLY_CLOSE_VACANT
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
     void createNeighbourOrder_();
     void countNeighbours_(const Board& b) const;
 #endif
@@ -99,7 +99,7 @@ private:
     /** indices to all possible rows. */
     std::vector<uint> scanOrder_;
 
-#ifdef TTT_ONLY_CLOSE_VACANT
+#ifdef TTT_ONLY_CLOSE_OCCUPIED
     mutable std::vector<int> neighbours_;
     std::vector<uint> neighbourOrder_;
 #endif

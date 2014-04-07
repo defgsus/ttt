@@ -46,14 +46,6 @@ public:
         S_LeftDown  = 28
     };
 
-    struct BoardData
-    {
-        uint32_t v;
-
-        /** 4 bits of length for each direction, left-up, up, up-right, right ... */
-        mutable uint32_t cap;
-    };
-
     static const Piece pieceMask = 3;
     static const Piece captureLockedMask = 4+8;
 
@@ -108,22 +100,24 @@ public:
     std::string toString(Move m) const;
 
     /** Return piece at given position */
-    Piece pieceAt(Square m) const { return board_[m].v & pieceMask; }
-    char pieceCharAt(Square m) const { return pieceChar(board_[m].v); }
+    Piece pieceAt(Square m) const { return board_[m] & pieceMask; }
+    char pieceCharAt(Square m) const { return pieceChar(board_[m]); }
     /** Sets piece flags, nothing else. @p p must be piece bits only! */
-    void setPieceAt(Square m, Piece p) { board_[m].v &= ~pieceMask; board_[m].v |= p; }
+    void setPieceAt(Square m, Piece p) { board_[m] &= ~pieceMask; board_[m] |= p; }
 
     /** Return whatever value is at position @p m */
-    Piece valueAt(Square m) const { return board_[m].v; }
+    Piece valueAt(Square m) const { return board_[m]; }
 
     /** Returns 1, 2 or 0 */
-    int blockedAt(Square m) const { return (board_[m].v & captureLockedMask) >> 2; }
+    int blockedAt(Square m) const { return (board_[m] & captureLockedMask) >> 2; }
 
     /** Is this a valid move? */
     bool canMoveTo(Stm stm, Move m) const;
 
+#ifdef TTT_CAPTURE
     /** Can this square capture? */
     bool canCapture(Square m) const;
+#endif
 
     /** execute move for stm */
     void makeMove(Move m);
@@ -135,6 +129,7 @@ public:
     /** number of made ply */
     int numPly() const { return ply_; }
 
+#ifdef TTT_CAPTURE
     /** Number of possible captures for stm */
     int numCaptures() const { if (num_captures_<0) getCaptures_(); return num_captures_; }
 
@@ -147,6 +142,7 @@ public:
     int numAllCaptured(Stm stm) const { return num_all_captured_[stm]; }
     void resetNumAllCaptured() { num_all_captured_[X] = num_all_captured_[O] = 0; }
     //int canBeCaptured()
+#endif
 
     /** Number of pieces >= size*size ? */
     bool isDraw() const;
@@ -165,6 +161,7 @@ public:
 
 protected:
 
+#ifdef TTT_CAPTURE
     /** Updates one field: board_[m].cap */
     void getCapture_(Square m) const;
 
@@ -176,6 +173,7 @@ protected:
     /** Executes all captures for that square as stated by capture bits.
         Returns number of captured pieces. */
     int exeCapture_(Square m);
+#endif
 
     // ---- config ----
 
@@ -183,7 +181,10 @@ protected:
 
     // ---- data -----
 
-    std::vector<BoardData> board_;
+    std::vector<Piece> board_;
+    /** 4 bits of length for each direction, left-up, up, up-right, right ... */
+    mutable std::vector<uint32_t> cap_;
+
 
     /** evaluation buffer */
     std::vector<int> score_;
@@ -193,11 +194,14 @@ protected:
     Stm stm_, nstm_;
 
     uint pieces_, ply_;
+
+#ifdef TTT_CAPTURE
     mutable int
     /** if -1, not initialized */
         num_captures_,
         num_all_captured_[4],
         num_last_captured_;
+#endif
 
 };
 
@@ -207,7 +211,7 @@ inline char Board::pieceChar(Piece p)
 {
     return p == 0 ?
         '.' : (p&pieceMask) != 0 ?
-                ((p&X) ? 'X' : 'O') : (((p&captureLockedMask)==8)? '2' : '1');
+                ((p&X) ? 'X' : 'O') : (((p&captureLockedMask)==8)? 'x' : 'o');
 }
 
 } // namespace TTT

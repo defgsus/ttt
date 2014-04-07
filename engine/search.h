@@ -263,7 +263,9 @@ inline Move Search::bestMove(Board &b, int maxdepth)
 
     Node n(b, &helper_);
 
+#ifdef TTT_CAPTURE
     n.board.resetNumAllCaptured();
+#endif
     n.board.clearEvalMap();
 #ifdef TTT_GREEDY
     n.greed = greed;
