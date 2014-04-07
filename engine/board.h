@@ -129,6 +129,9 @@ public:
     /** number of made ply */
     int numPly() const { return ply_; }
 
+    /** Number of pieces on board. */
+    int numPieces() const { return pieces_; }
+
 #ifdef TTT_CAPTURE
     /** Number of possible captures for stm */
     int numCaptures() const { if (num_captures_<0) getCaptures_(); return num_captures_; }

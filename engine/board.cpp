@@ -163,7 +163,7 @@ void Board::makeMove(Move m)
 #ifdef TTT_CAPTURE_WAIT
     // decrease the capture-block value
     for (auto &i : board_)
-        i = (i & pieceMask) | (((i & captureLockedMask) >> 1) & captureLockedMask);
+       i = (i & pieceMask) | (((i & captureLockedMask) >> 1) & captureLockedMask);
 #endif
 
 #ifdef TTT_CAPTURE

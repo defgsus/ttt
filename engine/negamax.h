@@ -165,8 +165,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Node * n)
     if (depth >= maxDepth_)
     {
         evals_++;
-        n->score = n->evaluate();
-        return n->score;
+        return n->score = n->evaluate();
     }
 
     Score maxv = -Node::maxScore();
@@ -246,8 +245,7 @@ typename NegaMax<Node>::Score NegaMax<Node>::negamax_(int depth, Score alpha, Sc
 
     }
 
-    n->score = alpha;
-    return alpha;
+    return n->score = alpha;
 }
 
 

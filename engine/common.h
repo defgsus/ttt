@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define TTT_CAPTURE
 /** Force one move pause for captured squares */
 #define TTT_CAPTURE_WAIT
-/** weight captured pieces in in evaluation */
+/** weight captured pieces in evaluation */
 #define TTT_CAPTURE_EVALUATE
 /** Use Alpha-Beta-Pruning */
 #define TTT_ALPHA_BETA
@@ -39,10 +39,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /** Only search close to occupied cells */
 //#define TTT_ONLY_CLOSE_OCCUPIED
 /** Use a greedyness value to cut-off nodes
-    EXPERIMENTAL */
+    EXPERIMENTAL (and not good) */
 //#define TTT_GREEDY
 /** randomize moves a little
-    CURRENTLY CRAP */
+    CURRENTLY EXPERIMENTAL */
 #define TTT_RANDOMNESS
 /** Use a hash table (worse performance in threading mode
     NOT USED RIGHT NOW */

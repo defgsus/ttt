@@ -82,11 +82,6 @@ public:
         ai[1].captureWeight = captureWeight[1];
         ai[0].evalDepthMult = evalDepthMult[0];
         ai[1].evalDepthMult = evalDepthMult[1];
-#ifdef TTT_GREEDY
-        ai[0].greed = greed[0];
-        ai[1].greed = greed[1];
-#endif
-        ai[0].rowMethod = 1;
         b.init();
 
         // 50/50 start turn
@@ -245,7 +240,12 @@ public:
         do_50_start = true;
         do_fixed_first_move = false;
         do_rnd_first_move = true;
-        captureWeight[0] = 50;
+        //captureWeight[0] = 50;
+        ai[0].rowMethod = 1;
+        //evalDepthMult[0] = 0.9;
+#ifdef TTT_GREEDY
+        ai[0].greed = 100;
+#endif
 
         const int num = 3000;
         for (int i=0; i<num; ++i)
@@ -262,6 +262,7 @@ public:
 
     void run()
     {
+        srand(time(0));
         run_one_on_one(); return;
 
         for (int i=0; i<=0; ++i)

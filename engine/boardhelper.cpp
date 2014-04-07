@@ -97,6 +97,7 @@ void BoardHelper::createMoveOrder_()
     for (auto &i : moveOrder_)
         i = 0;
 
+#if (1)
     // use an ulam spiral to create indices
     // that start in the middle and expand towards edges
     const int sh = (size_ >> 1) - !(size_&1);
@@ -113,6 +114,10 @@ void BoardHelper::createMoveOrder_()
     // at least for current evaluation function ;)
     //for (size_t i = 0; i < moveOrder_.size()/2; ++i)
     //    std::swap(moveOrder_[i], moveOrder_[moveOrder_.size()-1-i]);
+#else
+    for (uint i=0; i<moveOrder_.size(); ++i)
+        moveOrder_[i] = i;
+#endif
 }
 
 int BoardHelper::getRowValue_(int * row, const int X, const int O) const
@@ -212,6 +217,7 @@ int BoardHelper::getRowValue1_(int * row, const int X, const int O) const
 
     // generally less points when opponent breaks row
     u /= (1 + 2*other);
+    //if (other) u = 0;
 
     return std::max(0,u);
 }
@@ -414,7 +420,19 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
 
 #ifdef TTT_ONLY_CLOSE_OCCUPIED
     countNeighbours_(b);
-#endif
+
+    // first move?
+    if (b.numPieces() == 0)
+    {
+        for (size_t i=0; i<moveOrder_.size(); ++i)
+        {
+            const Square k = moveOrder_[i];
+            if (b.canMoveTo(b.stm_, k))
+                m.push_back(k);
+        }
+        return;
+    }
+#endif // TTT_ONLY_CLOSE_OCCUPIED
 
 #ifdef TTT_CAPTURE
     // check captures first
@@ -437,36 +455,16 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
     {
         const Square k = moveOrder_[i];
 
-        if (
+        if (    b.canMoveTo(b.stm_, k)
 #ifdef TTT_ONLY_CLOSE_OCCUPIED
-                neighbours_[k] &&
+                && neighbours_[k]
 #endif
-                b.canMoveTo(b.stm_, k)
 #ifdef TTT_CAPTURE
                 && !b.canCapture(k)
 #endif
             )
             m.push_back(k);
     }
-
-#ifdef TTT_ONLY_CLOSE_OCCUPIED
-    // first move?
-    if (m.empty())
-    {
-        m.push_back(moveOrder_[0]);
-    }
-#endif
-
-#ifdef TTT_RANDOMNESS
-    /*if (!m.empty())
-    for (size_t i=0; i<size_; ++i)
-    {
-        const uint
-            f = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size(),
-            t = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size();
-        std::swap(m[f], m[t]);
-    }*/
-#endif
 
 }
 
