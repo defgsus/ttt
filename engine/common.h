@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
     NOT USED RIGHT NOW */
 //#define TTT_THREADED
 /** Allow captures */
-//#define TTT_CAPTURE
+#define TTT_CAPTURE
 /** Force one move pause for captured squares */
 #define TTT_CAPTURE_WAIT
 /** weight captured pieces in in evaluation */
@@ -40,10 +40,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //#define TTT_ONLY_CLOSE_OCCUPIED
 /** Use a greedyness value to cut-off nodes
     EXPERIMENTAL */
-#define TTT_GREEDY
+//#define TTT_GREEDY
 /** randomize moves a little
     CURRENTLY CRAP */
-//#define TTT_RANDOMNESS
+#define TTT_RANDOMNESS
 /** Use a hash table (worse performance in threading mode
     NOT USED RIGHT NOW */
 //#define TTT_TRANSPOSITION_TABLE

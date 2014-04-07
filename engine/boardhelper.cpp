@@ -200,15 +200,15 @@ int BoardHelper::getRowValue1_(int * row, const int X, const int O) const
         return MaxScore; // win
     }
 
-    u = own;
+    u = own * 5;
 
     // additional points for consecutiveness
-    for (uint i=0; i<cons_-1; ++i)
-        if (row[i] == X && row[i+1] == X)
-            u *= 2;
+    //for (uint i=0; i<cons_-1; ++i)
+    //    if (row[i] == X && row[i+1] == X)
+    //        u *= 2;
 
-    if (own == (int)cons_-1)
-        u *= 10;
+    //if (own == (int)cons_-1)
+    //    u *= 10;
 
     // generally less points when opponent breaks row
     u /= (1 + 2*other);
@@ -458,14 +458,14 @@ void BoardHelper::getMoves(const Board& b, Moves &m) const
 #endif
 
 #ifdef TTT_RANDOMNESS
-    if (!m.empty())
+    /*if (!m.empty())
     for (size_t i=0; i<size_; ++i)
     {
         const uint
             f = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size(),
             t = (randomness_[(randpointer_++) & (randsize_-1)] ) % m.size();
         std::swap(m[f], m[t]);
-    }
+    }*/
 #endif
 
 }

@@ -122,6 +122,9 @@ inline bool Node::isTerminal()
 {
     const Score e = evaluate();
     return (abs(e) >= WinScore)
+#ifdef TTT_RANDOMNESS
+            || (depth>1 && (rand()&0xff) == 0)
+#endif
 #ifdef TTT_GREEDY
     // prune when too little progress
        || (depth>=2 && evaluate() < parent->parent->evaluate() + greed)
@@ -297,7 +300,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
     nps = (int)( (double)nodes / std::max(1, time) * 1000 );
 
     b.copyEvalFrom(n.board);
-//#ifndef TTT_NO_PRINT
+#ifndef TTT_NO_PRINT
     std::cout << std::endl;
 
     std::cout << " depth " << depth
@@ -309,7 +312,7 @@ inline Move Search::bestMove(Board &b, int maxdepth)
               << " nps " << nps
               << " took " << ((double)time/1000) << "s"
               << std::endl;
-//#endif
+#endif
 
     return n.bestChildMove;
 }

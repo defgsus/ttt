@@ -72,6 +72,7 @@ public:
 #endif
         do_50_start = true;
         do_fixed_first_move = true;
+        do_rnd_first_move = false;
     }
 
 
@@ -98,10 +99,13 @@ public:
         int start_square = -1;
 
         // start with fixed move
-        if (do_fixed_first_move)
+        if (do_fixed_first_move || do_rnd_first_move)
         {
-            start_square = (stat.num_games / (do_50_start? 2 : 1))
+            if (!do_rnd_first_move)
+                start_square = (stat.num_games / (do_50_start? 2 : 1))
                                 % (b.size()*b.size());
+            else
+                start_square = rand() % (b.size()*b.size());
             b.makeMove(start_square);
             stat.num_moves++;
             b.flipStm();
@@ -233,13 +237,38 @@ public:
         printStats(std::cerr);
     }
 
+    void run_one_on_one()
+    {
+        bh.setSize(b);
+        memset(&stat, 0, sizeof(stat));
+
+        do_50_start = true;
+        do_fixed_first_move = false;
+        do_rnd_first_move = true;
+        captureWeight[0] = 50;
+
+        const int num = 3000;
+        for (int i=0; i<num; ++i)
+        {
+            if (i!=0 && i%10==0)
+                printStats();
+
+            play_game();
+
+        }
+
+        printStats();
+    }
+
     void run()
     {
+        run_one_on_one(); return;
+
         for (int i=0; i<=0; ++i)
         {
             maxDepth[0] =
             maxDepth[1] = 4;
-            captureWeight[0] = i * 5;
+            //captureWeight[0] = i * 5;
             //greed[0] = -200 + i * 5;
             //evalDepthMult[0] = -0.1 - (float)i / 200;
             run_test();
@@ -261,7 +290,8 @@ public:
 #endif
     bool
         do_50_start,
-        do_fixed_first_move;
+        do_fixed_first_move,
+        do_rnd_first_move;
     ;
     // --- stats ----
 

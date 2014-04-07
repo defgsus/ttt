@@ -44,7 +44,7 @@ void printRules(Board b)
               << "---------------------------\n"
               << "try to connect " << b.consecutives() << " of your pieces (X).\n";
 #ifdef TTT_CAPTURE
-    std::out  << "surround the other player to capture/exchange.\n"
+    std::cout << "surround the other player to capture/exchange.\n"
               << "e.g. placing an X at the empty square\n";
     for (size_t i=0; i<b.size(); ++i)
         std::cout << " " << b.pieceCharAt(i);
@@ -53,7 +53,7 @@ void printRules(Board b)
     for (size_t i=0; i<b.size(); ++i)
         std::cout << " " << b.pieceCharAt(i);
 #ifdef TTT_CAPTURE_WAIT
-    std::cout << "\n\nwhile the ~ square is blocked for two plies.";
+    std::cout << "\n\nwhile the " << b.pieceCharAt(1) << " square is blocked for two plies.";
 #endif
 
 #endif
@@ -73,8 +73,9 @@ void printHelp(bool shrt = false)
               << "'help' and 'rules'\n"
               << std::endl;
     if (shrt) return;
+
     std::cout << "'x' and 'o' selects the player.\n"
-              << "'play x' starts playing x two-plys\n"
+              << "'play n' starts playing n moves\n"
               << "'size s n' sets the board to s by s squares and \n"
               << " the number of pieces, to be connected, to n.\n"
 #ifdef TTT_GREEDY
@@ -82,11 +83,12 @@ void printHelp(bool shrt = false)
               << " to consider child nodes with less improvement unworthy.\n"
               << " a negative value cuts off nodes that declined more than this.\n"
 #endif
+
+#ifdef TTT_KEEP_TREE
+              << "/* not implemented */\n"
               << "\n'tree' shows previous search nodes\n"
               << " the max. displayed depth can be set with 'tree1' to 'tree9'\n"
               << "'btree' shows only the winner branch.\n"
-#ifndef TTT_KEEP_TREE
-              << " /* note, due to compile switch, only the first level is accessible */\n"
 #endif
               << "\n"
               << std::endl;
@@ -106,7 +108,7 @@ void test_engines();
 
 int main(int , char **)
 {
-    //test_engines(); return 0;
+    test_engines(); return 0;
 
     printHelp(true);
 
@@ -123,12 +125,7 @@ int main(int , char **)
     //b.init("X..XX.o.....o....OXXX..XX");
     //b.init("O.O.XO..XXX...XXX.XOXXXOX");
     //std::cout << b.eval(X) << "\n"; return 0;
-/*     X . . X X     |        -7000 -7000
-     2 . 2 . . .     |  -7000  -196 -7000 -7000 -7000
-     3 . . 2 . .     |  -7000 -7000  -356 -7000 -7000
-     4 . . O X X     |  -7000 -7000
-     5 X . . X X
-*/
+
     std::vector<Board> stack;
 
     while (true)
@@ -263,6 +260,7 @@ int main(int , char **)
         if (bh.isOver(b))
         {
             std::cout << "the game is over, buddy" << std::endl;
+            autoplay = 0;
             goto ask_;
         }
 
